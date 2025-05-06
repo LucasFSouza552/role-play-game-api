@@ -6,6 +6,6 @@ export interface Mission {
     description: string;
     difficulty: MissionDifficult;
     targetDate: Date;
-    XP: number;
-    money: number;
+    XP?: number;
+    money?: number;
 }
