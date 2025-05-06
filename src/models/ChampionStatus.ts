@@ -6,5 +6,5 @@ export interface ChampionStatus {
     intelligence: number;
     vitality: number;
     XP: ValueRange;
-    Level: number;
+    level: number;
 }
