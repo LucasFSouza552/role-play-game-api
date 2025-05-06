@@ -1,9 +1,8 @@
-import { statValue } from "./StatsValue";
+import { ValueRange } from "./ValueRange";
 
 export interface ChampionRole {
     name: string;
-    HP: statValue;
-    MP: statValue;
-    EP: statValue;
+    HP: ValueRange;
+    MP: ValueRange;
+    EP: ValueRange;
 }
-

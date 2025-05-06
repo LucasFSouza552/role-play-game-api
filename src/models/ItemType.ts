@@ -1,4 +1,4 @@
-export enum ItemsType {
+export enum ItemType {
     SPELLS = "Spells",
     ARMOUR = "Armour",
     WEAPONS = "Weapons",
