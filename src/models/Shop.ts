@@ -1,8 +1,8 @@
-import { ShopType } from "./ShopType";
+import { ItemsType } from "./ItemsType";
 
 export interface Shop {
     name: string;
     inventory: [];
-    type: ShopType;
+    type: ItemsType;
     owner: string;
 }
