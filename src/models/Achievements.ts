@@ -1,4 +1,6 @@
 export interface Achievement {
     id:number;
-    guildId:number;
+    name:string;
+    description:string;
+    missionId:number;
 }
