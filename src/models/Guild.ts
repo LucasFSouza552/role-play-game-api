@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-export interface Guild {
-    
-=======
 import { Achievement } from "./Achievements";
 import { Champion } from "./Champion";
 
@@ -11,5 +7,4 @@ export interface Guild {
     level:number;
     champions:Champion[];
     achievements:Achievement[];
->>>>>>> guild
 }
