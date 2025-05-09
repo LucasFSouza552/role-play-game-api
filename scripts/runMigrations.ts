@@ -1,12 +1,12 @@
 import { knex } from 'knex';
-import config from './config/knexfile';
+import config from '../src/config/knexfile';
 
 async function runMigrations() {
   const db = knex(config.development);
 
   try {
     console.log('Iniciando as migrations...');
-    const a = await db.migrate.latest();
+    const a = await db.migrate.latest
     console.log(a)
     console.log('Migrations aplicadas com sucesso!');
   } catch (error) {
