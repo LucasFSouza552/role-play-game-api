@@ -1,5 +1,5 @@
 import { knex } from 'knex';
-import config from '../src/config/knexfile';
+import config from '../knexfile';
 
 async function runMigrations() {
   const db = knex(config.development);

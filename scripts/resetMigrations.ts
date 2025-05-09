@@ -1,5 +1,5 @@
 import { knex } from 'knex';
-import config from '../src/config/knexfile'; // ajuste o caminho conforme seu projeto
+import config from '../knexfile'; // ajuste conforme necessário
 
 async function hardResetAllMigrations() {
   const db = knex(config.development);
@@ -16,14 +16,20 @@ async function hardResetAllMigrations() {
 
     const tables = tablesResult.rows.map((row: any) => row.tablename);
 
-    // Apaga todas as tabelas
     for (const table of tables) {
-      console.log(`-> Dropando tabela: ${table}`);
-      await db.raw(`DROP TABLE IF EXISTS "${table}" CASCADE`);
+      try {
+        console.log(`-> Dropando tabela: ${table}`);
+        await db.raw(`DROP TABLE IF EXISTS "${table}" CASCADE`);
+      } catch (err) {
+        if (err instanceof Error) {
+          console.warn(`⚠️ Erro ao apagar tabela "${table}": ${err.message}`);
+        } else {
+          console.warn(`⚠️ Erro desconhecido ao apagar tabela "${table}":`, err);
+        }
+      }
     }
 
     console.log('🧹 Limpando histórico de migrations...');
-    // Apaga a tabela de histórico de migrations (knex_migrations)
     await db.raw('DROP TABLE IF EXISTS knex_migrations');
     await db.raw('DROP TABLE IF EXISTS knex_migrations_lock');
 

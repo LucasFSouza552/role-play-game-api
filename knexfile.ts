@@ -9,13 +9,17 @@ const knexConfig: { [key: string]: Knex.Config } = {
         client: 'pg',
         connection: {
             host: process.env.DB_HOST,
-            user: 'postgres',
-            password: "nova_senha" as string,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
             database: process.env.DB_DATABASE,
         },
         migrations: {
-            directory: path.join(__dirname, '../migrations'), // Ajuste o caminho para o diretório de migrações
+            directory: path.join(__dirname, './migrations'), // Ajuste o caminho para o diretório de migrações
         },
+        seeds:{
+            directory: path.join(__dirname, './seeds'), // Ajuste o caminho para o diretório de migrações
+
+        }
     }
 };
 

@@ -7,4 +7,5 @@ export interface ChampionStatus {
     vitality: number;
     XP: ValueRange;
     level: number;
+    SP: number; // Pontos para aplicar ao status
 }
