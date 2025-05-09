@@ -33,7 +33,6 @@
         - Descrição
         - Raridade
         - Nível
-        - Preço (mínimo)
-        - Preço (máximo)
+        - Preço (Mínimo e Máximo)
 
 ---

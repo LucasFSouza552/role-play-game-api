@@ -1,4 +1,4 @@
-import { MissionDifficult } from "./MissionDifficult";
+import { MissionDifficult } from "./enums/MissionDifficult";
 
 export interface Mission {
     id: number;

@@ -1,10 +1,10 @@
-import { statValue } from "./StatsValue";
+import { ValueRange } from "./ValueRange";
 
 export interface ChampionStatus {
     strength: number;
     dexterity: number;
     intelligence: number;
     vitality: number;
-    XP: statValue;
-    Level: number;
+    XP: ValueRange;
+    level: number;
 }

@@ -1,6 +1,7 @@
-import { skillTarget } from "./SkillTarget";
+import { skillTarget } from "./types/SkillTarget";
 
 export interface ChampionSkill {
+    id: number;
     name: string;
     description: string;
     power: number;
