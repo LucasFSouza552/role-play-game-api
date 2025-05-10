@@ -5,7 +5,8 @@ export interface ChampionStatus {
     dexterity: number;
     intelligence: number;
     vitality: number;
+    HP: number;
     XP: ValueRange;
+    SP: number;
     level: number;
-    SP: number; // Pontos para aplicar ao status
 }

@@ -14,10 +14,10 @@ const knexConfig: { [key: string]: Knex.Config } = {
             database: process.env.DB_DATABASE,
         },
         migrations: {
-            directory: path.join(__dirname, './migrations'), // Ajuste o caminho para o diretório de migrações
+            directory: path.join(__dirname, './migrations'),
         },
         seeds:{
-            directory: path.join(__dirname, './seeds'), // Ajuste o caminho para o diretório de migrações
+            directory: path.join(__dirname, './seeds'),
 
         }
     }

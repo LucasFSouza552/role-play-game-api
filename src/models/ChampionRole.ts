@@ -4,7 +4,7 @@ export interface ChampionRole {
     id: number;
     name: string;
     description: string;
-    HP: ValueRange;
-    MP: ValueRange;
-    EP: ValueRange;
+    HP: number;
+    MP: number;
+    EP: number;
 }
