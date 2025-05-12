@@ -1,16 +1,17 @@
-import { Champion } from './../models/Champion';
 import { Request, Response } from "express";
 import { ChampionService } from "../services/ChampionsService";
 import { Filters, defaultFilters } from "../models/Filters";
+import { validate } from 'uuid';
+import ValidateChampionId from "../utils/validateChampionId";
 
 const championService = new ChampionService();
 export class ChampionController {
 	async getAll(req: Request, res: Response) {
 		try {
-			const filters: Filters = {...defaultFilters, ...req.query};
+			const filters: Filters = { ...defaultFilters, ...req.query };
 			const champions = await championService.getAllChampions(filters);
 
-			res.status(200).json({champions: champions, length: champions.length});
+			res.status(200).json({ champions: champions, length: champions.length });
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
 		}
@@ -18,8 +19,14 @@ export class ChampionController {
 
 	async getById(req: Request, res: Response) {
 		try {
-			const id = req.params.id;
-			const champion = await championService.getChampionById(id);
+			const championId = req.params.id;
+
+			if (!ValidateChampionId(championId)) {
+				res.status(400).send({ error: "ID é inválido" })
+				return;
+			}
+
+			const champion = await championService.getChampionById(championId);
 			res.status(200).json(champion);
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
@@ -31,7 +38,8 @@ export class ChampionController {
 			const champion = req.body;
 
 			if (!champion.name || !champion.roleName) {
-				throw new Error('Campeão inválido');
+				res.status(400).json({ error: "Falta informação necessária para criar um campeão" });
+				return;
 			}
 
 			const newChampion = await championService.createChampion(champion);
@@ -46,30 +54,31 @@ export class ChampionController {
 			const championId = req.params.id;
 			const champion = req.body;
 
-			if(!championId) {
-				throw new Error('ID do campeão inválido');
+			if (!ValidateChampionId(championId)) {
+				res.status(400).json({ errror: "ID do campeão inválido" });
+				return;
 			}
 
 			const championExists = await championService.getChampionById(championId);
 
-			if(!championExists) {
-				throw new Error('Campeão não encontrado');
+			if (!championExists) {
+				res.status(400).json({ errror: "Campião não encontrado" })
+				return;
 			}
 
 			const dataChampionUpdate = {
 				money: champion.money || championExists.money,
 				guildId: champion.guildId || championExists.guildId,
 				strength: champion.strength || championExists.strength,
-				dexterity: champion.dexterity  || championExists.dexterity,
+				dexterity: champion.dexterity || championExists.dexterity,
 				intelligence: champion.intelligence || championExists.intelligence,
 				vitality: champion.vitality || championExists.vitality,
 				hp: champion.hp || championExists.hp,
-				xp: champion.xp	 || championExists.xp,
-				sp: champion.sp	|| championExists.sp
+				xp: champion.xp || championExists.xp,
+				sp: champion.sp || championExists.sp
 			}
 
-			const {role, skills, ...newChampion} = {...championExists, ...dataChampionUpdate};
-			
+			const { role, skills, ...newChampion } = { ...championExists, ...dataChampionUpdate };
 
 			const updatedChampion = await championService.updateChampion(championId, newChampion);
 			res.status(200).json(updatedChampion);
@@ -80,13 +89,17 @@ export class ChampionController {
 
 	async deleteChampion(req: Request, res: Response) {
 		try {
-			const id = req.params.id;
-			const deletedChampion = await championService.deleteChampion(id);
-			res.status(200).json({deletedChampion: !!deletedChampion});
+			const championId = req.params.id;
+
+			if (!ValidateChampionId(championId)) {
+				res.status(400).json({ errror: "ID do campeão inválido" })
+				return;
+			}
+
+			const deletedChampion = await championService.deleteChampion(championId);
+			res.status(200).json({ deletedChampion: !!deletedChampion });
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
 		}
 	}
-
-
 }

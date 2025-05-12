@@ -32,6 +32,7 @@ export class ChampionRepository {
 		const championSkills = await db('champion_skills').where({ championId: id });
 		const skills = await db('skills').whereIn('id', championSkills.map((cs: any) => cs.skillId));
 		const role = await db('champion_roles').where({ id: champion.roleId }).first();
+		champion.xp_max = getMaxExperience(champion.level);
 		champion.role = role;
 		champion.skills = skills;
 		return champion;

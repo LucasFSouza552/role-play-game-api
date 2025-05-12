@@ -1,4 +1,5 @@
 import db from "../database/db";
+import { ChampionRole } from "../models/ChampionRole";
 import { Filters } from "../models/Filters";
 
 export class ChampionRoleRepository {
@@ -15,7 +16,7 @@ export class ChampionRoleRepository {
             });
     }
 
-    async findById(id: number) {
+    async findById(id: string) {
         return await db(this.tableName).where({ id }).first();
     }
 
@@ -23,7 +24,7 @@ export class ChampionRoleRepository {
         return await db(this.tableName).where({ name }).first();
     }
 
-    async create(role: any) {
+    async create(role: ChampionRole) {
         try {
             return await db(this.tableName).insert(role);
         } catch (error) {
@@ -31,7 +32,7 @@ export class ChampionRoleRepository {
         }
     }
 
-    async update(id: number, role: any) {
+    async update(id: string, role: ChampionRole) {
         try {
             return await db(this.tableName).where({ id }).update(role);
         } catch (error) {
@@ -39,7 +40,7 @@ export class ChampionRoleRepository {
         }
     }
 
-    async delete(id: number) {
+    async delete(id: string) {
         try {
             return await db(this.tableName).where({ id }).del();
         } catch (error) {

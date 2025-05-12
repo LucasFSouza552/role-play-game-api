@@ -50,5 +50,32 @@ const championRoleController = new ChampionRoleController();
  */
 ChampionRoleRoute.get("/", championRoleController.getAll);
 
+/**
+ * @swagger
+ * /api/roles/{id}:
+ *   get:
+ *     summary: Recuperar uma classe específica
+ *     description: Retorna uma classe baseado no ID fornecido.
+ *     tags:
+ *       - Classes (Roles)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Identificador único da classe
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Detalhes da classe
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object     
+ *               properties:
+ *                 id:
+ */
+ChampionRoleRoute.get("/:id", championRoleController.getById);
+
 
 export default ChampionRoleRoute;

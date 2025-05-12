@@ -3,9 +3,10 @@
 GET /champions # Exibe todos os aventureiros
 GET /champions/:id # Exibe um aventureiro específico
 POST /champions #Cria um Aventureiro
-PATCH /champions # Atualiza um aventureiro
 POST /champions/:id/items # Adiciona um item no inventário do aventureiro
-PATCH /champions/:id/missions/:missionId/accept # Aceita uma missão específica
+POST /champions/:id/skills # Adicionar uma habilidade ao aventureiro
+POST /champions/:id/missions/accept # Aceita uma missão específica
+PATCH /champions # Atualiza um aventureiro
 ```
     
 ### Guilda (Guilds)
