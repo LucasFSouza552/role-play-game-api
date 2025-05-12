@@ -1,0 +1,1 @@
+export type skillTarget = 'self' | 'enemy' | 'ally';

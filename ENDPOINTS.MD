@@ -3,16 +3,19 @@
 GET /champions # Exibe todos os aventureiros
 GET /champions/:id # Exibe um aventureiro específico
 POST /champions #Cria um Aventureiro
-PATCH /champions # Atualiza um aventureiro
 POST /champions/:id/items # Adiciona um item no inventário do aventureiro
+POST /champions/:id/skills # Adicionar uma habilidade ao aventureiro
+POST /champions/:id/missions/accept # Aceita uma missão específica
+PATCH /champions # Atualiza um aventureiro
 ```
-
+    
 ### Guilda (Guilds)
 ```bash
 GET /guilds # Retorna todas as guildas
 GET /guilds/:id # Retorna uma guilda específica
 POST /guilds # Cria uma guilda
 PATCH /guilds # Atualiza a guilda
+POST /guilds/:id/join # Aventureiro entrar na guilda
 ```
 
 ### Missões (Missions)
