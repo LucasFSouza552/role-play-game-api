@@ -6,7 +6,7 @@ export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable(tableName, (table) => {
     table.increments('id').primary();
 
-    table.integer('championId').unsigned().notNullable();
+    table.uuid('championId').notNullable();
     table.integer('skillId').unsigned().notNullable();
 
     table

@@ -1,16 +1,24 @@
-import { ChampionStatus } from "./ChampionStatus";
 import { ChampionRole } from "./ChampionRole";
 import { ChampionSkill } from "./ChampionSkill";
 import { Mission } from "./Mission";
 
 export interface Champion {
-    id: number;
-    name: string;
-    money: number;
-    status: ChampionStatus;
-    role: ChampionRole;
-    missions: Mission[];
-    inventory: [];
-    guildId: number;
-    skills: ChampionSkill[];
+	id?: number;
+	name: string;
+	money?: number | 0;
+	strength?: number;
+	dexterity?: number;
+	intelligence?: number;
+	vitality?: number;
+	hp: number;
+	xp: number;
+	xp_max?: number;
+	sp: number; 
+	level: number;
+	roleId: number;
+	role?: ChampionRole;
+	missions?: Mission[];
+	inventory?: [];
+	guildId?: number;
+	skills?: ChampionSkill[];
 }

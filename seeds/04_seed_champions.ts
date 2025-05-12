@@ -1,12 +1,15 @@
 import { Knex } from 'knex';
+import { v5 as uuidv5 } from 'uuid';
+
+const NAMESPACE = uuidv5.DNS;
 
 export async function seed(knex: Knex): Promise<void> {
   await knex('champions').insert([
     {
-      id: 1,
-      name: 'Warrior',
+      id: uuidv5('Thorgar', NAMESPACE),
+      name: 'Thorgar',
       level: 1,
-      xp_max: 1000,
+      hp: 0, 
       strength: 20,
       dexterity: 15,
       intelligence: 10,
@@ -16,23 +19,23 @@ export async function seed(knex: Knex): Promise<void> {
       roleId: 1,
     },
     {
-      id: 2,
-      name: 'Mage',
+      id: uuidv5('Elandra', NAMESPACE),
+      name: 'Elandra',
       level: 1,
-      xp_max: 1000,
+      hp: 0,
       strength: 10,
       dexterity: 15,
       intelligence: 25,
       vitality: 15,
       money: 50,
-      guildId: null, 
+      guildId: null,
       roleId: 2,
     },
     {
-      id: 3,
-      name: 'Rogue',
+      id: uuidv5('Kael', NAMESPACE),
+      name: 'Kael', 
       level: 1,
-      xp_max: 1000,
+      hp: 0,
       strength: 15,
       dexterity: 25,
       intelligence: 10,
@@ -42,10 +45,10 @@ export async function seed(knex: Knex): Promise<void> {
       roleId: 3,
     },
     {
-      id: 4,
-      name: 'Paladin',
+      id: uuidv5('Seraphina', NAMESPACE),
+      name: 'Seraphina',
       level: 1,
-      xp_max: 1000,
+      hp: 0,
       strength: 18,
       dexterity: 12,
       intelligence: 15,
@@ -55,10 +58,10 @@ export async function seed(knex: Knex): Promise<void> {
       roleId: 4,
     },
     {
-      id: 5,
-      name: 'Druid',
+      id: uuidv5('Faelar', NAMESPACE),
+      name: 'Faelar', 
       level: 1,
-      xp_max: 1000,
+      hp: 0,
       strength: 12,
       dexterity: 14,
       intelligence: 22,
