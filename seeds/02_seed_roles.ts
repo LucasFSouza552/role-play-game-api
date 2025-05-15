@@ -4,7 +4,6 @@ export async function seed(knex: Knex): Promise<void> {
 
     await knex('champion_roles').insert([
         {
-
             name: 'warrior',
             description: 'strong and brave warrior',
             hp: 100,

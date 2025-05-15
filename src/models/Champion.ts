@@ -4,6 +4,7 @@ import { Mission } from "./Mission";
 
 export interface Champion {
 	id?: number;
+	userId: string;
 	name: string;
 	money?: number | 0;
 	strength?: number;

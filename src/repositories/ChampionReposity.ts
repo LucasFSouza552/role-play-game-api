@@ -9,6 +9,7 @@ export class ChampionRepository {
 		const allChampions = await db(this.tableName).select('*')
 			.limit(filter.size)
 			.offset(filter.offset)
+			.where({ userId: filter.userId })
 			.modify((query) => {
 				if (filter.name) {
 				query.whereILike('champions.name', `%${filter.name}%`);
@@ -27,8 +28,8 @@ export class ChampionRepository {
 		return allChampions;
 	}
 
-	async findById(id: string) {
-		const champion = await db(this.tableName).where({ id }).first().orderBy('champions.name', 'asc');
+	async findById(id: string, userId: string) {
+		const champion = await db(this.tableName).where({ id }).where({ userId }).first().orderBy('champions.name', 'asc');
 		const championSkills = await db('champion_skills').where({ championId: id });
 		const skills = await db('skills').whereIn('id', championSkills.map((cs: any) => cs.skillId));
 		const role = await db('champion_roles').where({ id: champion.roleId }).first();

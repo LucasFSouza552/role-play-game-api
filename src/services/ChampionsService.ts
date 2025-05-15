@@ -8,8 +8,8 @@ export class ChampionService {
 		return await championRepo.findAll(filter);
 	}
 
-	async getChampionById(id: string) {
-		return await championRepo.findById(id);
+	async getChampionById(id: string, userId: string) {
+		return await championRepo.findById(id, userId);
 	}
 
 	async createChampion(champion: any) {
@@ -23,6 +23,7 @@ export class ChampionService {
 
 		const newChampion: Champion = {
 			name: champion.name,
+			userId: champion.userId,
 			roleId: roleExists.id,
 			hp: roleExists.hp,
 			xp: 0,

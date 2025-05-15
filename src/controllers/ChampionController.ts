@@ -1,14 +1,15 @@
+import { user } from "./../models/User";
 import { Request, Response } from "express";
 import { ChampionService } from "../services/ChampionsService";
 import { Filters, defaultFilters } from "../models/Filters";
-import { validate } from 'uuid';
-import ValidateChampionId from "../utils/validateChampionId";
+import ValidateUUID from "../utils/validateChampionId";
+import { validateAuthorizationHeader } from "../utils/jwt";
 
 const championService = new ChampionService();
 export class ChampionController {
 	async getAll(req: Request, res: Response) {
 		try {
-			const filters: Filters = { ...defaultFilters, ...req.query };
+			const filters: Filters = { ...defaultFilters, ...req.query, userId: req.userId };
 			const champions = await championService.getAllChampions(filters);
 
 			res.status(200).json({ champions: champions, length: champions.length });
@@ -21,12 +22,12 @@ export class ChampionController {
 		try {
 			const championId = req.params.id;
 
-			if (!ValidateChampionId(championId)) {
+			if (!ValidateUUID(championId)) {
 				res.status(400).send({ error: "ID é inválido" })
 				return;
 			}
 
-			const champion = await championService.getChampionById(championId);
+			const champion = await championService.getChampionById(championId, req.userId as string);
 			res.status(200).json(champion);
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
@@ -42,6 +43,8 @@ export class ChampionController {
 				return;
 			}
 
+			champion.userId = req.userId as string;
+
 			const newChampion = await championService.createChampion(champion);
 			res.status(201).json(newChampion);
 		} catch (err: any) {
@@ -54,12 +57,12 @@ export class ChampionController {
 			const championId = req.params.id;
 			const champion = req.body;
 
-			if (!ValidateChampionId(championId)) {
+			if (!ValidateUUID(championId)) {
 				res.status(400).json({ errror: "ID do campeão inválido" });
 				return;
 			}
 
-			const championExists = await championService.getChampionById(championId);
+			const championExists = await championService.getChampionById(championId, req.userId as string);
 
 			if (!championExists) {
 				res.status(400).json({ errror: "Campião não encontrado" })
@@ -91,7 +94,7 @@ export class ChampionController {
 		try {
 			const championId = req.params.id;
 
-			if (!ValidateChampionId(championId)) {
+			if (!ValidateUUID(championId)) {
 				res.status(400).json({ errror: "ID do campeão inválido" })
 				return;
 			}
