@@ -3,6 +3,7 @@ import { Champion } from "../models/Champion";
 import { Filters } from "../models/Filters";
 import getMaxExperience from "../utils/getMaxExperience";
 
+
 export class ChampionRepository {
 	private tableName = 'champions';
 	async findAll(filter: Filters) {
@@ -12,12 +13,12 @@ export class ChampionRepository {
 			.where({ userId: filter.userId })
 			.modify((query) => {
 				if (filter.name) {
-				query.whereILike('champions.name', `%${filter.name}%`);
+					query.whereILike('champions.name', `%${filter.name}%`);
 				}
-				if(filter.role) {
+				if (filter.role) {
 					query.where('champions.roleId', filter.role);
 				}
-				if(filter.level) {
+				if (filter.level) {
 					query.where('champions.level', filter.level);
 				}
 			}).orderBy('champions.name', 'asc');
@@ -63,6 +64,20 @@ export class ChampionRepository {
 			return deletedChampion;
 		} catch (error) {
 			throw new Error('Erro ao deletar campeão');
+		}
+	}
+
+	async addSkill(championId: string, skillId: number) {
+		const newChampionSkill = await db('champion_skills').insert({ championId, skillId }).returning('*');
+		return newChampionSkill;
+	}
+
+	async getSkills(championId: string) {
+		try {
+			const championSkills = await db('champion_skills').where({ championId }).returning('*');
+			return championSkills;
+		} catch (error) {
+			throw new Error('Erro ao obter habilidades do campeão');
 		}
 	}
 

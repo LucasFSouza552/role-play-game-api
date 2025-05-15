@@ -4,6 +4,7 @@ import { ChampionService } from "../services/ChampionsService";
 import { Filters, defaultFilters } from "../models/Filters";
 import ValidateUUID from "../utils/validateChampionId";
 import { validateAuthorizationHeader } from "../utils/jwt";
+import { ChampionSkill } from "../models/ChampionSkill";
 
 const championService = new ChampionService();
 export class ChampionController {
@@ -105,4 +106,58 @@ export class ChampionController {
 			res.status(500).json({ error: err.message });
 		}
 	}
+
+	async addSkill(req: Request, res: Response) {
+		const championId = req.params.id;
+		const skillId = req.body.skillId;
+
+		if (!ValidateUUID(championId)) {
+			res.status(400).json({ errror: "ID do campeão inválido" })
+			return;
+		}
+
+		const championExists = await championService.getChampionById(championId, req.userId as string);
+		if (!championExists) {
+			res.status(400).json({ errror: "Campião não encontrado" })
+			return;
+		}
+
+		if (!skillId) {
+			res.status(400).json({ error: "Falta informação necessária para criar um campeão" });
+			return;
+		}
+
+		const championsSkills = championExists.skills.map((skill: ChampionSkill) => skill.id);
+		if (championsSkills.includes(skillId)) {
+			res.status(400).json({ error: "A habilidade já foi adicionada ao campeão" });
+			return;
+		}
+
+		try {
+			const addedSkill = await championService.addSkill(championId, skillId);
+			res.status(200).json(addedSkill);
+		} catch (error) {
+			res.status(400).json({ error: "Erro ao adicionar habilidade ao campeão" });
+		}
+	}
+
+	async getSkills(req: Request, res: Response) {
+		const championId = req.params.id;
+
+		if (!ValidateUUID(championId)) {
+			res.status(400).json({ errror: "ID do campeão inválido" })
+			return;
+		}
+
+		try {
+			const championSkills = await championService.getSkills(championId);
+			res.status(200).json(championSkills);
+		} catch (error) {
+			res.status(400).json({ error: "Erro ao obter habilidades do campeão" });
+		}
+
+	}
+
+
+
 }

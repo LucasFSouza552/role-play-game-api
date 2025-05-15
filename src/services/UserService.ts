@@ -14,8 +14,8 @@ export class UserService {
         return await userRepo.create(user);
     }
 
-    async updateUser(id: string, user: user): Promise<user> {
-        return await userRepo.update(id, user);
+    async updateUser(user: user): Promise<user> {
+        return await userRepo.update(user);
     }
 
     async getUserByEmail(email: string) {

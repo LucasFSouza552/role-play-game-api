@@ -13,10 +13,10 @@ export class ChampionService {
 	}
 
 	async createChampion(champion: any) {
-		
+
 		const roleName = champion.roleName;
 		const roleExists: ChampionRole = await roleRepo.findByName(roleName);
-		
+
 		if (!roleExists) {
 			return { error: 'Role not found' };
 		}
@@ -40,6 +40,14 @@ export class ChampionService {
 
 	async deleteChampion(id: string) {
 		return await championRepo.delete(id);
+	}
+
+	async addSkill(championId: string, skillId: number) {
+		return await championRepo.addSkill(championId, skillId);
+	}
+
+	async getSkills(ChampionId: string) {
+		return await championRepo.getSkills(ChampionId);
 	}
 
 }
