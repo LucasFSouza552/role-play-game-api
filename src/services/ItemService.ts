@@ -19,9 +19,8 @@ export class ItemService {
       description: item.description,
       priceMin: item.minPrice,
       priceMax: item.maxPrice,
-      rarity: item.rarity || "common",
-      level: item.level || 1,
-      type: item.type || "generic",
+      rarity: item.rarity || "Common",
+      type: item.type,
     };
     return await ItemRepository.create(newItem as Item);
   }
@@ -38,7 +37,6 @@ export class ItemService {
       priceMin: item.minPrice ?? existingItem.priceMin,
       priceMax: item.maxPrice ?? existingItem.priceMax,
       rarity: item.rarity ?? existingItem.rarity,
-      level: item.level ?? existingItem.level,
       type: item.type ?? existingItem.type,
     };
     return await ItemRepository.update(id, updatedItem);

@@ -6,7 +6,6 @@ export interface Item {
     name: string;
     description: string;
     rarity: ItemRarity;
-    level: number;
     priceMax: number;
     priceMin: number;
     type: ItemType; 
