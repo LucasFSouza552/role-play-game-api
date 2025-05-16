@@ -1,7 +1,7 @@
 import { Champion } from "../models/Champion";
 import { Filters } from "../models/Filters";
 import { ChampionRole } from "../models/ChampionRole";
-import { championRepo, roleRepo } from "../repositories/RepositoriosManager";
+import { championRepo, roleRepo } from "../repositories/RepositoryManager";
 
 export class ChampionService {
 	async getAllChampions(filter: Filters) {

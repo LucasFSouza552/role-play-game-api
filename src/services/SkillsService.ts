@@ -1,4 +1,4 @@
-import { skillRepo } from "../repositories/RepositoriosManager";
+import { skillRepo } from "../repositories/RepositoryManager";
 
 export class SkillsService {
     async getAllSkills() {

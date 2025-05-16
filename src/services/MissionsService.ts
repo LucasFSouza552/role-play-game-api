@@ -1,5 +1,5 @@
 import { Mission } from "../models/Mission";
-import { missionRepo } from "../repositories/RepositoriosManager";
+import { missionRepo } from "../repositories/RepositoryManager";
 import { MissionDifficult } from "../models/enums/MissionDifficult";
 
 export class MissionsService {

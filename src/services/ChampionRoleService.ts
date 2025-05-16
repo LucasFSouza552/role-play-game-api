@@ -1,5 +1,5 @@
 import { Filters } from "../models/Filters";
-import { roleRepo } from "../repositories/RepositoriosManager";
+import { roleRepo } from "../repositories/RepositoryManager";
 
 export class ChampionRoleService {
     async getAllChampionRoles(filter: Filters) {
