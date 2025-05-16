@@ -29,7 +29,7 @@ export class ChampionRepository {
 		return allChampions;
 	}
 
-	async findById(id: string, userId: string): Promise<Champion> {
+	async findById(id: string, userId: number): Promise<Champion> {
 		const champion = await db(this.tableName).where({ id }).where({ userId }).first().orderBy('champions.name', 'asc');
 		const championSkills = await db('champion_skills').where({ championId: id });
 		const skills = await db('skills').whereIn('id', championSkills.map((cs: any) => cs.skillId));
@@ -40,12 +40,12 @@ export class ChampionRepository {
 		return champion;
 	}
 
-	async create(champion: Champion): Promise<Champion> {
+	async create(champion: Omit<Champion, 'id'>): Promise<Champion> {
 
 		const newChampion = db(this.tableName).insert(champion).returning('*').then((newChampion: Champion[]) => newChampion[0]).catch((error) => {
 			throw new Error('Erro ao criar campeãoo');
 		});
-		
+
 		return newChampion;
 	}
 
@@ -73,12 +73,8 @@ export class ChampionRepository {
 	}
 
 	async getSkills(championId: string) {
-		try {
-			const championSkills = await db('champion_skills').where({ championId }).returning('*');
-			return championSkills;
-		} catch (error) {
-			throw new Error('Erro ao obter habilidades do campeão');
-		}
+		const championSkills = await db('champion_skills').where({ championId }).returning('*');
+		return championSkills;
 	}
 
 }

@@ -6,7 +6,7 @@ export class UserService {
         return await userRepo.getAll();
     }
 
-    async getUserById(id: string): Promise<user> {
+    async getUserById(id: number): Promise<user> {
         return await userRepo.findById(id);
     }
 

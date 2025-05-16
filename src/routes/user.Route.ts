@@ -46,7 +46,7 @@ userRoute.get("/", userController.getAllUsers);
  *               type: object
  *               properties:
  *                 id:
- *                   type: string
+ *                   type: number
  *                   description: Identificador único do usuário.
  *                 name:
  *                   type: string
@@ -137,7 +137,7 @@ userRoute.post("/login", userController.authenticateUser);
  *               type: object
  *               properties:
  *                 id:
- *                   type: string
+ *                   type: number
  *                   description: Identificador único do usuário.
  *                 name:
  *                   type: string

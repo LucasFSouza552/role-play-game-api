@@ -62,7 +62,7 @@ const ChampionRoute = Router();
  *                 type: object
  *                 properties:
  *                      id:
- *                          type: string
+ *                          type: number
  *                          description: Identificador único do campeão
  *                      name:
  *                          type: string

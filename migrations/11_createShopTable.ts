@@ -7,7 +7,7 @@ const itemType = Object.values(ItemType);
 export async function up(knex: Knex) {
     await knex.schema.createTable(tablename, (table) => {
         table.increments('id').primary();
-        table.uuid('userId').notNullable();
+        table.integer('userId').notNullable();
         table
             .foreign('userId')
             .references('id')
@@ -18,4 +18,8 @@ export async function up(knex: Knex) {
         table.enu('itemType', itemType).notNullable();
         
     })
+}
+
+export async function down(knex: Knex) {
+    await knex.schema.dropTable(tablename);
 }

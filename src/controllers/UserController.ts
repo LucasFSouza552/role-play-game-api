@@ -82,7 +82,7 @@ export class UserController {
     async getUserById(req: Request, res: Response) {
         try {
 
-            const userId: string = req.userId as string;
+            const userId: number = req.userId as number;
 
             const { name, email, role } = await userService.getUserById(userId);
             res.status(200).json({ user: { name, email, role } });

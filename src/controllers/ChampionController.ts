@@ -21,13 +21,19 @@ export class ChampionController {
 	async getById(req: Request, res: Response) {
 		try {
 			const championId = req.params.id;
+			const userId: number = req.userId as number;
 
 			if (!ValidateUUID(championId)) {
 				res.status(400).send({ error: "ID é inválido" })
 				return;
 			}
 
-			const champion = await championService.getChampionById(championId, req.userId as string);
+			if(!userId) {
+				res.status(400).json({ errror: "Usuário inválido" })
+				return;
+			}
+
+			const champion = await championService.getChampionById(championId,userId);
 			res.status(200).json(champion);
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
@@ -37,13 +43,19 @@ export class ChampionController {
 	async createChampion(req: Request, res: Response) {
 		try {
 			const champion = req.body;
+			const userId: number = req.userId as number;
 
 			if (!champion.name || !champion.roleName) {
 				res.status(400).json({ error: "Falta informação necessária para criar um campeão" });
 				return;
 			}
 
-			champion.userId = req.userId as string;
+			if(!userId) {
+				res.status(400).json({ errror: "Usuário inválido" })
+				return;
+			}
+
+			champion.userId = userId;
 
 			const newChampion = await championService.createChampion(champion);
 			res.status(201).json(newChampion);
@@ -56,13 +68,19 @@ export class ChampionController {
 		try {
 			const championId = req.params.id;
 			const champion = req.body;
+			const userId: number = req.userId as number;
 
 			if (!ValidateUUID(championId)) {
 				res.status(400).json({ errror: "ID do campeão inválido" });
 				return;
 			}
 
-			const championExists = await championService.getChampionById(championId, req.userId as string);
+			if(!userId) {
+				res.status(400).json({ errror: "Usuário inválido" })
+				return;
+			}
+
+			const championExists = await championService.getChampionById(championId, userId);
 
 			if (!championExists) {
 				res.status(400).json({ errror: "Campião não encontrado" })
@@ -109,13 +127,19 @@ export class ChampionController {
 	async addSkill(req: Request, res: Response) {
 		const championId = req.params.id;
 		const skillId = req.body.skillId;
+		const userId: number = req.userId as number;
 
 		if (!ValidateUUID(championId)) {
 			res.status(400).json({ errror: "ID do campeão inválido" })
 			return;
 		}
 
-		const championExists: Champion | null = await championService.getChampionById(championId, req.userId as string);
+		if(!userId) {
+			res.status(400).json({ errror: "Usuário inválido" })
+			return;
+		}
+
+		const championExists: Champion | null = await championService.getChampionById(championId, userId);
 		if (!championExists) {
 			res.status(400).json({ errror: "Campião não encontrado" })
 			return;
@@ -125,7 +149,7 @@ export class ChampionController {
 			res.status(400).json({ error: "Falta informação necessária para criar um campeão" });
 			return;
 		}
-		
+
 
 		const hasSkill = championExists.skills?.some((skill: ChampionSkill) => skill.id === skillId);
 		if (hasSkill) {

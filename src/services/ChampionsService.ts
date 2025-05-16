@@ -8,7 +8,7 @@ export class ChampionService {
 		return await championRepo.findAll(filter);
 	}
 
-	async getChampionById(id: string, userId: string): Promise<Champion> {
+	async getChampionById(id: string, userId: number): Promise<Champion> {
 		return await championRepo.findById(id, userId);
 	}
 
@@ -21,7 +21,7 @@ export class ChampionService {
 			return { error: 'Role not found' };
 		}
 
-		const newChampion: Champion = {
+		const newChampion: Omit<Champion, 'id'> = {
 			name: champion.name,
 			userId: champion.userId,
 			roleId: roleExists.id,
