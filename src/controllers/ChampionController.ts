@@ -70,11 +70,6 @@ export class ChampionController {
 			const champion = req.body;
 			const userId: number = req.userId as number;
 
-			if (!ValidateUUID(championId)) {
-				res.status(400).json({ errror: "ID do campeão inválido" });
-				return;
-			}
-
 			if(!userId) {
 				res.status(400).json({ errror: "Usuário inválido" })
 				return;
@@ -83,20 +78,13 @@ export class ChampionController {
 			const championExists = await championService.getChampionById(championId, userId);
 
 			if (!championExists) {
-				res.status(400).json({ errror: "Campião não encontrado" })
+				res.status(400).json({ error: "Campeão não encontrado" })
 				return;
 			}
 
-			const dataChampionUpdate = {
-				money: champion.money || championExists.money,
-				guildId: champion.guildId || championExists.guildId,
-				strength: champion.strength || championExists.strength,
-				dexterity: champion.dexterity || championExists.dexterity,
-				intelligence: champion.intelligence || championExists.intelligence,
-				vitality: champion.vitality || championExists.vitality,
-				hp: champion.hp || championExists.hp,
-				xp: champion.xp || championExists.xp,
-				sp: champion.sp || championExists.sp
+			const dataChampionUpdate: Omit<Champion, 'id' | 'userId' | 'role' | 'xp_max' > = {
+				...championExists,
+				...champion
 			}
 
 			const { role, skills, ...newChampion } = { ...championExists, ...dataChampionUpdate };

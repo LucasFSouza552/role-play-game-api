@@ -20,7 +20,12 @@ export default function AuthMiddleware(req: Request, res: Response, next: NextFu
         res.status(401).json({ error: "Invalid token" });
         return;
     }
-    req.userId = decodedToken.id as number;
+    req.userId = parseInt(decodedToken.id);
+
+    if (isNaN(req.userId)) {
+        res.status(401).json({ error: "Invalid token" });
+        return;
+    }
 
     next();
 }

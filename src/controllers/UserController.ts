@@ -59,11 +59,13 @@ export class UserController {
         try {
             const user = req.body;
 
+            console.log(user);
+
             if (!user.email || !user.password) {
                 res.status(400).json({ error: "Falta informação necessária para criar um usuário" });
                 return;
             }
-            console.log("user", user);
+            
             const User = await userService.getUserByEmail(user.email);
             const passwordEncoded = await validatePassword(user.password, User.password);
 
