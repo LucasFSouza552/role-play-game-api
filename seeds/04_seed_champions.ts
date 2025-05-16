@@ -1,12 +1,12 @@
 import { Knex } from 'knex';
-import { v5 as uuidv5 } from 'uuid';
-
-const NAMESPACE = uuidv5.DNS;
 
 export async function seed(knex: Knex): Promise<void> {
+
+
   await knex('champions').insert([
     {
-      id: uuidv5('Thorgar', NAMESPACE),
+      id: 1,
+      userId: 1,
       name: 'Thorgar',
       level: 1,
       hp: 0, 
@@ -19,7 +19,8 @@ export async function seed(knex: Knex): Promise<void> {
       roleId: 1,
     },
     {
-      id: uuidv5('Elandra', NAMESPACE),
+      id: 2,
+      userId: 2,
       name: 'Elandra',
       level: 1,
       hp: 0,
@@ -32,7 +33,8 @@ export async function seed(knex: Knex): Promise<void> {
       roleId: 2,
     },
     {
-      id: uuidv5('Kael', NAMESPACE),
+      id: 3,
+      userId: 3,
       name: 'Kael', 
       level: 1,
       hp: 0,
@@ -45,7 +47,8 @@ export async function seed(knex: Knex): Promise<void> {
       roleId: 3,
     },
     {
-      id: uuidv5('Seraphina', NAMESPACE),
+      id: 4,
+      userId: 4,
       name: 'Seraphina',
       level: 1,
       hp: 0,
@@ -58,7 +61,8 @@ export async function seed(knex: Knex): Promise<void> {
       roleId: 4,
     },
     {
-      id: uuidv5('Faelar', NAMESPACE),
+      id: 5,
+      userId: 5,
       name: 'Faelar', 
       level: 1,
       hp: 0,

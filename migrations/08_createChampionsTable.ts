@@ -3,7 +3,8 @@ import { Knex } from 'knex';
 const tablename = 'champions'
 export async function up(knex: Knex): Promise<void> {
 	await knex.schema.createTable(tablename, (table) => {
-		table.uuid('id').primary().defaultTo(knex.raw('gen_random_uuid()'));
+		table.increments('id').primary();
+		table.integer('userId').notNullable().references('id').inTable('users').onDelete('CASCADE');
 		table.string('name').notNullable();
 		table.decimal('money', 10, 2).defaultTo(0);
 		table.integer('guildId').nullable();

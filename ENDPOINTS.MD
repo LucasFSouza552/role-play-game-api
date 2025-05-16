@@ -2,10 +2,11 @@
 ```bash
 GET /champions # Exibe todos os aventureiros
 GET /champions/:id # Exibe um aventureiro específico
+GET /champions/:id/skills # Retorna todas as habilidades de um aventureiro
 POST /champions #Cria um Aventureiro
 POST /champions/:id/items # Adiciona um item no inventário do aventureiro
-POST /champions/:id/skills # Adicionar uma habilidade ao aventureiro
-POST /champions/:id/missions/accept # Aceita uma missão específica
+POST /champions/:id/skill # Adicionar uma habilidade ao aventureiro
+POST /champions/:id/guilds/join # Aventureiro entrar na guilda
 PATCH /champions # Atualiza um aventureiro
 ```
     
@@ -24,6 +25,7 @@ GET /missions # Retorna todas as missões
 GET /missions/:id # Retorna uma guilda específica
 POST /missions # Cria uma missão
 PATCH /missions # Atualiza uma missão
+POST /missions/:id/accept # Aceita uma missão específica
 ```
 
 ### Lojas (Shop)

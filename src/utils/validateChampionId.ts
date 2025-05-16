@@ -1,5 +1,5 @@
 import { validate } from "uuid";
 
-export default function ValidateChampionId(id: string) {
+export default function ValidateUUID(id: string) {
 	return id && validate(id);
 }

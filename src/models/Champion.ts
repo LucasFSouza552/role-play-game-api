@@ -3,7 +3,8 @@ import { ChampionSkill } from "./ChampionSkill";
 import { Mission } from "./Mission";
 
 export interface Champion {
-	id?: number;
+	id: number;
+	userId: number;
 	name: string;
 	money?: number | 0;
 	strength?: number;

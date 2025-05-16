@@ -3,7 +3,7 @@ import { ChampionSkill } from "../models/ChampionSkill";
 
 
 export class SkillRepository {
-    private tableName = 'champion_skills'; 
+    private tableName = 'champion_skills';
 
     async findAll() {
         return await db(this.tableName).select('*');
@@ -15,7 +15,8 @@ export class SkillRepository {
 
     async create(skill: ChampionSkill) {
         try {
-            return await db(this.tableName).insert(skill);
+            const [Skill] = await db(this.tableName).insert(skill).returning('*');
+            return Skill;
         } catch (error) {
             throw new Error('Erro ao criar habilidade');
         }

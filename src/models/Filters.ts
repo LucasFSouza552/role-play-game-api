@@ -5,6 +5,7 @@ export interface Filters {
     level?: number;
     size: number;
     offset: number;
+    userId?: number;
 }
 
 export const defaultFilters: Filters = {
