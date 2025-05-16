@@ -58,14 +58,14 @@ export class ChampionController {
 			const champion = req.body;
 
 			if (!ValidateUUID(championId)) {
-				res.status(400).json({ errror: "ID do campeão inválido" });
+				res.status(400).json({ error: "ID do campeão inválido" });
 				return;
 			}
 
 			const championExists = await championService.getChampionById(championId, req.userId as string);
 
 			if (!championExists) {
-				res.status(400).json({ errror: "Campião não encontrado" })
+				res.status(400).json({ error: "Campeão não encontrado" })
 				return;
 			}
 
@@ -95,7 +95,7 @@ export class ChampionController {
 			const championId = req.params.id;
 
 			if (!ValidateUUID(championId)) {
-				res.status(400).json({ errror: "ID do campeão inválido" })
+				res.status(400).json({ error: "ID do campeão inválido" })
 				return;
 			}
 
