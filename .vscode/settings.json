@@ -10,5 +10,6 @@
             "username": "postgres",
             "database": "role-play-game-api"
         }
-    ]
+    ],
+    "postman.settings.dotenv-detection-notification-visibility": false
 }
