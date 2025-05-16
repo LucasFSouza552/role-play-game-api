@@ -15,12 +15,13 @@ export class UserController {
         try {
             const user = req.body;
 
-            if (!user.name || !user.email || !user.password) {
+            if (!user || !user.name || !user.email || !user.password) {
                 res.status(400).json({ error: "Falta informação necessária para criar um usuário" });
                 return;
             }
 
             const userExists = await userService.getUserByEmail(user.email);
+
             if (userExists) {
                 res.status(400).json({ error: "Usuário já cadastrado" });
                 return;
@@ -35,11 +36,11 @@ export class UserController {
                 role: 'user'
             };
 
-
             const newUser = await userService.createUser(userData);
             const token = generateJwtToken(newUser.id);
             res.status(201).json({ token });
         } catch (err: any) {
+            console.error(err);
             res.status(400).json({ error: err.message });
         }
     }
@@ -62,7 +63,7 @@ export class UserController {
                 res.status(400).json({ error: "Falta informação necessária para criar um usuário" });
                 return;
             }
-
+            console.log("user", user);
             const User = await userService.getUserByEmail(user.email);
             const passwordEncoded = await validatePassword(user.password, User.password);
 

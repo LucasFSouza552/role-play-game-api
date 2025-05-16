@@ -12,6 +12,8 @@ await knex('champion_roles').del();
 // await knex.raw('ALTER SEQUENCE champions_id_seq RESTART WITH 1');
 await knex.raw('ALTER SEQUENCE skills_id_seq RESTART WITH 1');
 await knex.raw('ALTER SEQUENCE missions_id_seq RESTART WITH 1');
+await knex.raw('ALTER SEQUENCE users_id_seq RESTART WITH 1');
+
 
 // await knex.raw('ALTER SEQUENCE champion_roles_id_seq RESTART WITH 1');
 }
