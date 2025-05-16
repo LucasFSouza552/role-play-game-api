@@ -2,8 +2,8 @@ import { Knex } from 'knex';
 
 export async function seed(knex: Knex): Promise<void> {
 
-await knex('champion_skills').del();
-await knex('missions').del();
+// await knex('champion_skills').del(); 
+// await knex('missions').del(); 
 await knex('champions').del();
 await knex('skills').del();
 await knex('champion_roles').del();

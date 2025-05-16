@@ -19,3 +19,7 @@ export async function up(knex: Knex) {
         
     })
 }
+
+export async function down(knex:Knex): Promise<void> {
+    await knex.schema.dropTable(tablename);
+}
