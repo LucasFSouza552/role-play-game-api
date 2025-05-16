@@ -8,20 +8,20 @@ export class ChampionService {
 		return await championRepo.findAll(filter);
 	}
 
-	async getChampionById(id: string, userId: string) {
+	async getChampionById(id: string, userId: number): Promise<Champion> {
 		return await championRepo.findById(id, userId);
 	}
 
 	async createChampion(champion: any) {
-		
+
 		const roleName = champion.roleName;
 		const roleExists: ChampionRole = await roleRepo.findByName(roleName);
-		
+
 		if (!roleExists) {
 			return { error: 'Role not found' };
 		}
 
-		const newChampion: Champion = {
+		const newChampion: Omit<Champion, 'id'> = {
 			name: champion.name,
 			userId: champion.userId,
 			roleId: roleExists.id,
@@ -40,6 +40,14 @@ export class ChampionService {
 
 	async deleteChampion(id: string) {
 		return await championRepo.delete(id);
+	}
+
+	async addSkill(championId: string, skillId: number) {
+		return await championRepo.addSkill(championId, skillId);
+	}
+
+	async getSkills(ChampionId: string) {
+		return await championRepo.getSkills(ChampionId);
 	}
 
 }

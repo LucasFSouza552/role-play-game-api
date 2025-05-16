@@ -28,12 +28,6 @@ const swaggerOptions = {
       {
         bearerAuth: []
       }
-    ],
-    tags: [
-      {
-        name: 'Champions',
-        description: 'Aventureiros'
-      }
     ]
   },
   apis: ['./src/routes/*.Route.ts']

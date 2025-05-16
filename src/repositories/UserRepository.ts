@@ -8,7 +8,7 @@ export class UserRepository {
         return await db(this.tableName).select('*');
     }
 
-    async findById(id: string): Promise<user> {
+    async findById(id: number): Promise<user> {
         return await db(this.tableName).where({ id }).first();
     }
 
@@ -17,8 +17,8 @@ export class UserRepository {
         return User;
     }
 
-    async update(id: string, user: user): Promise<user> {
-        return await db(this.tableName).where({ id }).update(user);
+    async update(user: user): Promise<user> {
+        return await db(this.tableName).where({ id: user.id }).update(user);
     }
 
     async findByEmail(email: string): Promise<user> {

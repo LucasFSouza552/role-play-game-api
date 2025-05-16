@@ -6,7 +6,6 @@ export async function seed(knex: Knex): Promise<void> {
 	const skills = await db("skills").select("id").orderBy("id");
 
 	const ids = champions.map((champion, index) => ({
-		id: index + 1,
 		championId: champion.id,
 		skillId: skills[Math.floor(Math.random() * skills.length)].id
 	}));

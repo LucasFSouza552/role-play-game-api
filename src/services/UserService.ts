@@ -6,7 +6,7 @@ export class UserService {
         return await userRepo.getAll();
     }
 
-    async getUserById(id: string): Promise<user> {
+    async getUserById(id: number): Promise<user> {
         return await userRepo.findById(id);
     }
 
@@ -14,8 +14,8 @@ export class UserService {
         return await userRepo.create(user);
     }
 
-    async updateUser(id: string, user: user): Promise<user> {
-        return await userRepo.update(id, user);
+    async updateUser(user: user): Promise<user> {
+        return await userRepo.update(user);
     }
 
     async getUserByEmail(email: string) {

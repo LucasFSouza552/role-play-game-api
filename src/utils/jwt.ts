@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export function generateJwtToken(userId: string): string {
+export function generateJwtToken(userId: number): string {
     const JWT_SECRET = process.env.JWT_SECRET as string;
     return sign({ id: userId }, JWT_SECRET, { expiresIn: '1d' });
 }

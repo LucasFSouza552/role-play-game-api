@@ -7,7 +7,7 @@ const itemType = Object.values(ItemType);
 export async function up(knex: Knex) {
     await knex.schema.createTable(tablename, (table) => {
         table.increments('id').primary();
-        table.uuid('userId').notNullable();
+        table.integer('userId').notNullable();
         table
             .foreign('userId')
             .references('id')

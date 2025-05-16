@@ -1,9 +1,9 @@
 import { Router } from "express";
 
-import ChampionRoute from "./ChampionRoute.Route"
-import MissionsRoute from "./MissionsRoute.Route";
-import ChampionRoleRoute from "./ChampionRoleRoute.Route";
-import userRoute from "./userRoute.Route";
+import ChampionRoute from "./Champion.Route"
+import MissionsRoute from "./Missions.Route";
+import ChampionRoleRoute from "./ChampionRole.Route";
+import userRoute from "./user.Route";
 
 import AuthMiddleware from "../middleware/authMiddleware";
 

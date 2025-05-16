@@ -62,7 +62,7 @@ const ChampionRoute = Router();
  *                 type: object
  *                 properties:
  *                      id:
- *                          type: string
+ *                          type: number
  *                          description: Identificador único do campeão
  *                      name:
  *                          type: string
@@ -261,7 +261,6 @@ ChampionRoute.post("/", championController.createChampion);
  *       500:
  *         description: Erro interno do servidor
  */
-
 ChampionRoute.patch("/:id", championController.updateChampion);
 
 
@@ -287,5 +286,60 @@ ChampionRoute.patch("/:id", championController.updateChampion);
  *         description: Erro interno do servidor.
  */
 ChampionRoute.delete("/:id", championController.deleteChampion);
+
+/**
+ * @swagger
+ * /api/champions/{id}/skill:
+ *   post:
+ *     summary: Adicionar uma habilidade ao campeão
+ *     description: Adiciona uma habilidade ao campeão especificado pelo ID.
+ *     tags:
+ *       - Campeões
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Identificador único do campeão
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               skillId:
+ *                 type: integer
+ *                 description: Identificador da habilidade a ser adicionada.
+ *     responses:
+ *       200:
+ *         description: Habilidade adicionada com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 skill:
+ *                   type: object
+ *                   description: Informações da habilidade adicionada.
+ *       400:
+ *         description: Erro na requisição.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Descrição do erro.
+ *       404:
+ *         description: Campeão não encontrado.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+ChampionRoute.post("/:id/skill", championController.addSkill);
+
+ChampionRoute.get('/:id/skills', championController.getSkills)
 
 export default ChampionRoute;
