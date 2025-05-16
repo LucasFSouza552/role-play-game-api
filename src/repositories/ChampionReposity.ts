@@ -6,7 +6,7 @@ import getMaxExperience from "../utils/getMaxExperience";
 
 export class ChampionRepository {
 	private tableName = 'champions';
-	async findAll(filter: Filters) {
+	async findAll(filter: Filters): Promise<Champion[]> {
 		const allChampions = await db(this.tableName).select('*')
 			.limit(filter.size)
 			.offset(filter.offset)
@@ -29,7 +29,7 @@ export class ChampionRepository {
 		return allChampions;
 	}
 
-	async findById(id: string, userId: string) {
+	async findById(id: string, userId: string): Promise<Champion> {
 		const champion = await db(this.tableName).where({ id }).where({ userId }).first().orderBy('champions.name', 'asc');
 		const championSkills = await db('champion_skills').where({ championId: id });
 		const skills = await db('skills').whereIn('id', championSkills.map((cs: any) => cs.skillId));
@@ -40,13 +40,13 @@ export class ChampionRepository {
 		return champion;
 	}
 
-	async create(champion: Champion) {
-		try {
-			const newChampion = await db(this.tableName).insert(champion).returning('*');
-			return newChampion;
-		} catch (error) {
-			throw new Error('Erro ao criar campeão');
-		}
+	async create(champion: Champion): Promise<Champion> {
+
+		const newChampion = db(this.tableName).insert(champion).returning('*').then((newChampion: Champion[]) => newChampion[0]).catch((error) => {
+			throw new Error('Erro ao criar campeãoo');
+		});
+		
+		return newChampion;
 	}
 
 	async update(id: string, champion: Champion) {

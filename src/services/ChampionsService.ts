@@ -8,7 +8,7 @@ export class ChampionService {
 		return await championRepo.findAll(filter);
 	}
 
-	async getChampionById(id: string, userId: string) {
+	async getChampionById(id: string, userId: string): Promise<Champion> {
 		return await championRepo.findById(id, userId);
 	}
 

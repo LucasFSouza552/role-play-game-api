@@ -1,10 +1,9 @@
-import { user } from "./../models/User";
 import { Request, Response } from "express";
 import { ChampionService } from "../services/ChampionsService";
 import { Filters, defaultFilters } from "../models/Filters";
 import ValidateUUID from "../utils/validateChampionId";
-import { validateAuthorizationHeader } from "../utils/jwt";
 import { ChampionSkill } from "../models/ChampionSkill";
+import { Champion } from "../models/Champion";
 
 const championService = new ChampionService();
 export class ChampionController {
@@ -116,7 +115,7 @@ export class ChampionController {
 			return;
 		}
 
-		const championExists = await championService.getChampionById(championId, req.userId as string);
+		const championExists: Champion | null = await championService.getChampionById(championId, req.userId as string);
 		if (!championExists) {
 			res.status(400).json({ errror: "Campião não encontrado" })
 			return;
@@ -126,9 +125,10 @@ export class ChampionController {
 			res.status(400).json({ error: "Falta informação necessária para criar um campeão" });
 			return;
 		}
+		
 
-		const championsSkills = championExists.skills.map((skill: ChampionSkill) => skill.id);
-		if (championsSkills.includes(skillId)) {
+		const hasSkill = championExists.skills?.some((skill: ChampionSkill) => skill.id === skillId);
+		if (hasSkill) {
 			res.status(400).json({ error: "A habilidade já foi adicionada ao campeão" });
 			return;
 		}
