@@ -101,7 +101,7 @@ export class ChampionController {
 			const championId = req.params.id;
 
 			if (!ValidateUUID(championId)) {
-				res.status(400).json({ errror: "ID do campeão inválido" })
+				res.status(400).json({ error: "ID do campeão inválido" })
 				return;
 			}
 
