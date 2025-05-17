@@ -11,7 +11,7 @@ const apiRoute = Router();
 
 apiRoute.get("/", (req, res) => {
     res.send("API");
-})
+});
 
 apiRoute.use("/users", userRoute);
 apiRoute.use("/champions", AuthMiddleware, ChampionRoute);

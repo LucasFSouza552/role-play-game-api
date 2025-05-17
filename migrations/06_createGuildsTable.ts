@@ -1,6 +1,6 @@
 import { Knex } from "knex";
 
-const tablename = 'guild';
+const tablename = 'guilds';
 export async function up(knex: Knex): Promise<void> {
     await knex.schema.createTable(tablename, (table) => {
         table.increments('id').primary()
