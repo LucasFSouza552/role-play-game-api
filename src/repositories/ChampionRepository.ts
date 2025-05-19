@@ -80,4 +80,9 @@ export class ChampionRepository {
 		return championSkills;
 	}
 
+	async getSkillById(skillId: number) {
+		const skill = await db('skills').where({ id: skillId }).first();
+		return skill;
+	}
+
 }

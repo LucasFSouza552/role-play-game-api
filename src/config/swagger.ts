@@ -43,9 +43,13 @@ const swaggerOptions = {
               type: "integer",
               description: "Poder da habilidade",
             },
-            cost: {
+            EP: {
               type: "integer",
-              description: "Custo da habilidade",
+              description: "Custo de energia da habilidade",
+            },
+            MP: {
+              type: "integer",
+              description: "Custo de mana da habilidade",
             },
             target: {
               type: "string",

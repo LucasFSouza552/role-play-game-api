@@ -51,11 +51,17 @@ export class ChampionService {
 	}
 
 	async addSkill(championId: number, skillId: number) {
-		return await championRepo.addSkill(championId, skillId);
+		await championRepo.addSkill(championId, skillId);
+		const skill = await championRepo.getSkillById(skillId);
+		return skill;
 	}
 
 	async getSkills(ChampionId: number) {
 		return await championRepo.getSkills(ChampionId);
+	}
+
+	async getSkillById(skillId: number) {
+		return await championRepo.getSkillById(skillId);
 	}
 
 }

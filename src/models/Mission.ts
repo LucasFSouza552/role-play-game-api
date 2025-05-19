@@ -9,5 +9,6 @@ export interface Mission {
     targetDate: Date;
     status: MissionStatus;
     XP?: number;
+    SP?: number; 
     money?: number;
 }

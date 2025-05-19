@@ -165,7 +165,7 @@ export class ChampionController {
 	}
 
 	async addSkill(req: Request, res: Response) {
-		const championId = parseInt(req.params.championId);
+		const championId = parseInt(req.params.id);
 		const skillId = req.body.skillId;
 		const userId: number = req.userId as number;
 

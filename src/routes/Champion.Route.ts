@@ -198,51 +198,29 @@ ChampionRoute.get("/", championController.getAll);
  */
 ChampionRoute.get("/:id", championController.getById);
 
-/** 
+/**
  * @swagger
  * /api/champions/{id}/skills:
- *  get:
- *    summary: Recuperar todas as habilidades de um campeão
- *    tags:
- *      - Campeões (Champions)
- *    parameters:
- *      - in: path
- *        name: id
- *        required: true
- *        description: Identificador único do campeão
- *        schema:
- *          type: integer
- *    responses:
- *      200:
- *        description: Lista de habilidades do campeão
- *        content:
- *          application/json:
- *            schema:
- *              type: array
- *              items:
- *                type: object
- *                properties:
- *                  id:
- *                    type: integer
- *                    description: Identificador único da habilidade
- *                  name:
- *                    type: string
- *                    description: Nome da habilidade
- *                  description:
- *                    type: string
- *                    description: Descrição da habilidade
- *                  type:
- *                    type: string
- *                    description: Tipo da habilidade
- *                  level:
- *                    type: integer
- *                    description: Nível da habilidade
- *                  cost:
- *                    type: integer
- *                    description: Custo da habilidade
- *                  cooldown:
- *                    type: integer
- *                    description: Tempo de recarga da habilidade
+ *   get:
+ *     summary: Recuperar todas as habilidades de um campeão
+ *     tags:
+ *       - Campeões (Champions)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Identificador único do campeão
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Lista de habilidades do campeão
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Skill'
  */
 ChampionRoute.get('/:id/skills', championController.getSkills);
 
@@ -451,14 +429,14 @@ ChampionRoute.delete("/:id", championController.deleteChampion);
  *     summary: Adicionar uma habilidade ao campeão
  *     description: Adiciona uma habilidade ao campeão especificado pelo ID.
  *     tags:
- *       - Campeões
+ *       - Campeões (Champions)
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         description: Identificador único do campeão
  *         schema:
- *           type: string
+ *           type: integer
  *     requestBody:
  *       required: true
  *       content:
@@ -467,7 +445,7 @@ ChampionRoute.delete("/:id", championController.deleteChampion);
  *             type: object
  *             properties:
  *               skillId:
- *                 type: number
+ *                 type: integer
  *                 description: Identificador da habilidade a ser adicionada.
  *     responses:
  *       200:
@@ -475,11 +453,8 @@ ChampionRoute.delete("/:id", championController.deleteChampion);
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 skill:
- *                   type: object
- *                   description: Informações da habilidade adicionada.
+ *               $ref: '#/components/schemas/Skill'
+ *                   
  *       400:
  *         description: Erro na requisição.
  *         content:
