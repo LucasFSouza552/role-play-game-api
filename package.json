@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
@@ -9,6 +10,7 @@
     "nodemon": "^3.1.10",
     "pg": "^8.15.6",
     "projeto": "file:",
+    "swagger-autogen": "^2.23.7",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "uuid": "^11.1.0"
@@ -16,21 +18,24 @@
   "name": "projeto",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./src/index.js",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
-    "@types/cors": "^2.8.17",
+    "@types/cors": "^2.8.18",
+    "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.1",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/knex": "^0.15.2",
-    "@types/node": "^22.15.9",
+    "@types/node": "^22.15.18",
     "@types/swagger-ui-express": "^4.1.8",
+    "@types/uuid": "^10.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --watch src --watch index.ts --exec ts-node index.ts"
+    "dev": "nodemon --watch src --watch index.ts --exec ts-node index.ts",
+    "reset": "npx ts-node scripts/resetMigrations.ts"
   },
   "keywords": [],
   "author": "",

@@ -4,8 +4,6 @@ const tablename = "champions_missions";
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable(tablename, (table) => {
-    table.increments("id").primary();
-
     table.integer("championId").notNullable();
     table.integer("missionId").notNullable();
 

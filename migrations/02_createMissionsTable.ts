@@ -16,6 +16,7 @@ export async function up(knex: Knex): Promise<void> {
         table.enu('status', missionStatus).notNullable();
         table.date('targetDate').notNullable();
         table.integer('xp');
+        table.integer('sp');
         table.decimal('money');
     })
 }

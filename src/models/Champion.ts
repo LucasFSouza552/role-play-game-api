@@ -11,10 +11,12 @@ export interface Champion {
 	dexterity?: number;
 	intelligence?: number;
 	vitality?: number;
-	hp: number;
-	xp: number;
-	xp_max?: number;
-	sp: number; 
+	hp: number; // Pontos de Vida
+	mp: number; // Pontos de Magia
+	ep: number; // Pontos de Energia
+	sp: number; // Pontos de Status
+	xp: number; // Pontos de Experiência
+	xp_max?: number; // Pontos de Experiência Máxima
 	level: number;
 	roleId: number;
 	role?: ChampionRole;

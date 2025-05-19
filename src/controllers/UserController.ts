@@ -95,7 +95,47 @@ export class UserController {
         }
     }
 
-    // async updateUser(id: string, user: user): Promise<user> {
-    //     return await userService.updateUser(id, user);
-    // }
+    async updateUser(req: Request, res: Response){
+
+        const user = req.userId;
+
+        if (!user) {
+            res.status(400).json({ error: "Falta informação necessária para atualizar o usuário" });
+            return;
+        }
+
+        const User = await userService.getUserById(user);
+        
+        if(!User) {
+            res.status(400).json({ error: "Usuário não encontrado" });
+            return;
+        }
+        
+        const userBody:Partial<Omit<user, "id" | "email">> = req.body;
+
+        if(!userBody) {
+            res.status(400).json({ error: "Falta informação necessária para atualizar o usuário" });
+            return;
+        }
+
+        if (userBody?.password) {
+            const passwordEncoded = await cryptPassword(userBody.password);
+            userBody.password = passwordEncoded;
+        }
+
+        const userData: Partial<Omit<user, "id" | "email">> = {
+            ...User,
+            ...userBody
+        }
+        const userUpdated = await userService.updateUser(userData as user);
+        if (!userUpdated) {
+            res.status(400).json({ error: "Erro ao atualizar o usuário" });
+            return;
+        }   
+
+
+        const token = generateJwtToken(userUpdated.id);
+
+        res.status(200).json({ token });
+    }
 }

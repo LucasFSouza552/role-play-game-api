@@ -1,4 +1,4 @@
-import { userRepo } from "../repositories/RepositoriosManager";
+import { userRepo } from "../repositories/RepositoryManager";
 import { user } from "../models/User";
 
 export class UserService {

@@ -9,10 +9,10 @@ const ChampionRoute = Router();
  * path:
  * /api/champions:
  *   get:
- *     summary: Listar todos os campeões
- *     description: Retorna uma lista de todos os campeões disponíveis.
+ *     summary: Listar todos os campeões do usuário
+ *     description: Retorna uma lista de todos os campeões do usuário.
  *     tags:
- *       - Campeões
+ *       - Campeões (Champions)
  *     parameters:
  *       - in: query
  *         name: name
@@ -20,14 +20,12 @@ const ChampionRoute = Router();
  *         description: Nome do campeão para filtrar.
  *         schema:
  *           type: string
- *           example: "Ahri"
  *       - in: query
  *         name: role
  *         required: false
  *         description: Função ou classe do campeão para filtrar.
  *         schema:
  *           type: string
- *           example: "Mage"
  *       - in: query
  *         name: level
  *         required: false
@@ -118,31 +116,81 @@ ChampionRoute.get("/", championController.getAll);
  * @swagger
  * /api/champions/{id}:
  *   get:
- *     summary: Recuperar um campeão específico
- *     description: Retorna um campeão baseado no ID fornecido.
+ *     summary: Recuperar um campeão específico do usuário
+ *     description: Retorna um campeão do usuário baseado no ID fornecido.
  *     tags:
- *       - Campeões
+ *       - Campeões (Champions)
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         description: Identificador único do campeão
  *         schema:
- *           type: string
+ *           type: integer
  *     responses:
  *       200:
  *         description: Detalhes do campeão
  *         content:
  *           application/json:
  *             schema:
- *               type: object
+ *               type: 
+*                  object
  *               properties:
  *                 id:
- *                   type: string
+ *                   type: integer
  *                   description: Identificador único do campeão
  *                 name:
  *                   type: string
  *                   description: Nome do campeão
+ *                 roleId:
+ *                   type: integer
+ *                   description: Função ou classe do campeão
+ *                 guildId:
+ *                   type: integer
+ *                   nullable: true
+ *                   description: Identificador da guilda à qual o campeão pertence (pode ser nulo)
+ *                 money:
+ *                   type: number
+ *                   format: float
+ *                   description: Quantidade de dinheiro do campeão
+ *                 strength:
+ *                   type: integer
+ *                   description: Atributo de força física do campeão
+ *                 dexterity:
+ *                   type: integer   
+ *                   description: Atributo de agilidade e precisão do campeão
+ *                 intelligence:
+ *                   type: integer
+ *                   description: Atributo de inteligência e magia do campeão
+ *                 vitality:
+ *                   type: integer
+ *                   description: Atributo de resistência e vida máxima do campeão
+ *                 hp:
+ *                   type: integer
+ *                   description: Pontos de vida atuais do campeão
+ *                 level:
+ *                   type: integer
+ *                   description: Nível atual do campeão
+ *                 xp:
+ *                   type: integer
+ *                   description: Experiência acumulada pelo campeão
+ *                 xp_max:
+ *                   type: integer
+ *                   description: Experiência necessária para o próximo nível
+ *                 sp:
+ *                   type: integer
+ *                   description: Pontos de habilidade disponíveis para distribuição
+ *                 skills:
+ *                    type: array
+ *                    items:
+ *                       $ref: '#/components/schemas/Skill'
+ *                       description: Habilidade do campeão
+ *                    description: Lista de habilidades do campeão
+ *                 role:
+ *                    type: object
+ *                    $ref: '#/components/schemas/Role'
+ *                    description: Função ou classe do campeão
+
  *       404:
  *         description: Campeão não encontrado
  *       500:
@@ -152,12 +200,38 @@ ChampionRoute.get("/:id", championController.getById);
 
 /**
  * @swagger
+ * /api/champions/{id}/skills:
+ *   get:
+ *     summary: Recuperar todas as habilidades de um campeão
+ *     tags:
+ *       - Campeões (Champions)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Identificador único do campeão
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Lista de habilidades do campeão
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Skill'
+ */
+ChampionRoute.get('/:id/skills', championController.getSkills);
+
+/**
+ * @swagger
  * /api/champions:
  *   post:
  *     summary: Criar um novo campeão
  *     description: Cria um novo campeão com as informações fornecidas.
  *     tags:
- *       - Campeões
+ *       - Campeões (Champions)
  *     requestBody:
  *       required: true
  *       content:
@@ -183,11 +257,58 @@ ChampionRoute.get("/:id", championController.getById);
  *               type: object
  *               properties:
  *                 id:
- *                   type: string
- *                   description: Identificador único do campeão.
+ *                   type: integer
+ *                   description: Identificador único do campeão
  *                 name:
  *                   type: string
- *                   description: Nome do campeão.
+ *                   description: Nome do campeão
+ *                 roleId:
+ *                   type: integer
+ *                   description: Função ou classe do campeão
+ *                 guildId:
+ *                   type: integer
+ *                   nullable: true
+ *                   description: Identificador da guilda à qual o campeão pertence (pode ser nulo)
+ *                 money:
+ *                   type: number
+ *                   format: float
+ *                   description: Quantidade de dinheiro do campeão
+ *                 strength:
+ *                   type: integer
+ *                   description: Atributo de força física do campeão
+ *                 dexterity:
+ *                   type: integer   
+ *                   description: Atributo de agilidade e precisão do campeão
+ *                 intelligence:
+ *                   type: integer
+ *                   description: Atributo de inteligência e magia do campeão
+ *                 vitality:
+ *                   type: integer
+ *                   description: Atributo de resistência e vida máxima do campeão
+ *                 hp:
+ *                   type: integer
+ *                   description: Pontos de vida atuais do campeão
+ *                 level:
+ *                   type: integer
+ *                   description: Nível atual do campeão
+ *                 xp:
+ *                   type: integer
+ *                   description: Experiência acumulada pelo campeão
+ *                 xp_max:
+ *                   type: integer
+ *                   description: Experiência necessária para o próximo nível
+ *                 sp:
+ *                   type: integer
+ *                   description: Pontos de habilidade disponíveis para distribuição
+ *                 skills:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Skill'
+ *                   description: Lista de habilidades do campeão
+ *                 role:
+ *                   type: object
+ *                   $ref: '#/components/schemas/Role'
+ *                   description: Função ou classe do campeão
  *       400:
  *         description: Erro na requisição.
  *         content:
@@ -205,63 +326,77 @@ ChampionRoute.post("/", championController.createChampion);
 
 /**
  * @swagger
- * /api/champions/{id}:
+ * /api/champions/{id}/status:
  *   patch:
- *     summary: Atualiza parcialmente um campeão existente
- *     description: Atualiza os atributos especificados de um campeão a partir do ID fornecido.
+ *     summary: Atualizar o status de um campeão
+ *     description: Atualiza o status de um campeão baseado no ID fornecido.
  *     tags:
- *       - Campeões
+ *       - Campeões (Champions)
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
+ *         description: Identificador único do campeão
  *         schema:
- *           type: string
- *         description: ID do campeão a ser atualizado
+ *           type: integer
  *     requestBody:
+ *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
  *             properties:
- *               money:
- *                 type: number
- *                 example: 150
- *               guildId:
- *                 type: string
- *                 example: "abc123"
  *               strength:
- *                 type: number
- *                 example: 12
+ *                 type: integer
+ *                 description: Valor a ser adicionado ao atributo de força física do campeão
  *               dexterity:
- *                 type: number
- *                 example: 10
+ *                 type: integer
+ *                 description: Valor a ser adicionado ao atributo de agilidade e precisão do campeão
  *               intelligence:
- *                 type: number
- *                 example: 8
+ *                 type: integer
+ *                 description: Valor a ser adicionado ao atributo de inteligência e magia do campeão
  *               vitality:
- *                 type: number
- *                 example: 9
- *               hp:
- *                 type: number
- *                 example: 100
- *               xp:
- *                 type: number
- *                 example: 2000
- *               sp:
- *                 type: number
- *                 example: 30
+ *                 type: integer
+ *                 description: Valor a ser adicionado ao atributo de resistência e vida máxima do campeão
  *     responses:
  *       200:
- *         description: Campeão atualizado com sucesso
+ *         description: Status do campeão atualizado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   description: Identificador único do campeão
+ *                 strength:
+ *                   type: integer
+ *                   description: Novo valor de força física do campeão
+ *                 dexterity:
+ *                   type: integer
+ *                   description: Novo valor de agilidade e precisão do campeão
+ *                 intelligence:
+ *                   type: integer
+ *                   description: Novo valor de inteligência e magia do campeão
+ *                 vitality:
+ *                   type: integer
+ *                   description: Novo valor de resistência e vida máxima do campeão
  *       400:
- *         description: Requisição inválida
+ *         description: Erro na requisição.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Descrição do erro.
  *       404:
- *         description: Campeão não encontrado
+ *         description: Campeão não encontrado.
  *       500:
- *         description: Erro interno do servidor
+ *         description: Erro interno do servidor.
  */
-ChampionRoute.patch("/:id", championController.updateChampion);
+ChampionRoute.patch("/:id/status", championController.updateStatusChampion);
 
 
 /**
@@ -294,14 +429,14 @@ ChampionRoute.delete("/:id", championController.deleteChampion);
  *     summary: Adicionar uma habilidade ao campeão
  *     description: Adiciona uma habilidade ao campeão especificado pelo ID.
  *     tags:
- *       - Campeões
+ *       - Campeões (Champions)
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         description: Identificador único do campeão
  *         schema:
- *           type: string
+ *           type: integer
  *     requestBody:
  *       required: true
  *       content:
@@ -318,11 +453,8 @@ ChampionRoute.delete("/:id", championController.deleteChampion);
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 skill:
- *                   type: object
- *                   description: Informações da habilidade adicionada.
+ *               $ref: '#/components/schemas/Skill'
+ *                   
  *       400:
  *         description: Erro na requisição.
  *         content:
@@ -340,6 +472,5 @@ ChampionRoute.delete("/:id", championController.deleteChampion);
  */
 ChampionRoute.post("/:id/skill", championController.addSkill);
 
-ChampionRoute.get('/:id/skills', championController.getSkills)
 
 export default ChampionRoute;

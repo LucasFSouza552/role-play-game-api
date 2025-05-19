@@ -12,6 +12,7 @@ export async function seed(knex: Knex): Promise<void> {
       targetDate: new Date("2025-06-15"),
       xp: 1500,
       money: 500,
+      sp: 6,
       status: MissionStatus.AWAITING,
     },
     {
@@ -22,6 +23,7 @@ export async function seed(knex: Knex): Promise<void> {
       targetDate: new Date("2025-06-10"),
       xp: 200,
       money: 100,
+      sp: 1,
       status: MissionStatus.AWAITING,
     },
     {
@@ -32,6 +34,7 @@ export async function seed(knex: Knex): Promise<void> {
       targetDate: new Date("2025-06-12"),
       xp: 800,
       money: 300,
+      sp: 3,
       status: MissionStatus.AWAITING,
     },
     {
@@ -42,6 +45,7 @@ export async function seed(knex: Knex): Promise<void> {
       targetDate: new Date("2025-07-01"),
       xp: 5000,
       money: 2000,
+      sp: 10,
       status: MissionStatus.AWAITING,
     }
   ]);

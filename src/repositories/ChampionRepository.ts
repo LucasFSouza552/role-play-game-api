@@ -29,9 +29,9 @@ export class ChampionRepository {
 		return allChampions;
 	}
 
-	async findById(id: string, userId: number): Promise<Champion> {
-		const champion = await db(this.tableName).where({ id }).where({ userId }).first().orderBy('champions.name', 'asc');
-		const championSkills = await db('champion_skills').where({ championId: id });
+	async findById(championId: number, userId: number): Promise<Champion> {
+		const champion = await db(this.tableName).where({ id:championId }).where({ userId }).first().orderBy('champions.name', 'asc');
+		const championSkills = await db('champion_skills').where({ championId });
 		const skills = await db('skills').whereIn('id', championSkills.map((cs: any) => cs.skillId));
 		const role = await db('champion_roles').where({ id: champion.roleId }).first();
 		champion.xp_max = getMaxExperience(champion.level);
@@ -41,40 +41,48 @@ export class ChampionRepository {
 	}
 
 	async create(champion: Omit<Champion, 'id'>): Promise<Champion> {
-
-		const newChampion = db(this.tableName).insert(champion).returning('*').then((newChampion: Champion[]) => newChampion[0]).catch((error) => {
-			throw new Error('Erro ao criar campeãoo');
-		});
-
-		return newChampion;
+		try {
+			const newChampion = await db(this.tableName).insert(champion).returning('*');
+			return newChampion[0];
+		} catch (error) {
+			throw new Error('Erro ao criar campeão');
+		}
 	}
 
-	async update(id: string, champion: Champion) {
+	async update(championId: number, champion: Champion) {
 		try {
-			const updatedChampion = await db(this.tableName).where({ id }).update(champion);
+			const updatedChampion = await db(this.tableName).where({ id:championId }).update(champion);
 			return updatedChampion;
 		} catch (error) {
 			throw new Error('Erro ao atualizar campeão');
 		}
 	}
 
-	async delete(id: string) {
+	async delete(championId: number) {
 		try {
-			const deletedChampion = await db(this.tableName).where({ id }).del();
+			const deletedChampion = await db(this.tableName).where({ id: championId }).del();
 			return deletedChampion;
 		} catch (error) {
 			throw new Error('Erro ao deletar campeão');
 		}
 	}
 
-	async addSkill(championId: string, skillId: number) {
+	async addSkill(championId: number, skillId: number) {
 		const newChampionSkill = await db('champion_skills').insert({ championId, skillId }).returning('*');
 		return newChampionSkill;
 	}
 
-	async getSkills(championId: string) {
-		const championSkills = await db('champion_skills').where({ championId }).returning('*');
+	async getSkills(championId: number) {
+		const championSkills = await db('champion_skills')
+		.where({ championId })
+			.join('skills', 'skills.id', '=', 'champion_skills.skillId')
+			.select('name', 'description', 'power', 'cost', 'target');
 		return championSkills;
+	}
+
+	async getSkillById(skillId: number) {
+		const skill = await db('skills').where({ id: skillId }).first();
+		return skill;
 	}
 
 }
