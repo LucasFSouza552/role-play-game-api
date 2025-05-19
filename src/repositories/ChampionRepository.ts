@@ -49,9 +49,9 @@ export class ChampionRepository {
 		}
 	}
 
-	async update(championId: number, champion: Champion) {
+	async update(champion: Champion) {
 		try {
-			const updatedChampion = await db(this.tableName).where({ id:championId }).update(champion);
+			const updatedChampion = await db(this.tableName).where({ id:champion.id, userId: champion.userId }).update(champion);
 			return updatedChampion;
 		} catch (error) {
 			throw new Error('Erro ao atualizar campeão');
@@ -83,6 +83,22 @@ export class ChampionRepository {
 	async getSkillById(skillId: number) {
 		const skill = await db('skills').where({ id: skillId }).first();
 		return skill;
+	}
+
+	async updateGuild(Champion: Pick<Champion, 'id' | 'guildId' | 'userId'>) {
+		const updatedChampion = await db(this.tableName).where({ id: Champion.id, userId: Champion.userId }).update({ guildId: Champion.guildId });
+		return updatedChampion;
+	}
+
+	async updateStatus(champion: Pick<Champion, 'id' | 'userId' | 'strength' | 'dexterity' | 'intelligence' | 'vitality' | 'sp'>) {
+		const updatedChampion = await db(this.tableName).where({ id: champion.id, userId: champion.userId }).update({
+			strength: champion.strength,
+			dexterity: champion.dexterity,
+			intelligence: champion.intelligence,
+			vitality: champion.vitality,
+			sp: champion.sp
+		});
+		return updatedChampion;
 	}
 
 }

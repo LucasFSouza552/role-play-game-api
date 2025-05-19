@@ -406,14 +406,14 @@ ChampionRoute.patch("/:id/status", championController.updateStatusChampion);
  *     summary: Excluir um campeão
  *     description: Remove um campeão baseado no ID fornecido.
  *     tags:
- *       - Campeões
+ *       - Campeões (Champions)
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         description: Identificador único do campeão
  *         schema:
- *           type: string
+ *           type: integer
  *     responses:
  *       200:
  *         description: Campeão excluído com sucesso.
@@ -472,5 +472,61 @@ ChampionRoute.delete("/:id", championController.deleteChampion);
  */
 ChampionRoute.post("/:id/skill", championController.addSkill);
 
+// Aceitar Missões
+
+
+/**
+ * @swagger
+ * /api/champions/{id}/guild:
+ *   post:
+ *     summary: Entrar na guilda
+ *     description: O campeão entra na guilda especificada pelo ID.
+ *     tags:
+ *       - Campeões (Champions)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Identificador único do campeão
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - guildId
+ *             properties:
+ *               guildId:
+ *                 type: integer
+ *                 description: Identificador da guilda a se juntar.
+ *     responses:
+ *       200:
+ *         description: Campeão entrou na guilda com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Champion'
+ *       400:
+ *         description: Erro na requisição.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Descrição do erro.
+ *       404:
+ *         description: Campeão ou guilda não encontrados.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+ChampionRoute.post("/:id/guild", championController.joinGuild);
+
+// Sair de Guildas
+// ChampionRoute.delete("/:id/guild", championController.leaveGuild);
 
 export default ChampionRoute;

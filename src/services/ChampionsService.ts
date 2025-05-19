@@ -42,12 +42,26 @@ export class ChampionService {
 		return RetrievedChampion;
 	}
 
-	async updateChampion(id: number, champion: any) {
-		return await championRepo.update(id, champion);
+	async updateChampion(champion: Champion) {
+		return await championRepo.update(champion);
+	}
+
+	async updateChampionStatus(champion: Pick<Champion, 'id' | 'userId' | 'strength' | 'dexterity' | 'intelligence' | 'vitality' | 'sp'>) {
+		return await championRepo.updateStatus(champion);
+	}
+
+	async updateChampionGuild(champion:Pick<Champion, 'id' | 'guildId' | 'userId'>) {
+		return await championRepo.updateGuild(champion);
+
 	}
 
 	async deleteChampion(id: number) {
-		return await championRepo.delete(id);
+		try {
+			await championRepo.delete(id);
+			return { message: 'Champion deleted' };
+		} catch (error) {
+			throw new Error('Champion not deleted');
+		}
 	}
 
 	async addSkill(championId: number, skillId: number) {

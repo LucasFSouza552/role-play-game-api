@@ -7,7 +7,7 @@ export interface Mission {
     description: string;
     difficulty: MissionDifficult;
     targetDate: Date;
-    status: MissionStatus;
+    status?: MissionStatus;
     XP?: number;
     SP?: number; 
     money?: number;

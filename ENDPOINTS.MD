@@ -29,8 +29,7 @@ PATCH /champions # Atualiza um aventureiro
 GET /guilds # Retorna todas as guildas
 GET /guilds/:id # Retorna uma guilda específica
 POST /guilds # Cria uma guilda
-PATCH /guilds # Atualiza a guilda
-POST /guilds/:id/join # Aventureiro entrar na guilda
+PATCH /guilds # Atualiza o nome da guilda
 ```
 
 ### Missões (Missions)

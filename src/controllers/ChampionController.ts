@@ -1,10 +1,14 @@
+
 import { Request, Response } from "express";
 import { ChampionService } from "../services/ChampionsService";
 import { Filters, defaultFilters } from "../models/Filters";
 import { ChampionSkill } from "../models/ChampionSkill";
 import { Champion } from "../models/Champion";
+import { GuildService } from "../services/GuildService";
 
 const championService = new ChampionService();
+const guildService = new GuildService();
+
 export class ChampionController {
 	async getAll(req: Request, res: Response) {
 		try {
@@ -101,7 +105,9 @@ export class ChampionController {
 				return;
 			}
 
-			const updatedChampion = await championService.updateChampion(championId, {
+			const updatedChampion = await championService.updateChampionStatus({
+				id: championId,
+				userId: userId,
 				strength: championExists.strength + (strength || 0),
 				dexterity: championExists.dexterity + (dexterity || 0),
 				intelligence: championExists.intelligence + (intelligence || 0),
@@ -111,38 +117,6 @@ export class ChampionController {
 
 			res.status(200).json(updatedChampion);
 
-		} catch (err: any) {
-			res.status(500).json({ error: err.message });
-		}
-	}
-
-	async updateChampion(req: Request, res: Response) {
-		try {
-			const championId = parseInt(req.params.id);
-			const champion = req.body;
-			const userId: number = req.userId as number;
-
-			if(!userId) {
-				res.status(400).json({ errror: "Usuário inválido" })
-				return;
-			}
-
-			const championExists = await championService.getChampionById(championId, userId);
-
-			if (!championExists) {
-				res.status(400).json({ error: "Campeão não encontrado" })
-				return;
-			}
-
-			const dataChampionUpdate: Omit<Champion, 'id' | 'userId' | 'role' | 'xp_max' > = {
-				...championExists,
-				...champion
-			}
-
-			const { role, skills, ...newChampion } = { ...championExists, ...dataChampionUpdate };
-
-			const updatedChampion = await championService.updateChampion(championId, newChampion);
-			res.status(200).json(updatedChampion);
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
 		}
@@ -158,7 +132,8 @@ export class ChampionController {
 			}
 
 			const deletedChampion = await championService.deleteChampion(championId);
-			res.status(200).json({ deletedChampion: !!deletedChampion });
+
+			res.status(200).json({ deletedChampion: deletedChampion });
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
 		}
@@ -217,6 +192,54 @@ export class ChampionController {
 			res.status(200).json(championSkills);
 		} catch (error) {
 			res.status(400).json({ error: "Erro ao obter habilidades do campeão" });
+		}
+
+	}
+
+	async joinGuild(req: Request, res: Response) {
+		const championId = parseInt(req.params.id);
+		const guildId = req.body.guildId && parseInt(req.body.guildId);
+		const userId: number = req?.userId as number;
+
+		console.log("userId", userId, "championId", championId, "guildId", req.params.guildId);
+		if (!championId || !guildId) {
+			res.status(400).json({ error: "Falta informação necessária entrar na guilda" });
+			return;
+		}
+
+		if(!userId) {
+			res.status(400).json({ errror: "Usuário inválido" })
+			return;
+		}
+
+		const guildExists = await guildService.getGuildById(guildId);
+
+		if (!guildExists) {
+			res.status(400).json({ error: "Guilda não encontrada" });
+			return;
+		}
+
+		const championExists: Champion | null = await championService.getChampionById(championId, userId);
+		if (!championExists) {
+			res.status(400).json({ errror: "Campião não encontrado" })
+			return;
+		}
+
+		const hasGuild = championExists.guildId;
+		if (hasGuild) {
+			res.status(400).json({ error: "O campeão ja pertence a uma guilda" });
+			return;
+		}
+
+		try {
+			const joinedGuild = await championService.updateChampionGuild({
+				id: championId,
+				guildId: guildId,
+				userId: userId
+			});
+			res.status(200).json(joinedGuild);
+		} catch (error) {
+			res.status(400).json({ error: "Erro ao entrar na guilda" });
 		}
 
 	}
