@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import { MissionStatus } from "../src/models/enums/MissionStatus";
+import { MissionStatus } from "../../models/enums/MissionStatus";
 
 const tablename = "champions_missions";
 

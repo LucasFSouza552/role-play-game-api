@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import db from "../src/database/db";
+import db from "../db";
 
 export async function seed(knex: Knex): Promise<void> {
     const champions = await db("champions").select("id").orderBy("name");

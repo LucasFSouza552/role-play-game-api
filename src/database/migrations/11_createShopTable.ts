@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import { ItemType } from "../src/models/enums/ItemType";
+import { ItemType } from "../../models/enums/ItemType";
 
 const tablename = 'shop';
 const itemType = Object.values(ItemType);

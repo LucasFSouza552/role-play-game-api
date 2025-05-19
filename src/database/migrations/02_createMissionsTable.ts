@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import { MissionDifficult } from "../src/models/enums/MissionDifficult";
+import { MissionDifficult } from "../../models/enums/MissionDifficult";
 
 const difficultyKeys = Object.values(MissionDifficult);
 

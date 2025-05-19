@@ -1,6 +1,6 @@
 import { Knex } from "knex";
-import { MissionDifficult } from "../src/models/enums/MissionDifficult";
-import { MissionStatus } from "../src/models/enums/MissionStatus";
+import { MissionDifficult } from "../../models/enums/MissionDifficult";
+import { MissionStatus } from "../../models/enums/MissionStatus";
 
 export async function seed(knex: Knex): Promise<void> {
   await knex('missions').insert([
@@ -13,7 +13,6 @@ export async function seed(knex: Knex): Promise<void> {
       xp: 1500,
       money: 500,
       sp: 6,
-      status: MissionStatus.AWAITING,
     },
     {
       id: 2,
@@ -24,7 +23,6 @@ export async function seed(knex: Knex): Promise<void> {
       xp: 200,
       money: 100,
       sp: 1,
-      status: MissionStatus.AWAITING,
     },
     {
       id: 3,
@@ -35,7 +33,6 @@ export async function seed(knex: Knex): Promise<void> {
       xp: 800,
       money: 300,
       sp: 3,
-      status: MissionStatus.AWAITING,
     },
     {
       id: 4,
@@ -46,7 +43,6 @@ export async function seed(knex: Knex): Promise<void> {
       xp: 5000,
       money: 2000,
       sp: 10,
-      status: MissionStatus.AWAITING,
     }
   ]);
 }
