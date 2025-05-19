@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { Filters, defaultFilters } from "../models/Filters";
 import { ChampionRoleService } from "../services/ChampionRoleService";
-import ValidateUUID from "../utils/validateChampionId";
 
 const championRoleService = new ChampionRoleService();
 
@@ -22,11 +21,11 @@ export class ChampionRoleController {
         try {
             const roleId = req.params.id;
 
-            if (!ValidateUUID(roleId)) {
+            if (!roleId) {
                 res.status(400).send({ error: "ID é inválido" })
                 return;
             }
-
+            
             const role = await championRoleService.getChampionRoleById(roleId);
             res.status(200).json(role);
         } catch (error) {

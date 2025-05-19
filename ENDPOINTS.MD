@@ -1,3 +1,17 @@
+## Base Route Api
+```bash
+/api
+```
+
+
+### Usuário (User)
+```bash 
+GET /user # Exibe dados sobre o usuário
+POST /user/register # Cria um novo usuário
+POST /user/login # Autenticar usuário
+PATCH /user/update #Atualiza dados do usuário
+```
+
 ### Aventureiro (Champion)
 ```bash
 GET /champions # Exibe todos os aventureiros

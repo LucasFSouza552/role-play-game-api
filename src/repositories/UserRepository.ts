@@ -18,7 +18,7 @@ export class UserRepository {
     }
 
     async update(user: user): Promise<user> {
-        return await db(this.tableName).where({ id: user.id }).update(user);
+        return await db(this.tableName).where({ id: user.id }).update(user).returning('*').then((rows) => rows[0]);
     }
 
     async findByEmail(email: string): Promise<user> {

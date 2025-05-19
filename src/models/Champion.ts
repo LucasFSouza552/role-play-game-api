@@ -12,9 +12,11 @@ export interface Champion {
 	intelligence?: number;
 	vitality?: number;
 	hp: number;
+	mp: number;
+	ep: number;
+	sp: number; 
 	xp: number;
 	xp_max?: number;
-	sp: number; 
 	level: number;
 	roleId: number;
 	role?: ChampionRole;

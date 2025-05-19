@@ -1,4 +1,5 @@
 import AuthMiddleware from "../middleware/authMiddleware";
+import { validateAllowedFields } from "../middleware/validateAllowedFields";
 import { UserController } from "./../controllers/UserController";
 import { Router } from "express";
 
@@ -6,17 +7,56 @@ const userRoute = Router();
 
 const userController = new UserController();
 
-userRoute.get("/", userController.getAllUsers);
-
+/**
+ * @swagger
+ * /api/user:
+ *   get:
+ *     summary: Pegar dados do usuário logado
+ *     description: Retorna os dados do usuário logado.
+ *     tags:
+ *       - Usuários (Users)
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Dados do usuário logado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: number
+ *                   description: Identificador único do usuário.
+ *                 name:
+ *                   type: string
+ *                   description: Nome do usuário.
+ *                 email:
+ *                   type: string
+ *                   description: Email do usuário.
+ *       401:
+ *         description: Token inválido.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Descrição do erro.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+userRoute.get("/", AuthMiddleware, userController.getUserById);
 
 /**
  * @swagger
- * /api/users/register:
+ * /api/user/register:
  *   post:
  *     summary: Criar um novo usuário
  *     description: Cria um novo usuário com as informações fornecidas.
  *     tags:
- *       - Usuários
+ *       - Usuários (Users)
  *     requestBody:
  *       required: true
  *       content:
@@ -45,12 +85,9 @@ userRoute.get("/", userController.getAllUsers);
  *             schema:
  *               type: object
  *               properties:
- *                 id:
- *                   type: number
- *                   description: Identificador único do usuário.
- *                 name:
+ *                 token:
  *                   type: string
- *                   description: Nome do usuário.
+ *                   description: Token de autenticação do usuário.
  *       400:
  *         description: Requisição inválida.
  *         content:
@@ -66,15 +103,14 @@ userRoute.get("/", userController.getAllUsers);
  */
 userRoute.post("/register", userController.createUser);
 
-
 /**
  * @swagger
- * /api/users/login:
+ * /api/user/login:
  *   post:
  *     summary: Autenticar usuário
  *     description: Autentica um usuário com as credenciais fornecidas.
  *     tags:
- *       - Usuários
+ *       - Usuários (Users)
  *     requestBody:
  *       required: true
  *       content:
@@ -114,39 +150,6 @@ userRoute.post("/register", userController.createUser);
  *                   description: Descrição do erro.
  *       500:
  *         description: Erro interno do servidor.
- */
-userRoute.post("/login", userController.authenticateUser);
-
-
-/**
- * @swagger
- * /api/users/data:
- *   get:
- *     summary: Pegar dados do usuário logado
- *     description: Retorna os dados do usuário logado.
- *     tags:
- *       - Usuários
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Dados do usuário logado.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: number
- *                   description: Identificador único do usuário.
- *                 name:
- *                   type: string
- *                   description: Nome do usuário.
- *                 email:
- *                   type: string
- *                   description: Email do usuário.
- *       401:
- *         description: Token inválido.
  *         content:
  *           application/json:
  *             schema:
@@ -155,9 +158,48 @@ userRoute.post("/login", userController.authenticateUser);
  *                 error:
  *                   type: string
  *                   description: Descrição do erro.
- *       500:
- *         description: Erro interno do servidor.
+ * 
  */
-userRoute.get("/data", AuthMiddleware, userController.getUserById);
+userRoute.post("/login", userController.authenticateUser);
+
+/**
+ * @swagger
+ * /api/user/update:
+ *   patch:
+ *     summary: Atualizar dados do usuário
+ *     description: Atualiza os dados do usuário logado com as informações fornecidas.
+ *     tags:
+ *       - Usuários (Users)
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Nome do usuário.
+ *               password:
+ *                 type: string
+ *                 description: Senha do usuário.
+ *               role:
+ *                 type: string
+ *                 description: Papel do usuário.
+ *     responses:
+ *       200:
+ *         description: Dados do usuário atualizados com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Mensagem de sucesso.
+ */
+userRoute.patch("/update",AuthMiddleware, validateAllowedFields,userController.updateUser);
 
 export default userRoute;

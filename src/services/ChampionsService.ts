@@ -8,11 +8,11 @@ export class ChampionService {
 		return await championRepo.findAll(filter);
 	}
 
-	async getChampionById(id: string, userId: number): Promise<Champion> {
+	async getChampionById(id: number, userId: number): Promise<Champion> {
 		return await championRepo.findById(id, userId);
 	}
 
-	async createChampion(champion: any) {
+	async createChampion(champion: any): Promise<Champion | any> {
 
 		const roleName = champion.roleName;
 		const roleExists: ChampionRole = await roleRepo.findByName(roleName);
@@ -26,27 +26,35 @@ export class ChampionService {
 			userId: champion.userId,
 			roleId: roleExists.id,
 			hp: roleExists.hp,
+			ep: roleExists.ep,
+			mp: roleExists.mp,
 			xp: 0,
 			sp: 15,
 			level: 1
 		}
 
-		return await championRepo.create(newChampion);
+		const createdChampion = await championRepo.create(newChampion);
+		if (!createdChampion) {
+			throw new Error('Champion not created');
+		}
+
+		const RetrievedChampion = await championRepo.findById(createdChampion.id, champion.userId);
+		return RetrievedChampion;
 	}
 
-	async updateChampion(id: string, champion: any) {
+	async updateChampion(id: number, champion: any) {
 		return await championRepo.update(id, champion);
 	}
 
-	async deleteChampion(id: string) {
+	async deleteChampion(id: number) {
 		return await championRepo.delete(id);
 	}
 
-	async addSkill(championId: string, skillId: number) {
+	async addSkill(championId: number, skillId: number) {
 		return await championRepo.addSkill(championId, skillId);
 	}
 
-	async getSkills(ChampionId: string) {
+	async getSkills(ChampionId: number) {
 		return await championRepo.getSkills(ChampionId);
 	}
 

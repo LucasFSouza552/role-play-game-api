@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { ChampionService } from "../services/ChampionsService";
 import { Filters, defaultFilters } from "../models/Filters";
-import ValidateUUID from "../utils/validateChampionId";
 import { ChampionSkill } from "../models/ChampionSkill";
 import { Champion } from "../models/Champion";
 
@@ -20,10 +19,10 @@ export class ChampionController {
 
 	async getById(req: Request, res: Response) {
 		try {
-			const championId = req.params.id;
+			const championId = parseInt(req.params.id);
 			const userId: number = req.userId as number;
 
-			if (!ValidateUUID(championId)) {
+			if (!championId) {
 				res.status(400).send({ error: "ID é inválido" })
 				return;
 			}
@@ -33,7 +32,7 @@ export class ChampionController {
 				return;
 			}
 
-			const champion = await championService.getChampionById(championId,userId);
+			const champion = await championService.getChampionById(championId, userId);
 			res.status(200).json(champion);
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
@@ -64,9 +63,62 @@ export class ChampionController {
 		}
 	}
 
+	async updateStatusChampion(req: Request, res: Response) {
+		try {
+			const championId = parseInt(req.params.id);
+			const userId: number = req.userId as number;
+			const { strength, dexterity, intelligence, vitality } = req.body;
+
+			if (!userId) {
+				res.status(400).json({ errror: "Usuário inválido" })
+				return;
+			}
+
+			if (!championId) {
+				res.status(400).json({ error: "ID do campeão inválido" })
+				return;
+			}
+
+			if (!strength && !dexterity && !intelligence && !vitality) {
+				res.status(400).json({ error: "Falta informação necessária para atualizar o status do campeão" });
+				return;
+			}
+
+			if (strength < 0 && dexterity < 0 && intelligence < 0 && vitality < 0) {
+				res.status(400).json({ error: "O valor do status deve ser maior que zero" });
+				return;
+			}
+
+			const championExists = await championService.getChampionById(championId, userId);
+			if (!championExists) {
+				res.status(400).json({ error: "Campeão não encontrado" })
+				return;
+			}
+
+			const totalSP = strength + dexterity + intelligence + vitality;
+			if (totalSP > championExists.sp) {
+				res.status(400).json({ error: `O total de SP não pode ser maior que ${championExists.sp} pontos` });
+				return;
+			}
+
+			const updatedChampion = await championService.updateChampion(championId, {
+				strength: championExists.strength + (strength || 0),
+				dexterity: championExists.dexterity + (dexterity || 0),
+				intelligence: championExists.intelligence + (intelligence || 0),
+				vitality: championExists.vitality + (vitality || 0),
+				sp: championExists.sp - totalSP
+			});
+
+			res.status(200).json(updatedChampion);
+
+		} catch (err: any) {
+			res.status(500).json({ error: err.message });
+		}
+	}
+
 	async updateChampion(req: Request, res: Response) {
 		try {
-			const championId = req.params.id;
+			const championId = parseInt(req.params.id);
 			const champion = req.body;
 			const userId: number = req.userId as number;
 
@@ -98,9 +150,9 @@ export class ChampionController {
 
 	async deleteChampion(req: Request, res: Response) {
 		try {
-			const championId = req.params.id;
+			const championId = parseInt(req.params.id);
 
-			if (!ValidateUUID(championId)) {
+			if (!championId) {
 				res.status(400).json({ error: "ID do campeão inválido" })
 				return;
 			}
@@ -113,11 +165,11 @@ export class ChampionController {
 	}
 
 	async addSkill(req: Request, res: Response) {
-		const championId = req.params.id;
+		const championId = parseInt(req.params.championId);
 		const skillId = req.body.skillId;
 		const userId: number = req.userId as number;
 
-		if (!ValidateUUID(championId)) {
+		if (!championId) {
 			res.status(400).json({ errror: "ID do campeão inválido" })
 			return;
 		}
@@ -138,7 +190,6 @@ export class ChampionController {
 			return;
 		}
 
-
 		const hasSkill = championExists.skills?.some((skill: ChampionSkill) => skill.id === skillId);
 		if (hasSkill) {
 			res.status(400).json({ error: "A habilidade já foi adicionada ao campeão" });
@@ -154,9 +205,9 @@ export class ChampionController {
 	}
 
 	async getSkills(req: Request, res: Response) {
-		const championId = req.params.id;
+		const championId = parseInt(req.params.championId);
 
-		if (!ValidateUUID(championId)) {
+		if (!championId) {
 			res.status(400).json({ errror: "ID do campeão inválido" })
 			return;
 		}
