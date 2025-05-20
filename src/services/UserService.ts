@@ -1,5 +1,6 @@
 import { userRepo } from "../repositories/RepositoryManager";
 import { user } from "../models/User";
+import { createUserDTO, updateUserDTO, userDTO } from "../DTOS/Users/UserDTO";
 
 export class UserService {
     async getAllUsers(): Promise<user[]> {
@@ -10,11 +11,11 @@ export class UserService {
         return await userRepo.findById(id);
     }
 
-    async createUser(user: Omit<user, 'id'>): Promise<user> {
+    async createUser(user: createUserDTO): Promise<userDTO> {
         return await userRepo.create(user);
     }
 
-    async updateUser(user: user): Promise<user> {
+    async updateUser(user: updateUserDTO): Promise<userDTO> {
         return await userRepo.update(user);
     }
 
