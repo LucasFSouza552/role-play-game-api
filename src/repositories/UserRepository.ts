@@ -9,6 +9,7 @@ export class UserRepository {
         return await db(this.tableName).select('*');
     }
 
+
     async findById(id: number): Promise<user> {
         return await db(this.tableName).where({ id }).first();
     }
@@ -18,7 +19,7 @@ export class UserRepository {
         return User;
     }
 
-    async update(user: updateUserDTO): Promise<userDTO> {
+    async update(user: updateUserDTO): Promise<updateUserDTO> {
         return await db(this.tableName).where({ id: user.id }).update(user).returning('*').then((rows) => rows[0]);
     }
 

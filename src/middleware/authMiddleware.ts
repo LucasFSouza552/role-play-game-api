@@ -17,7 +17,7 @@ export default function AuthMiddleware(req: Request, res: Response, next: NextFu
     
     const decodedToken = validateAuthorizationHeader(token);
     if (!decodedToken) {
-        res.status(401).json({ error: "Invalid token" });
+        res.status(401).json({ error: "Invalid token. Use format Bearer <token>" });
         return;
     }
     req.userId = parseInt(decodedToken.id);

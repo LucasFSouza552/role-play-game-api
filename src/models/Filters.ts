@@ -6,9 +6,13 @@ export interface Filters {
     size: number;
     offset: number;
     userId?: number;
+    orderBy: string;
+    order: 'asc' | 'desc';
 }
 
 export const defaultFilters: Filters = {
     size: 5,
-    offset: 0
+    offset: 0,
+    orderBy: 'id',
+    order: 'asc',
 };

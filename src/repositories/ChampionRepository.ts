@@ -21,7 +21,7 @@ export class ChampionRepository {
 				if (filter.level) {
 					query.where('champions.level', filter.level);
 				}
-			}).orderBy('champions.name', 'asc');
+			}).orderBy(filter.orderBy, filter.order);
 
 		allChampions.map((champion: any) => {
 			champion.xp_max = getMaxExperience(champion.level);

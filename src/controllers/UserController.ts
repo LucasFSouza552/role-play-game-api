@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/UserService";
 import { user } from "../models/User";
-import { cryptPassword, validatePassword } from "../utils/bcryptPassword";
+import { validatePassword } from "../utils/bcryptPassword";
 import { generateJwtToken } from "../utils/jwt";
+import { createUserDTO, updateUserDTO } from "../DTOS/Users/UserDTO";
+import { UserMapper } from "../utils/mapppers/userMapping";
 
 const userService = new UserService();
 
@@ -27,14 +29,7 @@ export class UserController {
                 return;
             }
 
-            const passwordEncoded = await cryptPassword(user.password);
-
-            const userData: Omit<user, 'id'> = {
-                name: user.name,
-                email: user.email,
-                password: passwordEncoded,
-                role: 'user'
-            };
+            const userData: createUserDTO = UserMapper.mapCreateUserToDTO(user);
 
             const newUser = await userService.createUser(userData);
             const token = generateJwtToken(newUser.id);
@@ -59,14 +54,18 @@ export class UserController {
         try {
             const user = req.body;
 
-            console.log(user);
-
             if (!user.email || !user.password) {
                 res.status(400).json({ error: "Falta informação necessária para criar um usuário" });
                 return;
             }
-            
+
             const User = await userService.getUserByEmail(user.email);
+
+            if (!User) {
+                res.status(400).json({ error: "Usuário não encontrado" });
+                return;
+            }
+
             const passwordEncoded = await validatePassword(user.password, User.password);
 
             if (!passwordEncoded) {
@@ -87,15 +86,15 @@ export class UserController {
 
             const userId: number = req.userId as number;
 
-            const { name, email, role } = await userService.getUserById(userId);
-            res.status(200).json({ user: { name, email, role } });
+            const user = await userService.getUserById(userId);
+            res.status(200).json({ user });
         } catch (err: any) {
             console.error(err);
             res.status(400).json({ error: err.message });
         }
     }
 
-    async updateUser(req: Request, res: Response){
+    async updateUser(req: Request, res: Response) {
 
         const user = req.userId;
 
@@ -105,33 +104,26 @@ export class UserController {
         }
 
         const User = await userService.getUserById(user);
-        
-        if(!User) {
+
+        if (!User) {
             res.status(400).json({ error: "Usuário não encontrado" });
             return;
         }
-        
-        const userBody:Partial<Omit<user, "id" | "email">> = req.body;
 
-        if(!userBody) {
+        const userBody: Partial<Omit<user, "id" | "email">> = req.body;
+
+        if (!userBody) {
             res.status(400).json({ error: "Falta informação necessária para atualizar o usuário" });
             return;
         }
 
-        if (userBody?.password) {
-            const passwordEncoded = await cryptPassword(userBody.password);
-            userBody.password = passwordEncoded;
-        }
-
-        const userData: Partial<Omit<user, "id" | "email">> = {
-            ...User,
-            ...userBody
-        }
-        const userUpdated = await userService.updateUser(userData as user);
-        if (!userUpdated) {
+        const userData: updateUserDTO = UserMapper.mapUserToUpdateDTO(userBody); 
+        
+        const userUpdated = await userService.updateUser(userData);
+        if (!userUpdated || userUpdated.id !== user) {
             res.status(400).json({ error: "Erro ao atualizar o usuário" });
             return;
-        }   
+        }
 
 
         const token = generateJwtToken(userUpdated.id);
