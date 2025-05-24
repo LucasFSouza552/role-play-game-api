@@ -1,16 +1,15 @@
 import { guildRepo } from "../repositories/RepositoriosManager";
 import { Guild } from "../models/Guild";
-import { error } from "console";
 
 export class GuildService {
 
-    async findAllGuild() {
+    async getAllGuild() {
         return await guildRepo.findAll();
     }
-    async findByGuildName(name: string) {
+    async getByGuildName(name: string) {
         return await guildRepo.findByGuildName(name);
     }
-    async findGuildById(id: number) {
+    async getGuildById(id: number) {
         return await guildRepo.findById(id);
     }
     async createGuild(guild: Guild) {
