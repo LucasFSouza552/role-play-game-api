@@ -1,8 +1,12 @@
 import { Request, Response } from "express";
 import { ItemService } from "../services/ItemService";
+import { ItemCreateDTO, ItemUpdateDTO } from "../DTOS/Itens/ItemDTO";
+import { ItemType } from "../models/enums/ItemType";
+import { ItemRarity } from "../models/enums/ItemRarity";
 
+// Controller responsável por gerenciar requisições relacionadas a itens
 export class ItemController {
-  // Lista todos os itens com filtros opcionais
+  // Lista todos os itens, com filtros opcionais por nome e preço
   static async getAllItems(req: Request, res: Response) {
     try {
       const { name, minPrice, maxPrice } = req.query;
@@ -12,95 +16,113 @@ export class ItemController {
         maxPrice: maxPrice ? Number(maxPrice) : undefined,
       };
       const items = await ItemService.getAllItems(filter);
-      return res.status(200).json(items);
+      res.status(200).json(items);
     } catch (error) {
-      console.error("Erro ao listar itens:", error);
-      return res.status(500).json({ error: "Erro ao listar itens." });
+      res.status(500).json({ error: "Erro ao listar itens." });
     }
   }
 
-  // Busca um item específico pelo ID
+  // Busca um item pelo ID
   static async getItemById(req: Request, res: Response) {
     try {
       const { id } = req.params;
       const item = await ItemService.getItemById(id);
-
       if (!item) {
-        return res.status(404).json({ error: "Item não encontrado." });
+        res.status(404).json({ error: "Item não encontrado." });
+        return;
       }
-
-      return res.status(200).json(item);
-    } catch (error) {
-      console.error(`Erro ao buscar o item com ID ${req.params.id}:`, error);
-      return res.status(500).json({ error: "Erro ao buscar o item." });
+      res.status(200).json(item);
+    } catch {
+      res.status(500).json({ error: "Erro ao buscar o item." });
     }
   }
 
-  // Cria um novo item
+  // Cria um novo item, validando campos obrigatórios e enums
   static async createItem(req: Request, res: Response) {
     try {
-      const item = req.body;
+      const item: ItemCreateDTO = req.body;
 
-      // Validação dos dados de entrada
+      // Validação dos campos obrigatórios
       if (
         !item.name ||
         !item.description ||
-        item.minPrice == null ||
-        item.maxPrice == null
+        item.priceMin == null ||
+        item.priceMax == null ||
+        !item.rarity ||
+        !item.type
       ) {
-        return res.status(400).json({ error: "Todos os campos obrigatórios devem ser preenchidos." });
+        res.status(400).json({ error: "Todos os campos obrigatórios devem ser preenchidos." });
+        return;
       }
-      if (item.minPrice > item.maxPrice) {
-        return res.status(400).json({ error: "O preço mínimo não pode ser maior que o preço máximo." });
+
+      // Validação dos enums
+      if (!(Object.values(ItemType) as string[]).includes(item.type)) {
+        res.status(400).json({ error: "Tipo de item inválido." });
+        return;
+      }
+      if (!(Object.values(ItemRarity) as string[]).includes(item.rarity)) {
+        res.status(400).json({ error: "Raridade de item inválida." });
+        return;
+      }
+
+      // Regra de negócio: preço mínimo não pode ser maior que o máximo
+      if (item.priceMin > item.priceMax) {
+        res.status(400).json({ error: "O preço mínimo não pode ser maior que o preço máximo." });
+        return;
       }
 
       const newItem = await ItemService.createItem(item);
-
-      return res.status(201).json(newItem);
-    } catch (error) {
-      console.error("Erro ao criar o item:", error);
-      return res.status(500).json({ error: "Erro ao criar o item." });
+      res.status(201).json(newItem);
+    } catch {
+      res.status(500).json({ error: "Erro ao criar o item." });
     }
   }
 
-  // Atualiza um item existente
+  // Atualiza um item existente, validando regras de negócio
   static async updateItem(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const item = req.body;
+      const item: ItemUpdateDTO = req.body;
 
-      // Validação dos dados de entrada (opcional, mas recomendado)
-      if (item.minPrice != null && item.maxPrice != null && item.minPrice > item.maxPrice) {
-        return res.status(400).json({ error: "O preço mínimo não pode ser maior que o preço máximo." });
+      // Validação de preço mínimo e máximo
+      if (item.priceMin != null && item.priceMax != null && item.priceMin > item.priceMax) {
+        res.status(400).json({ error: "O preço mínimo não pode ser maior que o preço máximo." });
+        return;
+      }
+
+      // Validação dos enums, se enviados
+      if (item.type && !(Object.values(ItemType) as string[]).includes(item.type)) {
+        res.status(400).json({ error: "Tipo de item inválido." });
+        return;
+      }
+      if (item.rarity && !(Object.values(ItemRarity) as string[]).includes(item.rarity)) {
+        res.status(400).json({ error: "Raridade de item inválida." });
+        return;
       }
 
       const updatedItem = await ItemService.updateItem(id, item);
-
       if (!updatedItem) {
-        return res.status(404).json({ error: "Item não encontrado ou erro ao atualizar." });
+        res.status(404).json({ error: "Item não encontrado ou erro ao atualizar." });
+        return;
       }
-
-      return res.status(200).json(updatedItem);
-    } catch (error) {
-      console.error(`Erro ao atualizar o item com ID ${req.params.id}:`, error);
-      return res.status(500).json({ error: "Erro ao atualizar o item." });
+      res.status(200).json(updatedItem);
+    } catch {
+      res.status(500).json({ error: "Erro ao atualizar o item." });
     }
   }
 
-  // Deleta um item existente
+  // Deleta um item pelo ID
   static async deleteItem(req: Request, res: Response) {
     try {
       const { id } = req.params;
       const result = await ItemService.deleteItem(id);
-
       if (!result) {
-        return res.status(404).json({ error: "Item não encontrado ou erro ao deletar." });
+        res.status(404).json({ error: "Item não encontrado ou erro ao deletar." });
+        return;
       }
-
-      return res.status(200).json(result);
-    } catch (error) {
-      console.error(`Erro ao deletar o item com ID ${req.params.id}:`, error);
-      return res.status(500).json({ error: "Erro ao deletar o item." });
+      res.status(200).json(result);
+    } catch {
+      res.status(500).json({ error: "Erro ao deletar o item." });
     }
   }
 }

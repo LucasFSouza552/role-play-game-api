@@ -1,48 +1,36 @@
 import db from "../database/db";
 import { Item } from "../models/Item";
 
+// Responsável por acessar e manipular os dados dos itens no banco
 export class ItemRepository {
-	// Lista todos os itens do banco de dados com filtros opcionais
-	async findAll(filter: { name?: string; minPrice?: number; maxPrice?: number }) {
-		const query = db("items").select("*");
+  // Busca todos os itens, aplicando filtros opcionais
+  static async findAll(filter: { name?: string; minPrice?: number; maxPrice?: number }) {
+    const query = db("items").select("*");
+    if (filter.name) query.whereILike("name", `%${filter.name}%`);
+    if (filter.minPrice !== undefined) query.where("priceMin", ">=", filter.minPrice);
+    if (filter.maxPrice !== undefined) query.where("priceMax", "<=", filter.maxPrice);
+    return await query.orderBy("name", "asc");
+  }
 
-		// Aplicar filtros, se fornecidos
-		if (filter.name) {
-			query.whereILike("name", `%${filter.name}%`);
-		}
-		if (filter.minPrice !== undefined) {
-			query.where("minPrice", ">=", filter.minPrice);
-		}
-		if (filter.maxPrice !== undefined) {
-			query.where("maxPrice", "<=", filter.maxPrice);
-		}
+  // Busca um item pelo ID
+  static async findById(id: string | number): Promise<Item | null> {
+    return await db("items").where({ id }).first();
+  }
 
-		// Ordenar os resultados pelo nome em ordem ascendente
-		return await query.orderBy("name", "asc");
-	}
+  // Cria um novo item no banco
+  static async create(item: Omit<Item, "id">): Promise<Item> {
+    const [newItem] = await db("items").insert(item).returning("*");
+    return newItem;
+  }
 
-	// Busca um item específico pelo ID
-	async findById(id: string): Promise<Item | null> {
-		return await db("items").where({ id }).first();
-	}
+  // Atualiza um item existente pelo ID
+  static async update(id: string | number, item: Partial<Item>): Promise<Item | null> {
+    const [updatedItem] = await db("items").where({ id }).update(item).returning("*");
+    return updatedItem;
+  }
 
-	// Cria um novo item no banco de dados
-	async create(item: Item): Promise<Item> {
-		const [newItem] = await db("items").insert(item).returning("*");
-		return newItem;
-	}
-
-	// Atualiza um item existente no banco de dados
-	async update(id: string, item: Partial<Item>): Promise<Item> {
-		const [updatedItem] = await db("items")
-			.where({ id })
-			.update(item)
-			.returning("*");
-		return updatedItem;
-	}
-
-	// Deleta um item do banco de dados
-	async delete(id: string): Promise<number> {
-		return await db("items").where({ id }).del();
-	}
+  // Deleta um item pelo ID
+  static async delete(id: string | number): Promise<number> {
+    return await db("items").where({ id }).del();
+  }
 }
