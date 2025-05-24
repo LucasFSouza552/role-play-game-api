@@ -19,7 +19,6 @@ export class UserService {
 
     async createUser(user: createUserDTO): Promise<userDTO> {
         try {
-            
             const passwordEncoded = await cryptPassword(user.password);
             user.password = passwordEncoded;
 

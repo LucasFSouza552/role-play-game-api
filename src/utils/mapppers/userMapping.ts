@@ -26,9 +26,9 @@ export class UserMapper {
 
     public static mapUserToUpdateDTO(user: user | updateUserDTO): updateUserDTO {
         return {
-            id: user.id,
-            name: user.name,
-            password: user.password
-        };
+        id: user.id!,
+        ...(user.name && { name: user.name }),
+        ...(user.password && { password: user.password }),
+    };
     }
 }

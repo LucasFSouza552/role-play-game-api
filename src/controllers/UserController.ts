@@ -110,14 +110,12 @@ export class UserController {
             return;
         }
 
-        const userBody: Partial<Omit<user, "id" | "email">> = req.body;
-
-        if (!userBody) {
+        const userData: updateUserDTO = UserMapper.mapUserToUpdateDTO(req.body as user);
+        userData.id = user;
+        if (!userData) {
             res.status(400).json({ error: "Falta informação necessária para atualizar o usuário" });
             return;
         }
-
-        const userData: updateUserDTO = UserMapper.mapUserToUpdateDTO(userBody); 
         
         const userUpdated = await userService.updateUser(userData);
         if (!userUpdated || userUpdated.id !== user) {
