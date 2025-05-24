@@ -2,45 +2,50 @@ import { userRepo } from "../repositories/RepositoryManager";
 import { createUserDTO, updateUserDTO, userDTO } from "../DTOS/Users/UserDTO";
 import { UserMapper } from "../utils/mapppers/userMapping";
 import { cryptPassword } from "../utils/bcryptPassword";
+import { ServiceInterface } from "../interfaces/serviceInterface";
 
-export class UserService {
-    async getAllUsers(): Promise<userDTO[]> {
-        return await userRepo.getAll();
-    }
+export class UserService implements ServiceInterface<createUserDTO, updateUserDTO, userDTO> {
 
-    async getUserById(id: number): Promise<userDTO> {
-        try {
-            const user = await userRepo.findById(id);
-            return UserMapper.mapUserToDTO(user);       
-        } catch (error) {
-            throw new Error("Erro ao buscar usuário: " + error);
-        }
-    }
+	async getAll(): Promise<userDTO[]> {
+		return await userRepo.getAll();
+	}
 
-    async createUser(user: createUserDTO): Promise<userDTO> {
-        try {
-            
-            const passwordEncoded = await cryptPassword(user.password);
-            user.password = passwordEncoded;
+    async getById(id: number): Promise<userDTO> {
+		try {
+			const user = await userRepo.getById(id);
+			return UserMapper.mapUserToDTO(user); 
+		} catch (error) {
+			throw new Error("Erro ao buscar usuário: " + error);
+		}
+	}
 
-            const newUser: userDTO =  await userRepo.create(user);
-            return UserMapper.mapUserToDTO(newUser);
-        } catch (error) {
-            throw new Error("Erro ao criar usuário: " + error);
-        }
-    }
+	async create(user: createUserDTO): Promise<userDTO> {
+		try {
+			const passwordEncoded = await cryptPassword(user.password);
+			user.password = passwordEncoded;
 
-    async updateUser(user: updateUserDTO): Promise<updateUserDTO> {
-        if (user?.password) {
-            const passwordEncoded = await cryptPassword(user.password);
-            user.password = passwordEncoded;
-        }
+			const newUser: userDTO = await userRepo.create(user);
+			return UserMapper.mapUserToDTO(newUser);
+		} catch (error) {
+			throw new Error("Erro ao criar usuário: " + error);
+		}
+	}
 
-        const userUpdated: updateUserDTO = await userRepo.update(user);
-        return UserMapper.mapUserToUpdateDTO(userUpdated);
-    }
+	async update(user: updateUserDTO): Promise<updateUserDTO> {
+		if (user?.password) {
+			const passwordEncoded = await cryptPassword(user.password);
+			user.password = passwordEncoded;
+		}
 
-    async getUserByEmail(email: string) {
-        return await userRepo.findByEmail(email);
+		const userUpdated: updateUserDTO = await userRepo.update(user);
+		return UserMapper.mapUserToUpdateDTO(userUpdated);
+	}
+
+	async getByEmail(email: string) {
+		return await userRepo.findByEmail(email);
+	}
+
+	delete(id: number): Promise<void> {
+	    throw new Error("Method not implemented.");
     }
 }

@@ -3,10 +3,12 @@ import { ItemController } from "../controllers/ItemController";
 
 const ItemRoute = Router();
 
-ItemRoute.get("/", (req, res) => ItemController.getAllItems(req, res));
-ItemRoute.get("/:id", (req, res) => ItemController.getItemById(req, res));
-ItemRoute.post("/", (req, res) => ItemController.createItem(req, res));
-ItemRoute.patch("/:id", (req, res) => ItemController.updateItem(req, res));
-ItemRoute.delete("/:id", (req, res) => ItemController.deleteItem(req, res));
+const itemController = new ItemController();
+
+ItemRoute.get("/", itemController.getAllItems);
+ItemRoute.get("/:id", itemController.getItemById);
+ItemRoute.post("/", itemController.createItem);
+ItemRoute.patch("/:id", itemController.updateItem);
+ItemRoute.delete("/:id", itemController.deleteItem);
 
 export default ItemRoute;

@@ -1,18 +1,24 @@
-
-export interface Filters {
-    name?: string;
-    role?: number;
-    level?: number;
+export interface Filter {
     size: number;
     offset: number;
-    userId?: number;
     orderBy: string;
     order: 'asc' | 'desc';
 }
 
-export const defaultFilters: Filters = {
+export const FilterDefault: Filter = {
     size: 5,
     offset: 0,
     orderBy: 'id',
     order: 'asc',
 };
+
+export interface FilterChampion extends Filter {
+    name?: string;
+    role?: number;
+    level?: number;
+    userId?: number;
+}
+
+
+
+

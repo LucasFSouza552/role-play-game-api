@@ -1,7 +1,7 @@
 
 import { Request, Response } from "express";
 import { ChampionService } from "../services/ChampionsService";
-import { Filters, defaultFilters } from "../models/Filters";
+import { Filters, FilterDefault } from "../models/Filters";
 import { ChampionSkill } from "../models/ChampionSkill";
 import { Champion } from "../models/Champion";
 import { GuildService } from "../services/GuildService";
@@ -12,7 +12,7 @@ const guildService = new GuildService();
 export class ChampionController {
 	async getAll(req: Request, res: Response) {
 		try {
-			const filters: Filters = { ...defaultFilters, ...req.query, userId: req.userId };
+			const filters: Filters = { ...FilterDefault, ...req.query, userId: req.userId };
 			const champions = await championService.getAllChampions(filters);
 
 			res.status(200).json({ champions: champions, length: champions.length });

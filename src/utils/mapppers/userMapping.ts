@@ -24,7 +24,7 @@ export class UserMapper {
         };
     }
 
-    public static mapUserToUpdateDTO(user: user | updateUserDTO): updateUserDTO {
+    public static mapUserToUpdateDTO(user: updateUserDTO): updateUserDTO {
         return {
             id: user.id,
             name: user.name,
