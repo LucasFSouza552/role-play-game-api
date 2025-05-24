@@ -74,7 +74,7 @@ export class ChampionController {
 			const { strength, dexterity, intelligence, vitality } = req.body;
 
 			if (!userId) {
-				res.status(400).json({ errror: "Usuário inválido" })
+				res.status(400).json({ error: "Usuário inválido" })
 				return;
 			}
 
