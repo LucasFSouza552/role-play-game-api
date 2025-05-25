@@ -1,6 +1,6 @@
 import { ItemRepository } from "../repositories/ItemRepository";
 import { ItemType } from "../models/enums/ItemType";
-import { ItemDTO } from "../DTOS/Itens/ItemDTO";
+import { ItemDTO } from "../DTOS/ItemDTO";
 
 
  // Camada de regras de negócio dos itens.

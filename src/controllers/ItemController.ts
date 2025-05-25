@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ItemService } from "../services/ItemService";
 import { ItemType } from "../models/enums/ItemType";
-import { ItemDTO } from "../DTOS/Itens/ItemDTO";
+import { ItemDTO } from "../DTOS/ItemDTO";
 
 const itemService = new ItemService();
 // Controller responsável por gerenciar requisições relacionadas a itens
