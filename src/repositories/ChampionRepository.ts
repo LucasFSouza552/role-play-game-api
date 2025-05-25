@@ -5,7 +5,7 @@ import { Champion } from "../models/Champion";
 import { FilterChampion } from "../models/Filters";
 import getMaxExperience from "../utils/getMaxExperience";
 
-export class ChampionRepository implements RepositoryInterface {
+export class ChampionRepository implements RepositoryInterface<createChampionDTO, updateChampionDTO, ChampionDTO> {
 	private tableName = 'champions';
 	async getAll(filter: FilterChampion): Promise<Champion[]> {
 		const allChampions = await db(this.tableName).select('*')
@@ -31,7 +31,7 @@ export class ChampionRepository implements RepositoryInterface {
 	}
 
 	async getById(championId: number, userId: number): Promise<ChampionDTO> {
-		const champion = await db(this.tableName).where({ id:championId }).where({ userId }).first();
+		const champion = await db(this.tableName).where({ id:championId, userId }).first();
 		const championSkills = await db('champion_skills').where({ championId });
 		const skills = await db('skills').whereIn('id', championSkills.map((cs: any) => cs.skillId));
 		const role = await db('champion_roles').where({ id: champion.roleId }).first();

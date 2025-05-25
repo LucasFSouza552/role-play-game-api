@@ -4,7 +4,7 @@ import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { ChampionRole } from "../models/ChampionRole";
 import { FilterChampionRole } from "../models/Filters";
 
-export class ChampionRoleRepository implements RepositoryInterface {
+export class ChampionRoleRepository implements RepositoryInterface<createChampionRoleDTO, updateChampionRoleDTO, ChampionRole> {
     private tableName = 'champion_roles';
 
     async getAll(filter: FilterChampionRole): Promise<ChampionRole[]> {
@@ -47,7 +47,7 @@ export class ChampionRoleRepository implements RepositoryInterface {
         }
     }
 
-    async update(championRole: updateChampionRoleDTO) {
+    async update(championRole: updateChampionRoleDTO): Promise<ChampionRole> {
         try {
             return await db(this.tableName).where({ id: championRole.id }).update(championRole);
         } catch (error) {

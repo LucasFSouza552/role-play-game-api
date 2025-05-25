@@ -217,7 +217,6 @@ export class ChampionController implements ControllerInterface {
 		const guildId = req.body.guildId && parseInt(req.body.guildId);
 		const userId: number = req?.userId as number;
 
-		console.log("userId", userId, "championId", championId, "guildId", req.params.guildId);
 		if (!championId || !guildId) {
 			res.status(400).json({ error: "Falta informação necessária entrar na guilda" });
 			return;
@@ -228,7 +227,7 @@ export class ChampionController implements ControllerInterface {
 			return;
 		}
 
-		const guildExists = await guildService.getGuildById(guildId);
+		const guildExists = await guildService.getById(guildId);
 
 		if (!guildExists) {
 			res.status(400).json({ error: "Guilda não encontrada" });

@@ -3,7 +3,7 @@ import { createUserDTO, updateUserDTO, userDTO } from "../DTOS/UserDTO";
 import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { user } from "../models/User";
 
-export class UserRepository implements RepositoryInterface {
+export class UserRepository implements RepositoryInterface<createUserDTO, updateUserDTO, userDTO> {
 	tableName = 'users';
 
 	async getAll(): Promise<user[]> {

@@ -1,14 +1,19 @@
 import db from "../database/db";
+import { createSkillDTO, updateSkillDTO } from "../DTOS/SkillDTO";
 import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { ChampionSkill } from "../models/ChampionSkill";
 
 
-export class SkillRepository implements RepositoryInterface {
+export class SkillRepository implements RepositoryInterface<createSkillDTO, updateSkillDTO, ChampionSkill> {
 
     private tableName = 'champion_skills';
 
     async getAll(): Promise<ChampionSkill[]> {
-        return await db(this.tableName).select('*');
+        try {
+            return await db(this.tableName).select('*');
+        } catch (error) {
+            throw new Error('Erro ao buscar todas as habilidades');
+        }
     }
 
     async getById(id: number): Promise<ChampionSkill> {
@@ -35,7 +40,7 @@ export class SkillRepository implements RepositoryInterface {
     async delete(id: number): Promise<boolean> {
         try {
             await db(this.tableName).where({ id }).del();
-            return true; 
+            return true;
         } catch (error) {
             throw new Error('Erro ao deletar habilidade');
         }
