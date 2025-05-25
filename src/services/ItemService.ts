@@ -10,13 +10,13 @@ export class ItemService {
    // Busca todos os itens com filtros opcionais.
 
   async getAllItems(filter: { name?: string; minPrice?: number; maxPrice?: number }) {
-    return await ItemRepository.findAll(filter);
+    return await ItemRepository.getAll(filter);
   }
 
 // Busca um item pelo ID.
 
   async getItemById(id: string | number) {
-    return await ItemRepository.findById(id);
+    return await ItemRepository.getById(id);
   }
 
    // Cria um novo item a partir do DTO recebido.
@@ -60,7 +60,7 @@ export class ItemService {
 
    // Valida campos enviados e regras de negócio.
   async updateItem(id: string | number, item: ItemDTO) {
-    const existingItem = await ItemRepository.findById(id);
+    const existingItem = await ItemRepository.getById(id);
     if (!existingItem) return null;
 
     // Validação dos enums, se enviados
@@ -90,7 +90,7 @@ export class ItemService {
 
 // Deleta um item pelo ID, se ele existir.
   async deleteItem(id: string | number) {
-    const existingItem = await ItemRepository.findById(id);
+    const existingItem = await ItemRepository.getById(id);
     if (!existingItem) return null;
     await ItemRepository.delete(id);
     return { message: "Item deletado com sucesso." };

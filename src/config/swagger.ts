@@ -85,6 +85,31 @@ const swaggerOptions = {
               description: "Pontos de energia da classe",
             },
           },
+        },
+        Mission: {
+          type: "object",
+          properties: {
+            id: {
+              type: "integer",
+              description: "ID da missão",
+            },
+            title: {
+              type: "string",
+              description: "Título da missão",
+            },
+            description: {
+              type: "string",
+              description: "Descrição da missão",
+            },
+            difficulty: {
+              type: "string",
+              description: "Dificuldade da missão",
+            },
+            targetDate: {
+              type: "string",
+              description: "Data de conclusão da missão",
+            },
+          },
         }
       },
     },

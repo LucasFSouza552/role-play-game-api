@@ -11,10 +11,11 @@ export async function up(knex: Knex): Promise<void> {
         table.string('title').notNullable();
         table.text('description').notNullable();
         table.enu('difficulty', difficultyKeys).notNullable();
-        table.date('targetDate').notNullable();
         table.integer('xp');
         table.integer('sp');
         table.decimal('money');
+        table.integer('timeLimit').defaultTo(1); // in minutes
+        table.timestamp('created_at').defaultTo(knex.fn.now());
     })
 }
 

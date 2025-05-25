@@ -84,6 +84,7 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 			const skill = await skillRepo.getById(skillId);
 			return skill;
 		} catch (error) {
+			console.error(error);
 			throw new Error('Error adding skill to champion');
 		}
 	}

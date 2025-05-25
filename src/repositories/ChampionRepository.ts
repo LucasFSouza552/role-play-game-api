@@ -38,6 +38,7 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 		champion.xp_max = getMaxExperience(champion.level);
 		champion.role = role;
 		champion.skills = skills;
+		console.log(champion);
 		return champion;
 	}
 

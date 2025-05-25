@@ -38,6 +38,7 @@ export class ChampionController implements ControllerInterface {
 			}
 
 			const champion = await championService.getById(championId, userId);
+			console.log(champion);
 			res.status(200).json(champion);
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });

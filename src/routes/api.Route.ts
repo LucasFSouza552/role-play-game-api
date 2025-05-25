@@ -16,6 +16,6 @@ apiRoute.get("/", (req, res) => {
 apiRoute.use("/user", userRoute);
 apiRoute.use("/champions", AuthMiddleware, ChampionRoute);
 apiRoute.use("/roles", ChampionRoleRoute);
-apiRoute.use("/missions", AuthMiddleware, MissionsRoute);
+apiRoute.use("/missions", MissionsRoute);
 
 export default apiRoute;

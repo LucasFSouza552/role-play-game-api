@@ -1,10 +1,13 @@
 import db from "../database/db";
+import { RepositoryInterface } from "../interfaces/repositoryInterface";
+import { Filter } from "../models/Filters";
 import { Item } from "../models/Item";
 
 // Responsável por acessar e manipular os dados dos itens no banco
-export class ItemRepository {
+export class ItemRepository implements RepositoryInterface<Item, Item, Item> {
+
   // Busca todos os itens, aplicando filtros opcionais
-  static async findAll(filter: { name?: string; minPrice?: number; maxPrice?: number }) {
+  static async getAll(filter: { name?: string; minPrice?: number; maxPrice?: number }) {
     const query = db("items").select("*");
     if (filter.name) query.whereILike("name", `%${filter.name}%`);
     if (filter.minPrice !== undefined) query.where("priceMin", ">=", filter.minPrice);
@@ -13,7 +16,7 @@ export class ItemRepository {
   }
 
   // Busca um item pelo ID
-  static async findById(id: string | number): Promise<Item | null> {
+  static async getById(id: string | number): Promise<Item | null> {
     return await db("items").where({ id }).first();
   }
 
@@ -24,7 +27,7 @@ export class ItemRepository {
   }
 
   // Atualiza um item existente pelo ID
-  static async update(id: string | number, item: Partial<Item>): Promise<Item | null> {
+  static async update(id: number, item: Partial<Item>): Promise<Item | null> {
     const [updatedItem] = await db("items").where({ id }).update(item).returning("*");
     return updatedItem;
   }

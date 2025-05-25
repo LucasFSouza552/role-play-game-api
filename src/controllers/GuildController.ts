@@ -1,23 +1,23 @@
 import { Request, Response } from 'express';
 import { GuildService } from '../services/GuildService';
-import { guildRepo } from '../repositories/RepositoriosManager';
-import ValidateUUID from '../utils/validateChampionId';
 import { error } from 'console';
+import { ControllerInterface } from '../interfaces/controllerInterface';
+import { updateGuildDTO } from '../DTOS/GuildDTO';
 
 const guildService = new GuildService();
 
-export class GuildController {
+export class GuildController implements ControllerInterface {
 
-    async getAll(req: Request, res: Response) {
+    async getAll(req: Request, res: Response): Promise<void> {
         try {
-            const guilds = await guildService.getAllGuild();
+            const guilds = await guildService.getAll();
             res.json(guilds);
         } catch (error: any) {
             res.status(500).json({ error: error.message });
         }
     }
 
-    async getById(req: Request, res: Response) {
+    async getById(req: Request, res: Response): Promise<void> {
         try {
             const guildId = req.params.id;
             res.json(guildId);
@@ -26,17 +26,18 @@ export class GuildController {
         }
     }
 
-    async createGuild(req: Request, res: Response) {
+    async create(req: Request, res: Response): Promise<void> {
         try {
             const guild = req.body;
 
             if (!guild.name || !guild.level) {
-                return res.status(400).json({ error: 'Faltam informações para criar a Guilda' });
+                res.status(400).json({ error: 'Faltam informações para criar a Guilda' });
+                return;
             }
 
-            guild.userId = req.userId as string;
+            guild.userId = req.userId as number;
 
-            const newGuild = await guildService.createGuild(guild);
+            const newGuild = await guildService.create(guild);
 
             res.status(201).json(newGuild);
         } catch (error: any) {
@@ -44,7 +45,7 @@ export class GuildController {
         }
     }
 
-    async updateGuild(req: Request, res: Response) {
+    async update(req: Request, res: Response): Promise<void> {
         try {
           const guildId = parseInt(req.params.id);
       
@@ -59,8 +60,14 @@ export class GuildController {
             res.status(400).json({ error: 'Dados incompletos para atualizar a Guilda.' });
             return;
           }
+
+          const guildData: updateGuildDTO = {
+            id: guildId,
+            name: guild.name,
+            level: guild.level,
+          }
       
-          const updatedGuild = await guildService.updateGuild(guildId, guild);
+          const updatedGuild = await guildService.update(guildData);
           res.status(200).json(updatedGuild);
         } catch (error: any) {
           res.status(500).json({ error: error.message });
@@ -68,7 +75,7 @@ export class GuildController {
       }
       
 
-    async deleteGuild(req: Request, res: Response) {
+    async delete(req: Request, res: Response): Promise<void> {
         try {
           const guildId = parseInt(req.params.id);
       
@@ -77,7 +84,7 @@ export class GuildController {
             return;
           }
       
-          const deletedGuild = await guildService.deleteGuild(guildId);
+          const deletedGuild = await guildService.delete(guildId);
           res.status(200).json({ deletedGuild: !!deletedGuild });
         } catch (error: any) {
           res.status(500).json({ error: error.message });

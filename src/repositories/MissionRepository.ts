@@ -1,43 +1,57 @@
 import db from "../database/db";
+import { createMissionDTO, updateMissionDTO } from "../DTOS/MissionDTO";
+import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { Mission } from "../models/Mission";
 
-export class MissionRepository {
-    private tableName = 'missions';
+export class MissionRepository implements RepositoryInterface<createMissionDTO, updateMissionDTO, Mission> {
+	private tableName = 'missions';
 
-    async findAll() {
-        return await db(this.tableName).select('*');
-    }
+	async getAll(): Promise<Mission[]> {
+		try {
+			return await db(this.tableName).select('*');
+		} catch (error) {
+			throw new Error('Erro ao buscar todas as missões.');
+		}
+	}
 
-    async findById(id: number) {
-        return await db(this.tableName).where({ id }).first();
-    }
+	async getById(id: number): Promise<Mission> {
+		try {
+            return await db(this.tableName).where({ id }).first();
+        } catch (error) {
+            throw new Error('Erro ao buscar a missão pelo ID.');
+        }
+	}
 
-    async createMission(mission: Mission) {
-        try {
-            const [newMission] = await db(this.tableName)
-                .insert(mission)
+	async create(mission: createMissionDTO): Promise<Mission> {
+		try {
+			const [newMission] = await db(this.tableName)
+				.insert(mission)
+				.returning('*');
+			return newMission;
+		} catch (error) {
+			throw new Error('Não foi possível criar a missão.');
+		}
+	}
+
+	async update(mission: updateMissionDTO): Promise<updateMissionDTO> {
+		try {
+			const updatedMission = await db(this.tableName)
+                .where({ id: mission.id })
+                .update(mission)
                 .returning('*');
-            return newMission;
-        } catch (error) {
-            throw new Error('Não foi possível criar a missão.');
-        }
-    }
 
-    async updateMission(id: number, mission: Mission) {
-        try {
-            const updatedMission = await db(this.tableName).where({ id }).update(mission);
-            return updatedMission;
-        } catch (error) {
-            throw new Error('Erro ao atualizar a missão.');
-        }
-    }
+			return updatedMission[0];
+		} catch (error) {
+			throw new Error('Erro ao atualizar a missão.');
+		}
+	}
 
-    async deleteMission(id: number) {
-        try {
-            const deletedMission = await db(this.tableName).where({ id }).del();
-            return deletedMission;
-        } catch (error) {
-            throw new Error('Não foi possível deletar a missão.');
-        }
-    }
+	async delete(id: number, userId: number): Promise<boolean> {
+		try {
+			await db(this.tableName).where({ id, userId }).del();
+			return true;
+		} catch (error) {
+			throw new Error('Não foi possível deletar a missão.');
+		}
+	}
 }
