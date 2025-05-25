@@ -1,8 +1,9 @@
 import { userRepo } from "../repositories/RepositoryManager";
-import { createUserDTO, updateUserDTO, userDTO } from "../DTOS/Users/UserDTO";
+import { createUserDTO, updateUserDTO, userDTO } from "../DTOS/UserDTO";
 import { UserMapper } from "../utils/mapppers/userMapping";
 import { cryptPassword } from "../utils/bcryptPassword";
 import { ServiceInterface } from "../interfaces/serviceInterface";
+import { user } from "../models/User";
 
 export class UserService implements ServiceInterface<createUserDTO, updateUserDTO, userDTO> {
 
@@ -41,11 +42,11 @@ export class UserService implements ServiceInterface<createUserDTO, updateUserDT
 		return UserMapper.mapUserToUpdateDTO(userUpdated);
 	}
 
-	async getByEmail(email: string) {
+	async getByEmail(email: string): Promise<user> {
 		return await userRepo.findByEmail(email);
 	}
 
-	delete(id: number): Promise<void> {
+	delete(id: number): Promise<boolean> {
 	    throw new Error("Method not implemented.");
     }
 }

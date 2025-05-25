@@ -240,14 +240,18 @@ ChampionRoute.get('/:id/skills', championController.getSkills);
  *             type: object
  *             required:
  *               - name
- *               - roleName
+ *               - roleId
  *             properties:
  *               name:
  *                 type: string
  *                 description: Nome do campeão.
- *               roleName:
- *                 type: string
+ *               roleId:
+ *                 type: integer
  *                 description: Identificador único da classe do campeão.
+ *                 default: 1
+ *                 minimum: 1
+ * 
+ * 
  *     responses:
  *       201:
  *         description: Campeão criado com sucesso.
@@ -322,7 +326,7 @@ ChampionRoute.get('/:id/skills', championController.getSkills);
  *       500:
  *         description: Erro interno do servidor.
  */
-ChampionRoute.post("/", championController.createChampion);
+ChampionRoute.post("/", championController.create);
 
 /**
  * @swagger
@@ -396,7 +400,7 @@ ChampionRoute.post("/", championController.createChampion);
  *       500:
  *         description: Erro interno do servidor.
  */
-ChampionRoute.patch("/:id/status", championController.updateStatusChampion);
+ChampionRoute.patch("/:id/status", championController.updateStatus);
 
 
 /**
@@ -420,7 +424,7 @@ ChampionRoute.patch("/:id/status", championController.updateStatusChampion);
  *       500:
  *         description: Erro interno do servidor.
  */
-ChampionRoute.delete("/:id", championController.deleteChampion);
+ChampionRoute.delete("/:id", championController.delete);
 
 /**
  * @swagger

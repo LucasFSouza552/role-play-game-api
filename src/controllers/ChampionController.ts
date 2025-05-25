@@ -1,19 +1,20 @@
-
 import { Request, Response } from "express";
 import { ChampionService } from "../services/ChampionsService";
-import { Filters, FilterDefault } from "../models/Filters";
 import { ChampionSkill } from "../models/ChampionSkill";
-import { Champion } from "../models/Champion";
 import { GuildService } from "../services/GuildService";
+import { FilterChampion, FilterDefault } from "../models/Filters";
+import { ControllerInterface } from "../interfaces/controllerInterface";
+import { ChampionDTO, createChampionDTO, updatedChampionStatusDTO } from "../DTOS/ChampionDTO";
 
 const championService = new ChampionService();
 const guildService = new GuildService();
 
-export class ChampionController {
-	async getAll(req: Request, res: Response) {
+export class ChampionController implements ControllerInterface {
+
+	async getAll(req: Request, res: Response): Promise<void> {
 		try {
-			const filters: Filters = { ...FilterDefault, ...req.query, userId: req.userId };
-			const champions = await championService.getAllChampions(filters);
+			const filters: FilterChampion = { ...FilterDefault, ...req.query, userId: req.userId };
+			const champions = await championService.getAll(filters);
 
 			res.status(200).json({ champions: champions, length: champions.length });
 		} catch (err: any) {
@@ -21,7 +22,7 @@ export class ChampionController {
 		}
 	}
 
-	async getById(req: Request, res: Response) {
+	async getById(req: Request, res: Response): Promise<void> {
 		try {
 			const championId = parseInt(req.params.id);
 			const userId: number = req.userId as number;
@@ -36,19 +37,19 @@ export class ChampionController {
 				return;
 			}
 
-			const champion = await championService.getChampionById(championId, userId);
+			const champion = await championService.getById(championId, userId);
 			res.status(200).json(champion);
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
 		}
 	}
 
-	async createChampion(req: Request, res: Response) {
+	async create(req: Request, res: Response): Promise<void> {
 		try {
-			const champion = req.body;
+			const champion: createChampionDTO = req.body;
 			const userId: number = req.userId as number;
 
-			if (!champion.name || !champion.roleName) {
+			if (!champion.name || !champion.roleId) {
 				res.status(400).json({ error: "Falta informação necessária para criar um campeão" });
 				return;
 			}
@@ -60,14 +61,17 @@ export class ChampionController {
 
 			champion.userId = userId;
 
-			const newChampion = await championService.createChampion(champion);
+			const newChampion = await championService.create(champion);
 			res.status(201).json(newChampion);
 		} catch (err: any) {
 			res.status(400).json({ error: err.message });
 		}
 	}
+	update(req: Request, res: Response): Promise<void> {
+		throw new Error("Method not implemented.");
+	}
 
-	async updateStatusChampion(req: Request, res: Response) {
+	async updateStatus(req: Request, res: Response): Promise<void> {
 		try {
 			const championId = parseInt(req.params.id);
 			const userId: number = req.userId as number;
@@ -83,29 +87,33 @@ export class ChampionController {
 				return;
 			}
 
-			if (!strength && !dexterity && !intelligence && !vitality) {
-				res.status(400).json({ error: "Falta informação necessária para atualizar o status do campeão" });
-				return;
+			if (strength == null &&
+				dexterity == null &&
+				intelligence == null &&
+				vitality == null) {
+					res.status(400).json({ error: "Nenhum atributo foi enviado para atualizar" });
+					return;
 			}
 
-			if (strength < 0 && dexterity < 0 && intelligence < 0 && vitality < 0) {
+			const status = [strength, dexterity, intelligence, vitality];
+			if (status.some((stat) => stat < 0)) {
 				res.status(400).json({ error: "O valor do status deve ser maior que zero" });
 				return;
 			}
 
-			const championExists = await championService.getChampionById(championId, userId);
+			const championExists = await championService.getById(championId, userId);
 			if (!championExists) {
 				res.status(400).json({ error: "Campeão não encontrado" })
 				return;
 			}
 
-			const totalSP = strength + dexterity + intelligence + vitality;
+			const totalSP = status.reduce((acc, stat) => acc + (stat || 0), 0);
 			if (totalSP > championExists.sp) {
 				res.status(400).json({ error: `O total de SP não pode ser maior que ${championExists.sp} pontos` });
 				return;
 			}
 
-			const updatedChampion = await championService.updateChampionStatus({
+			const championData: updatedChampionStatusDTO = {
 				id: championId,
 				userId: userId,
 				strength: championExists.strength + (strength || 0),
@@ -113,7 +121,9 @@ export class ChampionController {
 				intelligence: championExists.intelligence + (intelligence || 0),
 				vitality: championExists.vitality + (vitality || 0),
 				sp: championExists.sp - totalSP
-			});
+			};
+
+			const updatedChampion = await championService.updateChampionStatus(championData);
 
 			res.status(200).json(updatedChampion);
 
@@ -122,16 +132,22 @@ export class ChampionController {
 		}
 	}
 
-	async deleteChampion(req: Request, res: Response) {
+	async delete(req: Request, res: Response): Promise<void> {
 		try {
 			const championId = parseInt(req.params.id);
+			const userId: number = req.userId as number;
+
+			if (!userId) {
+				res.status(400).json({ errror: "Usuário inválido" })
+				return;
+			}
 
 			if (!championId) {
 				res.status(400).json({ error: "ID do campeão inválido" })
 				return;
 			}
 
-			const deletedChampion = await championService.deleteChampion(championId);
+			const deletedChampion: boolean = await championService.delete(userId, championId);
 
 			res.status(200).json({ deletedChampion: deletedChampion });
 		} catch (err: any) {
@@ -139,7 +155,7 @@ export class ChampionController {
 		}
 	}
 
-	async addSkill(req: Request, res: Response) {
+	async addSkill(req: Request, res: Response): Promise<void> {
 		const championId = parseInt(req.params.id);
 		const skillId = req.body.skillId;
 		const userId: number = req.userId as number;
@@ -154,7 +170,7 @@ export class ChampionController {
 			return;
 		}
 
-		const championExists: Champion | null = await championService.getChampionById(championId, userId);
+		const championExists: ChampionDTO = await championService.getById(championId, userId);
 		if (!championExists) {
 			res.status(400).json({ errror: "Campião não encontrado" })
 			return;
@@ -179,7 +195,7 @@ export class ChampionController {
 		}
 	}
 
-	async getSkills(req: Request, res: Response) {
+	async getSkills(req: Request, res: Response): Promise<void> {
 		const championId = parseInt(req.params.championId);
 
 		if (!championId) {
@@ -196,7 +212,7 @@ export class ChampionController {
 
 	}
 
-	async joinGuild(req: Request, res: Response) {
+	async joinGuild(req: Request, res: Response): Promise<void> {
 		const championId = parseInt(req.params.id);
 		const guildId = req.body.guildId && parseInt(req.body.guildId);
 		const userId: number = req?.userId as number;
@@ -219,7 +235,7 @@ export class ChampionController {
 			return;
 		}
 
-		const championExists: Champion | null = await championService.getChampionById(championId, userId);
+		const championExists: ChampionDTO = await championService.getById(championId, userId);
 		if (!championExists) {
 			res.status(400).json({ errror: "Campião não encontrado" })
 			return;

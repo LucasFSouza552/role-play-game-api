@@ -1,4 +1,5 @@
-import { createUserDTO, updateUserDTO, userDTO } from "../../DTOS/Users/UserDTO";
+
+import { createUserDTO, updateUserDTO, userDTO } from "../../DTOS/UserDTO";
 import { user } from "../../models/User";
 
 export class UserMapper {

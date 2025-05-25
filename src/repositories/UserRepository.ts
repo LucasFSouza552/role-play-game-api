@@ -1,11 +1,10 @@
 import db from "../database/db";
-import { createUserDTO, updateUserDTO, userDTO } from "../DTOS/Users/UserDTO";
+import { createUserDTO, updateUserDTO, userDTO } from "../DTOS/UserDTO";
 import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { user } from "../models/User";
 
 export class UserRepository implements RepositoryInterface {
-
-	tableName = 'users'
+	tableName = 'users';
 
 	async getAll(): Promise<user[]> {
 		return await db(this.tableName).select('*');
@@ -28,9 +27,7 @@ export class UserRepository implements RepositoryInterface {
 		return await db(this.tableName).where({ email }).first();
 	}
 
-	delete(id: number): Promise<void> {
+	async delete(id: number): Promise<boolean> {
 		throw new Error("Method not implemented.");
 	}
-
-
 }

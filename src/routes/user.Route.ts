@@ -47,7 +47,7 @@ const userController = new UserController();
  *       500:
  *         description: Erro interno do servidor.
  */
-userRoute.get("/", AuthMiddleware, userController.getUserById);
+userRoute.get("/", AuthMiddleware, userController.getById);
 
 /**
  * @swagger
@@ -101,7 +101,7 @@ userRoute.get("/", AuthMiddleware, userController.getUserById);
  *       500:
  *         description: Erro interno do servidor.
  */
-userRoute.post("/register", userController.createUser);
+userRoute.post("/register", userController.create);
 
 /**
  * @swagger
@@ -200,6 +200,6 @@ userRoute.post("/login", userController.authenticateUser);
  *                   type: string
  *                   description: Mensagem de sucesso.
  */
-userRoute.patch("/update",AuthMiddleware, validateAllowedFields,userController.updateUser);
+userRoute.patch("/update",AuthMiddleware, validateAllowedFields,userController.update);
 
 export default userRoute;

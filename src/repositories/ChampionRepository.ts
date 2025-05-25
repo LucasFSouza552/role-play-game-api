@@ -1,12 +1,13 @@
 import db from "../database/db";
+import { ChampionDTO, updatedChampionStatusDTO, updateChampionGuildDTO, createChampionDTO, updateChampionDTO } from "../DTOS/ChampionDTO";
+import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { Champion } from "../models/Champion";
-import { Filters } from "../models/Filters";
+import { FilterChampion } from "../models/Filters";
 import getMaxExperience from "../utils/getMaxExperience";
 
-
-export class ChampionRepository {
+export class ChampionRepository implements RepositoryInterface {
 	private tableName = 'champions';
-	async findAll(filter: Filters): Promise<Champion[]> {
+	async getAll(filter: FilterChampion): Promise<Champion[]> {
 		const allChampions = await db(this.tableName).select('*')
 			.limit(filter.size)
 			.offset(filter.offset)
@@ -29,8 +30,8 @@ export class ChampionRepository {
 		return allChampions;
 	}
 
-	async findById(championId: number, userId: number): Promise<Champion> {
-		const champion = await db(this.tableName).where({ id:championId }).where({ userId }).first().orderBy('champions.name', 'asc');
+	async getById(championId: number, userId: number): Promise<ChampionDTO> {
+		const champion = await db(this.tableName).where({ id:championId }).where({ userId }).first();
 		const championSkills = await db('champion_skills').where({ championId });
 		const skills = await db('skills').whereIn('id', championSkills.map((cs: any) => cs.skillId));
 		const role = await db('champion_roles').where({ id: champion.roleId }).first();
@@ -40,7 +41,7 @@ export class ChampionRepository {
 		return champion;
 	}
 
-	async create(champion: Omit<Champion, 'id'>): Promise<Champion> {
+	async create(champion: createChampionDTO): Promise<ChampionDTO> {
 		try {
 			const newChampion = await db(this.tableName).insert(champion).returning('*');
 			return newChampion[0];
@@ -49,56 +50,74 @@ export class ChampionRepository {
 		}
 	}
 
-	async update(champion: Champion) {
+	async update(champion: updateChampionDTO): Promise<ChampionDTO> {
 		try {
-			const updatedChampion = await db(this.tableName).where({ id:champion.id, userId: champion.userId }).update(champion);
-			return updatedChampion;
+			const updatedChampion = await db(this.tableName)
+				.where({ id:champion.id, userId: champion.userId })
+				.update(champion).returning('*');
+			return updatedChampion[0];
 		} catch (error) {
 			throw new Error('Erro ao atualizar campeão');
 		}
 	}
 
-	async delete(championId: number) {
+	async delete(userId: number, championId: number): Promise<boolean> {
 		try {
-			const deletedChampion = await db(this.tableName).where({ id: championId }).del();
-			return deletedChampion;
+			await db(this.tableName).where({ id: championId, userId }).del();
+			return true;
 		} catch (error) {
 			throw new Error('Erro ao deletar campeão');
 		}
 	}
 
 	async addSkill(championId: number, skillId: number) {
-		const newChampionSkill = await db('champion_skills').insert({ championId, skillId }).returning('*');
-		return newChampionSkill;
+		try {
+			const newChampionSkill = await db('champion_skills').insert({ championId, skillId }).returning('*');
+			console.log(newChampionSkill);
+			return newChampionSkill;
+		} catch (error) {
+			throw new Error('Erro ao adicionar habilidade ao campeão');
+		}
 	}
 
 	async getSkills(championId: number) {
-		const championSkills = await db('champion_skills')
-		.where({ championId })
-			.join('skills', 'skills.id', '=', 'champion_skills.skillId')
-			.select('name', 'description', 'power', 'cost', 'target');
-		return championSkills;
+		try {
+			const championSkills = await db('champion_skills')
+				.where({ championId })
+				.join('skills', 'skills.id', '=', 'champion_skills.skillId')
+				.select('name', 'description', 'power', 'cost', 'target');
+			return championSkills;
+		} catch (error) {
+			throw new Error('Erro ao buscar habilidades do campeão');
+		}
 	}
 
-	async getSkillById(skillId: number) {
-		const skill = await db('skills').where({ id: skillId }).first();
-		return skill;
+	async updateGuild(Champion: updateChampionGuildDTO) {
+		try {
+			const updatedChampion = await db(this.tableName)
+			.where({ id: Champion.id, userId: Champion.userId })
+			.update({ guildId: Champion.guildId });
+			return updatedChampion;
+		} catch (error) {
+			throw new Error('Erro ao atualizar guild do campeão');
+		}
 	}
 
-	async updateGuild(Champion: Pick<Champion, 'id' | 'guildId' | 'userId'>) {
-		const updatedChampion = await db(this.tableName).where({ id: Champion.id, userId: Champion.userId }).update({ guildId: Champion.guildId });
-		return updatedChampion;
-	}
-
-	async updateStatus(champion: Pick<Champion, 'id' | 'userId' | 'strength' | 'dexterity' | 'intelligence' | 'vitality' | 'sp'>) {
-		const updatedChampion = await db(this.tableName).where({ id: champion.id, userId: champion.userId }).update({
-			strength: champion.strength,
-			dexterity: champion.dexterity,
-			intelligence: champion.intelligence,
-			vitality: champion.vitality,
-			sp: champion.sp
-		});
-		return updatedChampion;
+	async updateStatus(champion: updatedChampionStatusDTO) {
+		try {
+			const updatedChampion = await db(this.tableName)
+			.where({ id: champion.id, userId: champion.userId })
+			.update({
+				strength: champion.strength,
+				dexterity: champion.dexterity,
+				intelligence: champion.intelligence,
+				vitality: champion.vitality,
+				sp: champion.sp
+			});
+			return updatedChampion;
+		} catch (error) {
+			throw new Error('Erro ao atualizar status do campeão');
+		}
 	}
 
 }

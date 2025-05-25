@@ -1,11 +1,10 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/UserService";
-import { user } from "../models/User";
 import { validatePassword } from "../utils/bcryptPassword";
 import { generateJwtToken } from "../utils/jwt";
-import { createUserDTO, updateUserDTO } from "../DTOS/Users/UserDTO";
 import { UserMapper } from "../utils/mapppers/userMapping";
 import { ControllerInterface } from "../interfaces/controllerInterface";
+import { createUserDTO, updateUserDTO } from "../DTOS/UserDTO";
 
 const userService = new UserService();
 

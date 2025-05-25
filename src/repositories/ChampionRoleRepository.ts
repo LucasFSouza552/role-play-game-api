@@ -1,12 +1,15 @@
 import db from "../database/db";
+import { createChampionRoleDTO, updateChampionRoleDTO } from "../DTOS/ChampionRoleDTO";
+import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { ChampionRole } from "../models/ChampionRole";
-import { Filters } from "../models/Filters";
+import { FilterChampionRole } from "../models/Filters";
 
-export class ChampionRoleRepository {
+export class ChampionRoleRepository implements RepositoryInterface {
     private tableName = 'champion_roles';
 
-    async findAll(filter: Filters) {
-        return await db(this.tableName).select('*')
+    async getAll(filter: FilterChampionRole): Promise<ChampionRole[]> {
+        return await db(this.tableName)
+            .select('*')
             .limit(filter.size)
             .offset(filter.offset)
             .modify((query) => {
@@ -16,15 +19,27 @@ export class ChampionRoleRepository {
             });
     }
 
-    async findById(id: string) {
-        return await db(this.tableName).where({ id }).first();
+    async getById(id: number): Promise<ChampionRole> {
+        try {
+            return await db(this.tableName)
+                .where({ id })
+                .select('*').first();
+        } catch (error) {
+            throw new Error('Erro ao buscar role pelo id');
+        }
     }
 
     async findByName(name: string) {
-        return await db(this.tableName).where({ name }).first();
+        try {
+            return await db(this.tableName)
+                .whereILike({ name })
+                .first();
+        } catch (error) {
+            throw new Error('Erro ao buscar role pelo nome');
+        }
     }
 
-    async create(role: ChampionRole) {
+    async create(role: createChampionRoleDTO): Promise<ChampionRole> {
         try {
             return await db(this.tableName).insert(role);
         } catch (error) {
@@ -32,17 +47,18 @@ export class ChampionRoleRepository {
         }
     }
 
-    async update(id: string, role: ChampionRole) {
+    async update(championRole: updateChampionRoleDTO) {
         try {
-            return await db(this.tableName).where({ id }).update(role);
+            return await db(this.tableName).where({ id: championRole.id }).update(championRole);
         } catch (error) {
             throw new Error('Erro ao atualizar role');
         }
     }
 
-    async delete(id: string) {
+    async delete(id: number): Promise<boolean> {
         try {
-            return await db(this.tableName).where({ id }).del();
+            await db(this.tableName).where({ id }).del();
+            return true;
         } catch (error) {
             throw new Error('Erro ao deletar role');
         }

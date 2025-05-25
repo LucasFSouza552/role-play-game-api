@@ -22,6 +22,6 @@ export interface Champion {
 	role?: ChampionRole;
 	missions?: Mission[];
 	inventory?: [];
-	guildId?: number;
+	guildId?: number | null;
 	skills?: ChampionSkill[];
 }

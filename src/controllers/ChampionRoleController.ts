@@ -1,15 +1,23 @@
 import { Request, Response } from "express";
-import { Filters, FilterDefault } from "../models/Filters";
+import { FilterChampionRole, FilterDefault } from "../models/Filters";
 import { ChampionRoleService } from "../services/ChampionRoleService";
+import { ControllerInterface } from "../interfaces/controllerInterface";
 
 const championRoleService = new ChampionRoleService();
 
-export class ChampionRoleController {
+export class ChampionRoleController implements ControllerInterface {
 
-    async getAll(req: Request, res: Response) {
+    update(req: Request, res: Response): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
+    delete(req: Request, res: Response): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
+
+    async getAll(req: Request, res: Response): Promise<void> {
         try {
-            const filters: Filters = { ...FilterDefault, ...req.query };
-            const roles = await championRoleService.getAllChampionRoles(filters);
+            const filters: FilterChampionRole = { ...FilterDefault, ...req.query };
+            const roles = await championRoleService.getAll(filters);
 
             res.status(200).json({ roles: roles, length: roles.length });
         } catch (error: any) {
@@ -17,23 +25,24 @@ export class ChampionRoleController {
         }
     }
 
-    async getById(req: Request, res: Response) {
+    async getById(req: Request, res: Response): Promise<void> {
         try {
-            const roleId = req.params.id;
+            const roleId = req.params.id ? parseInt(req.params.id) : null;
+            const userId: number = req.userId as number;
 
             if (!roleId) {
                 res.status(400).send({ error: "ID é inválido" })
                 return;
             }
             
-            const role = await championRoleService.getChampionRoleById(roleId);
+            const role = await championRoleService.getById(roleId, userId);
             res.status(200).json(role);
         } catch (error) {
             throw new Error("Erro ao buscar classe");
         }
     }
 
-    async createRole(req: Request, res: Response) {
+    async create(req: Request, res: Response): Promise<void> {
         try {
             const role = req.body;
 
@@ -42,7 +51,7 @@ export class ChampionRoleController {
                 return;
             }
 
-            const newRole = await championRoleService.createChampionRole(role);
+            const newRole = await championRoleService.create(role);
             res.status(201).json(newRole);
         } catch (error: any) {
             res.status(400).json({ error: error.message });

@@ -1,6 +1,5 @@
 import db from "../database/db";
 import { Guild } from "../models/Guild";
-import { Filters } from "../models/Filters";
 
 export class GuildRepository {
     private tablename = 'guild';

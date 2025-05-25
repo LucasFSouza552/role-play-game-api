@@ -1,16 +1,22 @@
 import db from "../database/db";
+import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { ChampionSkill } from "../models/ChampionSkill";
 
 
-export class SkillRepository {
+export class SkillRepository implements RepositoryInterface {
+
     private tableName = 'champion_skills';
 
-    async findAll() {
+    async getAll(): Promise<ChampionSkill[]> {
         return await db(this.tableName).select('*');
     }
 
-    async findById(id: number) {
-        return await db(this.tableName).where({ id }).first();
+    async getById(id: number): Promise<ChampionSkill> {
+        try {
+            return await db(this.tableName).where({ id }).first();
+        } catch (error) {
+            throw new Error('Erro ao buscar habilidade pelo id');
+        }
     }
 
     async create(skill: ChampionSkill) {
@@ -22,9 +28,14 @@ export class SkillRepository {
         }
     }
 
-    async delete(id: number) {
+    update(element: any): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+
+    async delete(id: number): Promise<boolean> {
         try {
-            return await db(this.tableName).where({ id }).del();
+            await db(this.tableName).where({ id }).del();
+            return true; 
         } catch (error) {
             throw new Error('Erro ao deletar habilidade');
         }

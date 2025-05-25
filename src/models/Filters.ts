@@ -19,6 +19,10 @@ export interface FilterChampion extends Filter {
     userId?: number;
 }
 
+export interface FilterChampionRole extends Filter {
+    name?: string;
+}
+
 
 
 
