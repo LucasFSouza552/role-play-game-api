@@ -69,10 +69,10 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 		return await championRepo.updateGuild(champion);
 	}
 
-	async delete( userId: number, championId: number): Promise<boolean> {
+	async delete(championId: number,  userId: number): Promise<boolean> {
 		try {
-			await championRepo.delete(userId, championId);
-			return true;
+			const deletedChampion = await championRepo.delete(championId, userId);
+			return deletedChampion;
 		} catch (error) {
 			throw new Error('Champion not deleted');
 		}

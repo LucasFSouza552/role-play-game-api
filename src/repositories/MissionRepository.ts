@@ -48,8 +48,8 @@ export class MissionRepository implements RepositoryInterface<createMissionDTO, 
 
 	async delete(id: number, userId: number): Promise<boolean> {
 		try {
-			await db(this.tableName).where({ id, userId }).del();
-			return true;
+			const deletedMission = await db(this.tableName).where({ id, userId }).del();
+			return deletedMission == 1;
 		} catch (error) {
 			throw new Error('Não foi possível deletar a missão.');
 		}

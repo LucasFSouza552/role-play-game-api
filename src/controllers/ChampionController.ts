@@ -68,7 +68,7 @@ export class ChampionController implements ControllerInterface {
 			res.status(400).json({ error: err.message });
 		}
 	}
-	update(req: Request, res: Response): Promise<void> {
+	async update(req: Request, res: Response): Promise<void> {
 		throw new Error("Method not implemented.");
 	}
 

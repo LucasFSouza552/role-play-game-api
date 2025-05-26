@@ -1,3 +1,5 @@
+import { ItemType } from "./enums/ItemType";
+
 export interface Filter {
     size: number;
     offset: number;
@@ -23,6 +25,17 @@ export interface FilterChampionRole extends Filter {
     name?: string;
 }
 
+export interface FilterItem extends Filter {
+    name?: string;
+    minPrice?: number;
+    maxPrice?: number;
+}
+
+export interface FilterShop extends Filter {
+    name?: string;
+    userId?: number;
+    type?: ItemType;
+}
 
 
 

@@ -1,39 +1,76 @@
 import db from "../database/db";
+import { createItemDTO, updateItemDTO } from "../DTOS/ItemDTO";
 import { RepositoryInterface } from "../interfaces/repositoryInterface";
-import { Filter } from "../models/Filters";
+import { FilterItem } from "../models/Filters";
 import { Item } from "../models/Item";
 
 // Responsável por acessar e manipular os dados dos itens no banco
-export class ItemRepository implements RepositoryInterface<Item, Item, Item> {
+export class ItemRepository implements RepositoryInterface<createItemDTO, updateItemDTO, Item> {
+	private tableName = "items";
+	// Busca todos os itens, aplicando filtros opcionais
+	async getAll(filter: FilterItem): Promise<Item[]> {
+		try {
+			const allItems = await db(this.tableName).select("*")
+				.limit(filter.size)
+				.offset(filter.offset)
+				.modify((query) => {
+					if (filter.name) {
+						query.whereILike("items.name", `%${filter.name}%`);
+					}
+					if (filter.minPrice !== undefined) {
+						query.where("items.priceMin", ">=", filter.minPrice);
+					}
+					if (filter.maxPrice !== undefined) {
+						query.where("items.priceMax", "<=", filter.maxPrice);
+					}
+				}).orderBy(filter.orderBy, filter.order);
+			return allItems;
+		} catch (error) {
+			throw new Error("Error fetching items");
+		}
+	}
 
-  // Busca todos os itens, aplicando filtros opcionais
-  static async getAll(filter: { name?: string; minPrice?: number; maxPrice?: number }) {
-    const query = db("items").select("*");
-    if (filter.name) query.whereILike("name", `%${filter.name}%`);
-    if (filter.minPrice !== undefined) query.where("priceMin", ">=", filter.minPrice);
-    if (filter.maxPrice !== undefined) query.where("priceMax", "<=", filter.maxPrice);
-    return await query.orderBy("name", "asc");
-  }
+	// Busca um item pelo ID
+	async getById(id: number): Promise<Item> {
+		try {
+			const item = await db(this.tableName).where({ id }).first();
+			if (!item) throw new Error("Item not found");
+			return item;
+		} catch (error) {
+			throw new Error("Error fetching item");
+		}
+	}
 
-  // Busca um item pelo ID
-  static async getById(id: string | number): Promise<Item | null> {
-    return await db("items").where({ id }).first();
-  }
+	// Cria um novo item no banco
+	async create(item: createItemDTO): Promise<Item> {
+		try {
+			const [newItem] = await db(this.tableName).insert(item).returning("*");
+			return newItem;
+		} catch (error) {
+			throw new Error("Error creating item");
+		}
+	}
 
-  // Cria um novo item no banco
-  static async create(item: Omit<Item, "id">): Promise<Item> {
-    const [newItem] = await db("items").insert(item).returning("*");
-    return newItem;
-  }
+	// Atualiza um item existente pelo ID
+	async update(item: updateItemDTO): Promise<Item> {
+		try {
+			const [updatedItem] = await db(this.tableName)
+				.where({ id: item.id })
+				.update(item)
+				.returning("*");
+			return updatedItem;
+		} catch (error) {
+			throw new Error("Error updating item");
+		}
+	}
 
-  // Atualiza um item existente pelo ID
-  static async update(id: number, item: Partial<Item>): Promise<Item | null> {
-    const [updatedItem] = await db("items").where({ id }).update(item).returning("*");
-    return updatedItem;
-  }
-
-  // Deleta um item pelo ID
-  static async delete(id: string | number): Promise<number> {
-    return await db("items").where({ id }).del();
-  }
+	// Deleta um item pelo ID
+	async delete(id: number): Promise<boolean> {
+		try {
+			const deletedItem = await db(this.tableName).where({ id }).del();
+			return deletedItem == 1;
+		} catch (error) {
+			throw new Error("Erro ao deletar item");
+		}
+	}
 }

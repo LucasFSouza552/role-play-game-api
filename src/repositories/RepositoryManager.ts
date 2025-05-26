@@ -14,4 +14,12 @@ const missionRepo = new MissionRepository();
 const itemsRepo = new ItemRepository();
 const guildRepo = new GuildRepository();
 
-export { championRepo, roleRepo, skillRepo, userRepo, missionRepo, itemsRepo,guildRepo };
+export {
+  championRepo,
+  roleRepo,
+  skillRepo,
+  userRepo,
+  missionRepo,
+  itemsRepo,
+  guildRepo,
+};

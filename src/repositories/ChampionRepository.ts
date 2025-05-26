@@ -62,10 +62,10 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 		}
 	}
 
-	async delete(userId: number, championId: number): Promise<boolean> {
+	async delete(championId: number, userId: number): Promise<boolean> {
 		try {
-			await db(this.tableName).where({ id: championId, userId }).del();
-			return true;
+			const deletedChampion = await db(this.tableName).where({ id: championId, userId }).del();
+			return deletedChampion == 1;
 		} catch (error) {
 			throw new Error('Erro ao deletar campeão');
 		}

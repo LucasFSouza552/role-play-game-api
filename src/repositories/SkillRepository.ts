@@ -39,8 +39,8 @@ export class SkillRepository implements RepositoryInterface<createSkillDTO, upda
 
     async delete(id: number): Promise<boolean> {
         try {
-            await db(this.tableName).where({ id }).del();
-            return true;
+            const deletedSkill = await db(this.tableName).where({ id }).del();
+            return deletedSkill == 1;
         } catch (error) {
             throw new Error('Erro ao deletar habilidade');
         }

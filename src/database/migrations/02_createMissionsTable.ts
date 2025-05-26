@@ -16,7 +16,7 @@ export async function up(knex: Knex): Promise<void> {
         table.decimal('money');
         table.integer('timeLimit').defaultTo(1); // in minutes
         table.timestamp('created_at').defaultTo(knex.fn.now());
-    })
+    });
 }
 
 export async function down(knex: Knex) {

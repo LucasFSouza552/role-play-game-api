@@ -10,7 +10,7 @@ import AuthMiddleware from "../middleware/authMiddleware";
 const apiRoute = Router();
 
 apiRoute.get("/", (req, res) => {
-    res.send("API");
+    res.send("API"); 
 });
 
 apiRoute.use("/user", userRoute);

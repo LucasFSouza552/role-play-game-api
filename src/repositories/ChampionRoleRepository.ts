@@ -57,8 +57,8 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 
     async delete(id: number): Promise<boolean> {
         try {
-            await db(this.tableName).where({ id }).del();
-            return true;
+            const deletedRole = await db(this.tableName).where({ id }).del();
+            return deletedRole == 1;
         } catch (error) {
             throw new Error('Erro ao deletar role');
         }

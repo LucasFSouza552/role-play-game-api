@@ -45,8 +45,8 @@ export class GuildRepository implements RepositoryInterface<createGuildDTO, upda
 
 	async delete(id: number): Promise<boolean> {
 		try {
-			await db(this.tablename).where({ id }).del();
-			return true;
+			const deletedGuild = await db(this.tablename).where({ id }).del();
+			return deletedGuild == 1;
 		} catch (error) {
 			throw new Error('Erro ao deletar a Guilda');
 		}
