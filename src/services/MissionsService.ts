@@ -38,9 +38,6 @@ export class MissionsService implements ServiceInterface<createMissionDTO, updat
 			if (!mission.description || mission.description.trim() === '') {
 				throw new Error('Descrição vazia!');
 			}
-			if (!mission.targetDate) {
-				throw new Error('Data deve ser estipulada!');
-			}
 
 			return await missionRepo.create(mission);
 		} catch (error) {

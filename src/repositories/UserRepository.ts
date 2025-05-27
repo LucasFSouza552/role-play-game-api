@@ -34,8 +34,12 @@ export class UserRepository implements RepositoryInterface<createUserDTO, update
 	}
 
 	async update(user: updateUserDTO): Promise<updateUserDTO> {
+
+		console.log('Updating user:', user);
 		try {
-			return await db(this.tableName).where({ id: user.id }).update(user).returning('*').then((rows) => rows[0]);
+			const updatedUser = await db(this.tableName).where({ id: user.id }).update(user).returning('*');
+
+			return updatedUser[0];
 		} catch (error) {
 			throw new Error('Error updating user');
 		}

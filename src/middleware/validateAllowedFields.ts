@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-const camposPermitidos = ['name', 'password', 'role'];
+const camposPermitidos = ['name', 'password'];
 
 export function validateAllowedFields(req: Request, res: Response, next: NextFunction) {
 	const campos = Object.keys(req.body);

@@ -36,29 +36,8 @@ export class ItemService implements ServiceInterface<createItemDTO, updateItemDT
 
   async create(item: createItemDTO): Promise<Item> {
     try {
-      // Validação dos campos obrigatórios
-      if (
-        !item.name ||
-        !item.description ||
-        !item.priceMin ||
-        !item.priceMax ||
-        !item.type
-      ) {
-        throw new Error("Todos os campos obrigatórios devem ser preenchidos.");
-      }
-
-      // Validação dos enums
-      const validTypes = Object.values(ItemType) as string[];
-      if (!validTypes.includes(item.type)) {
-        throw new Error("Tipo de item inválido.");
-      }
-
-      // Regra de negócio: preço mínimo não pode ser maior que o máximo
-      if (item.priceMin > item.priceMax) {
-        throw new Error("O preço mínimo não pode ser maior que o preço máximo.");
-      }
-
       // Monta o objeto conforme o modelo/tabela
+      // TODO: Adicionar MAPPER
       const newItem: createItemDTO = {
         name: item.name,
         description: item.description,

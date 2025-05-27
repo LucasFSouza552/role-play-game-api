@@ -37,7 +37,7 @@ export class UserService implements ServiceInterface<createUserDTO, updateUserDT
 			const passwordEncoded = await cryptPassword(user.password);
 			user.password = passwordEncoded;
 		}
-
+		console.log('Updating user:', user);
 		const userUpdated: updateUserDTO = await userRepo.update(user);
 		return UserMapper.mapUserToUpdateDTO(userUpdated);
 	}

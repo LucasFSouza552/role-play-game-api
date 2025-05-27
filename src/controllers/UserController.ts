@@ -93,31 +93,33 @@ export class UserController implements ControllerInterface {
 
 	async update(req: Request, res: Response) {
 
-		const user = req.userId;
+		const userId = req.userId;
+		const userBody: updateUserDTO = req.body;
 
-		if (!user) {
+		if (!userId) {
 			res.status(400).json({ error: "Falta informação necessária para atualizar o usuário" });
 			return;
 		}
 
-		const User = await userService.getById(user);
+		const User = await userService.getById(userId);
 
 		if (!User) {
 			res.status(400).json({ error: "Usuário não encontrado" });
 			return;
 		}
 
-		const userBody: updateUserDTO = req.body;
-
+		
 		if (!userBody) {
 			res.status(400).json({ error: "Falta informação necessária para atualizar o usuário" });
 			return;
 		}
-
+		
+		
+		userBody.id = userId;
 		const userData: updateUserDTO = UserMapper.mapUserToUpdateDTO(userBody); 
 
 		const userUpdated = await userService.update(userData);
-		if (!userUpdated || userUpdated.id !== user) {
+		if (!userUpdated || userUpdated.id !== userId) {
 			res.status(400).json({ error: "Erro ao atualizar o usuário" });
 			return;
 		}

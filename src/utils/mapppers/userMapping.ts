@@ -29,7 +29,7 @@ export class UserMapper {
         return {
         id: user.id!,
         ...(user.name && { name: user.name }),
-        ...(user.password && { password: user.password }),
+        ...(user.password && { password: user.password })
     };
     }
 }

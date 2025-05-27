@@ -71,13 +71,16 @@ export class MissionsController implements ControllerInterface {
                 res.status(400).json({ error: 'Missão não encontrada' });
                 return;
             }
-
+        
+            //TODO: Criar MAPPER
             const missionData: updateMissionDTO = {
                 id: missionId,
                 title: mission.title || missionExists.title,
                 difficulty: mission.difficulty || missionExists.difficulty,
                 description: mission.description || missionExists.description,
-                targetDate: mission.targetDate || missionExists.targetDate
+                SP: mission.SP || missionExists.SP,
+                XP: mission.XP || missionExists.XP,
+                money: mission.money || missionExists.money
             }
 
             const updatedMission = await missionsServices.update(missionData);

@@ -44,8 +44,11 @@ export class ItemRepository implements RepositoryInterface<createItemDTO, update
 	// Cria um novo item no banco
 	async create(item: createItemDTO): Promise<Item> {
 		try {
-			const [newItem] = await db(this.tableName).insert(item).returning("*");
-			return newItem;
+			const newItem = await db(this.tableName).insert(item).returning("*");
+			if (!newItem || newItem.length === 0) {
+				throw new Error("Item not created");
+			}
+			return newItem[0];
 		} catch (error) {
 			throw new Error("Error creating item");
 		}
@@ -54,11 +57,14 @@ export class ItemRepository implements RepositoryInterface<createItemDTO, update
 	// Atualiza um item existente pelo ID
 	async update(item: updateItemDTO): Promise<Item> {
 		try {
-			const [updatedItem] = await db(this.tableName)
+			const updatedItem = await db(this.tableName)
 				.where({ id: item.id })
 				.update(item)
 				.returning("*");
-			return updatedItem;
+			if (!updatedItem || updatedItem.length === 0) {
+				throw new Error("Item not updated");
+			}
+			return updatedItem[0];
 		} catch (error) {
 			throw new Error("Error updating item");
 		}

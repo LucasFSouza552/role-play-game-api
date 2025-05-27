@@ -1,4 +1,4 @@
-import { user } from "../models/User";
+import { user } from "./../models/User";
 
 // Criar um usuário sem o cargo (role) e sem o id
 export type createUserDTO = Omit<user, 'id' | 'role'>;

@@ -5,8 +5,6 @@ export interface Mission {
     title: string;
     description: string;
     difficulty: MissionDifficult;
-    created_at: Date;
-    timeLimit: number;
     XP?: number;
     SP?: number; 
     money?: number;

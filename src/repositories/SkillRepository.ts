@@ -3,7 +3,6 @@ import { createSkillDTO, updateSkillDTO } from "../DTOS/SkillDTO";
 import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { ChampionSkill } from "../models/ChampionSkill";
 
-
 export class SkillRepository implements RepositoryInterface<createSkillDTO, updateSkillDTO, ChampionSkill> {
 
     private tableName = 'champion_skills';
@@ -24,17 +23,31 @@ export class SkillRepository implements RepositoryInterface<createSkillDTO, upda
         }
     }
 
-    async create(skill: ChampionSkill) {
+    async create(skill: createSkillDTO): Promise<ChampionSkill> {
         try {
-            const [Skill] = await db(this.tableName).insert(skill).returning('*');
-            return Skill;
+            const Skill = await db(this.tableName).insert(skill).returning('*');
+            if (!Skill || Skill.length === 0) {
+                throw new Error('Habilidade não criada');
+            }
+            return Skill[0];
         } catch (error) {
             throw new Error('Erro ao criar habilidade');
         }
     }
 
-    update(element: any): Promise<any> {
-        throw new Error("Method not implemented.");
+    async update(skill: updateSkillDTO): Promise<updateSkillDTO> {
+        try {
+            const updatedSkill = await db(this.tableName)
+                .where({ id: skill.id })
+                .update(skill)
+                .returning('*');
+            if (!updatedSkill || updatedSkill.length === 0) {
+                throw new Error('Habilidade não atualizada');
+            }
+            return updatedSkill[0];
+        } catch (error) {
+            throw new Error('Erro ao atualizar habilidade');
+        }
     }
 
     async delete(id: number): Promise<boolean> {

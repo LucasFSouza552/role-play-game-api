@@ -1,21 +1,19 @@
 import { Request, Response } from "express";
 import { ItemService } from "../services/ItemService";
 import { ItemType } from "../models/enums/ItemType";
-import { ItemDTO } from "../DTOS/ItemDTO";
+import { ControllerInterface } from "../interfaces/controllerInterface";
+import { Item } from "../models/Item";
+import { FilterDefault, FilterItem } from "../models/Filters";
 
 const itemService = new ItemService();
 // Controller responsável por gerenciar requisições relacionadas a itens
-export class ItemController {
+export class ItemController implements ControllerInterface {
+
   // Lista todos os itens, com filtros opcionais por nome e preço
-  async getAllItems(req: Request, res: Response) {
+  async getAll(req: Request, res: Response): Promise<void> {
     try {
-      const { name, minPrice, maxPrice } = req.query;
-      const filter = {
-        name: name as string,
-        minPrice: minPrice ? Number(minPrice) : undefined,
-        maxPrice: maxPrice ? Number(maxPrice) : undefined,
-      };
-      const items = await itemService.getAllItems(filter);
+      const filter: FilterItem = { ...FilterDefault, ...req.query };
+      const items = await itemService.getAll(filter);
       res.status(200).json(items);
     } catch (error) {
       res.status(500).json({ error: "Erro ao listar itens." });
@@ -23,10 +21,16 @@ export class ItemController {
   }
 
   // Busca um item pelo ID
-  async getItemById(req: Request, res: Response) {
+  async getById(req: Request, res: Response): Promise<void> {
     try {
-      const { id } = req.params;
-      const item = await itemService.getItemById(id);
+      const ItemId = parseInt(req.params.id, 10);
+
+      if (!ItemId) {
+        res.status(400).json({ error: "ID inválido." });
+        return;
+      }
+
+      const item = await itemService.getById(ItemId);
       if (!item) {
         res.status(404).json({ error: "Item não encontrado." });
         return;
@@ -38,9 +42,9 @@ export class ItemController {
   }
 
   // Cria um novo item, validando campos obrigatórios e enums
-  async createItem(req: Request, res: Response) {
+  async create(req: Request, res: Response): Promise<void> {
     try {
-      const item: ItemDTO = req.body;
+      const item: Item = req.body;
 
       // Validação dos campos obrigatórios
       if (
@@ -67,7 +71,7 @@ export class ItemController {
         return;
       }
 
-      const newItem = await itemService.createItem(item);
+      const newItem = await itemService.create(item);
       res.status(201).json(newItem);
     } catch {
       res.status(500).json({ error: "Erro ao criar o item." });
@@ -75,25 +79,30 @@ export class ItemController {
   }
 
   // Atualiza um item existente, validando regras de negócio
-  async updateItem(req: Request, res: Response) {
+  async update(req: Request, res: Response): Promise<void> {
     try {
-      const { id } = req.params;
-      const item: ItemDTO = req.body;
+      const ItemId = req.params.id;
+      const item: Item = req.body;
+
+      if (!ItemId || !item) {
+        res.status(400).json({ error: "ID ou dados do item inválidos." });
+        return;
+      }
 
       // Validação de preço mínimo e máximo
       if (item.priceMin != null && item.priceMax != null && item.priceMin > item.priceMax && item.priceMin !== item.priceMax) {
         res.status(400).json({ error: "O preço mínimo não pode ser maior que o preço máximo." });
         return;
       }
-
       // Validação dos enums, se enviados
       const validTypes = Object.values(ItemType) as string[];
       if (item.type && !validTypes.includes(item.type)) {
         res.status(400).json({ error: "Tipo de item inválido." });
         return;
       }
+      item.id = parseInt(ItemId, 10);
 
-      const updatedItem = await itemService.updateItem(id, item);
+      const updatedItem = await itemService.update(item);
       if (!updatedItem) {
         res.status(404).json({ error: "Item não encontrado ou erro ao atualizar." });
         return;
@@ -105,15 +114,20 @@ export class ItemController {
   }
 
   // Deleta um item pelo ID
-  async deleteItem(req: Request, res: Response) {
+  async delete(req: Request, res: Response): Promise<void> {
     try {
-      const { id } = req.params;
-      const result = await itemService.deleteItem(id);
-      if (!result) {
+      const id = parseInt(req.params.id);
+      if (!id) {
+        res.status(400).json({ error: "ID inválido." });
+        return;
+      }
+
+      const deletedItem = await itemService.delete(id);
+      if (!deletedItem) {
         res.status(404).json({ error: "Item não encontrado ou erro ao deletar." });
         return;
       }
-      res.status(200).json(result);
+      res.status(200).json(deletedItem);
     } catch {
       res.status(500).json({ error: "Erro ao deletar o item." });
     }
