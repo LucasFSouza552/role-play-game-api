@@ -1,13 +1,13 @@
 import { Knex } from "knex";
 
-const tablename = 'shop_items';
+const tablename = 'champion_items';
 
 export async function up(knex: Knex): Promise<void> {
     await knex.schema.createTable(tablename, (table) => {
         table.integer('inventoryId')
             .notNullable()
             .references('id')
-            .inTable('shop')
+            .inTable('champion_inventory')
             .onDelete('CASCADE');
         table.integer('itemId')
             .notNullable()
@@ -15,6 +15,9 @@ export async function up(knex: Knex): Promise<void> {
             .inTable('items')
             .onDelete('CASCADE');
         table.primary(['inventoryId', 'itemId']);
+        table.integer('quantity')
+            .notNullable()
+            .defaultTo(1);
 
     });
 }

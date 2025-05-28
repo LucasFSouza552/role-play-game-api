@@ -9,6 +9,7 @@ export async function up(knex: Knex): Promise<void> {
             .notNullable()
             .references('id')
             .inTable('shop')
+            .unique()
             .onDelete('CASCADE');
         table.integer('capacity').defaultTo(10);
     });

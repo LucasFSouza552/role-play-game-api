@@ -9,6 +9,7 @@ export async function up(knex: Knex): Promise<void> {
             .notNullable()
             .references('id')
             .inTable('champions')
+            .unique()
             .onDelete('CASCADE');
         table.integer('capacity').defaultTo(20);
     });
