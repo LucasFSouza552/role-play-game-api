@@ -1,5 +1,8 @@
+import { InventoryItens } from "./InventoryItens";
+
 export interface Inventory {
     id: number; 
-    inventoryId: number; 
+    ownerId: number; // Referência a ShopId ou ChampionId
     capacity?: number;
+    itens?: InventoryItens[];
 }

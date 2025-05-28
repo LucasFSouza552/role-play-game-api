@@ -1,11 +1,11 @@
 import { Knex } from "knex";
 
 export async function seed(knex: Knex): Promise<void> {
-	const champions = await knex('champions').select('id');
+	const shop = await knex('shop').select('id');
 
-	const inventories = champions.map((champion) => ({
+	const inventories = shop.map((shop) => ({
 		capacity: 5,
-		shopId: champion.id
+		shopId: shop.id
 	}));
 
 	await knex('shop_inventory').insert(inventories);
