@@ -3,6 +3,7 @@ import { ControllerInterface } from "../interfaces/controllerInterface";
 import { Mission } from "../models/Mission";
 import { MissionsService } from "../services/MissionsService";
 import { Request, Response } from "express";
+import { MissionMapper } from "../utils/mapppers/missionMapping";
 
 const missionsServices = new MissionsService();
 
@@ -48,8 +49,10 @@ export class MissionsController implements ControllerInterface {
                 res.status(400).json({ error: 'A missão precisa de recompensas' });
                 return;
             }
+            
+            const missionData: createMissionDTO = MissionMapper.mapCreateMissionToDTO(mission)
 
-            const newMission = await missionsServices.create(mission);
+            const newMission = await missionsServices.create(missionData);
             res.status(201).json({ newMission });
         } catch (err: any) {
             res.status(400).json({ error: err.message });
@@ -59,7 +62,7 @@ export class MissionsController implements ControllerInterface {
     async update(req: Request, res: Response): Promise<void> {
         try {
             const missionId = parseInt(req.params.id);
-            const mission = req.body;
+            const mission: updateMissionDTO = req.body;
 
             if (!missionId) {
                 res.status(400).json({ error: 'ID inválido para missão' });
@@ -72,16 +75,7 @@ export class MissionsController implements ControllerInterface {
                 return;
             }
         
-            //TODO: Criar MAPPER
-            const missionData: updateMissionDTO = {
-                id: missionId,
-                title: mission.title || missionExists.title,
-                difficulty: mission.difficulty || missionExists.difficulty,
-                description: mission.description || missionExists.description,
-                SP: mission.SP || missionExists.SP,
-                XP: mission.XP || missionExists.XP,
-                money: mission.money || missionExists.money
-            }
+            const missionData: updateMissionDTO = MissionMapper.mapUpdateMissionToDTO(mission);
 
             const updatedMission = await missionsServices.update(missionData);
             res.status(200).json(updatedMission);
