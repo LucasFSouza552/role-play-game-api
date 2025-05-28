@@ -38,7 +38,6 @@ export class MissionsService implements ServiceInterface<createMissionDTO, updat
 			if (!mission.description || mission.description.trim() === '') {
 				throw new Error('Descrição vazia!');
 			}
-
 			return await missionRepo.create(mission);
 		} catch (error) {
 			throw new Error('Erro ao criar a missão');

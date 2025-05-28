@@ -1,12 +1,13 @@
 import db from "../database/db";
+import { createInventoryDTO } from "../DTOS/InventoryDTO";
 import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { Filter } from "../models/Filters";
 import { Inventory } from "../models/Inventory";
 
-export class ChampionInventoryRepository implements RepositoryInterface<Inventory, Inventory, Inventory>{
+export class ChampionInventoryRepository implements RepositoryInterface<createInventoryDTO, Inventory, Inventory>{
 	private tableName = "champion_inventory";
 
-	async create(inventory: Inventory): Promise<Inventory> {
+	async create(inventory: createInventoryDTO): Promise<Inventory> {
 		try {
 			const newInventory = await db(this.tableName).insert(inventory).returning("*");
 			if(!newInventory || newInventory.length === 0){

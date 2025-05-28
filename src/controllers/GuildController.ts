@@ -61,6 +61,8 @@ export class GuildController implements ControllerInterface {
             return;
           }
 
+          
+			// TODO: Criar MAPPER
           const guildData: updateGuildDTO = {
             id: guildId,
             name: guild.name,

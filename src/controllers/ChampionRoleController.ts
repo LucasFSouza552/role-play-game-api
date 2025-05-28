@@ -2,22 +2,26 @@ import { Request, Response } from "express";
 import { FilterChampionRole, FilterDefault } from "../models/Filters";
 import { ChampionRoleService } from "../services/ChampionRoleService";
 import { ControllerInterface } from "../interfaces/controllerInterface";
+import { ChampionRole } from "../models/ChampionRole";
 
 const championRoleService = new ChampionRoleService();
 
 export class ChampionRoleController implements ControllerInterface {
 
     update(req: Request, res: Response): Promise<void> {
+
+        // TODO: Implementar
         throw new Error("Method not implemented.");
     }
     delete(req: Request, res: Response): Promise<void> {
+        // TODO: Implementar
         throw new Error("Method not implemented.");
     }
 
     async getAll(req: Request, res: Response): Promise<void> {
         try {
             const filters: FilterChampionRole = { ...FilterDefault, ...req.query };
-            const roles = await championRoleService.getAll(filters);
+            const roles: ChampionRole[] = await championRoleService.getAll(filters);
 
             res.status(200).json({ roles: roles, length: roles.length });
         } catch (error: any) {
@@ -51,6 +55,7 @@ export class ChampionRoleController implements ControllerInterface {
                 return;
             }
 
+			// TODO: Criar MAPPER
             const newRole = await championRoleService.create(role);
             res.status(201).json(newRole);
         } catch (error: any) {

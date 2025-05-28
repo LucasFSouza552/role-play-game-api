@@ -1,13 +1,16 @@
 import { Request, Response } from "express";
 import { ChampionService } from "../services/ChampionsService";
+
 import { ChampionSkill } from "../models/ChampionSkill";
 import { GuildService } from "../services/GuildService";
 import { FilterChampion, FilterDefault } from "../models/Filters";
 import { ControllerInterface } from "../interfaces/controllerInterface";
 import { ChampionDTO, createChampionDTO, updatedChampionStatusDTO } from "../DTOS/ChampionDTO";
+import { ChampionInventoryService } from "../services/InventoryService";
 
 const championService = new ChampionService();
 const guildService = new GuildService();
+const championInventoryService = new ChampionInventoryService();
 
 export class ChampionController implements ControllerInterface {
 
@@ -63,6 +66,13 @@ export class ChampionController implements ControllerInterface {
 			champion.userId = userId;
 
 			const newChampion = await championService.create(champion);
+			//TODO: fazer Mapper
+			
+			await championInventoryService.create({
+				ownerId: newChampion.id,
+				capacity: 20,
+			});
+
 			res.status(201).json(newChampion);
 		} catch (err: any) {
 			res.status(400).json({ error: err.message });
@@ -114,6 +124,8 @@ export class ChampionController implements ControllerInterface {
 				return;
 			}
 
+			
+			// TODO: Criar MAPPER
 			const championData: updatedChampionStatusDTO = {
 				id: championId,
 				userId: userId,

@@ -1,3 +1,4 @@
+import { createInventoryDTO } from "../DTOS/InventoryDTO";
 import { ServiceInterface } from "../interfaces/serviceInterface";
 import { Filter } from "../models/Filters";
 import { Inventory } from "../models/Inventory";
@@ -6,7 +7,7 @@ import { ChampionInventoryRepository } from "../repositories/ChampionInventoryRe
 
 const Inventory = new ChampionInventoryRepository();
 
-export class ChampionInventoryService implements ServiceInterface<Inventory, Inventory, Inventory> {
+export class ChampionInventoryService implements ServiceInterface<createInventoryDTO, Inventory, Inventory> {
 	async getAll(filter: Filter): Promise<Inventory[]> {
 		try {
 			return await Inventory.getAll(filter);
@@ -21,7 +22,7 @@ export class ChampionInventoryService implements ServiceInterface<Inventory, Inv
 			throw new Error("Error fetching inventory");
 		}
 	}
-	async create(inventory: Inventory): Promise<Inventory> {
+	async create(inventory: createInventoryDTO): Promise<Inventory> {
 		try {
 			return await Inventory.create(inventory);
 		} catch (error) {
