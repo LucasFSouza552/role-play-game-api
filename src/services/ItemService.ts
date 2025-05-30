@@ -1,55 +1,100 @@
+import { ItemType } from "../models/enums/ItemType";
+import { createItemDTO, updateItemDTO } from "../DTOS/ItemDTO";
 import { Item } from "../models/Item";
+import { ServiceInterface } from "../interfaces/serviceInterface";
+import { ItemRepository } from "../repositories/ItemRepository";
+import { FilterItem } from "../models/Filters";
 
-import { itemsRepo } from "../repositories/RepositoryManager";
+const itemRepository = new ItemRepository();
 
-export class ItemService {
-	// Lista todos os itens do banco de dados com filtros opcionais
-	async getAllItems(filter: { name?: string; minPrice?: number; maxPrice?: number }) {
-		return await itemsRepo.findAll(filter);
-	}
+// Camada de regras de negócio dos itens.
 
-	// Busca um item específico pelo ID
-	async getItemById(id: string) {
-		return await itemsRepo.findById(id);
-	}
+export class ItemService implements ServiceInterface<createItemDTO, updateItemDTO, Item> {
 
-	// Cria um novo item no banco de dados
-	async createItem(item: any) {
-		const newItem: Omit<Item, "id"> = {
-			name: item.name,
-			description: item.description,
-			priceMin: item.minPrice,
-			priceMax: item.maxPrice,
-			rarity: item.rarity || "Common",
-			type: item.type,
-		};
-		return await itemsRepo.create(newItem as Item);
-	}
+  // Busca todos os itens com filtros opcionais.
 
-	// Atualiza um item existente no banco de dados
-	async updateItem(id: string, item: any) {
-		const existingItem = await itemsRepo.findById(id);
-		if (!existingItem) {
-			return null;
-		}
-		const updatedItem: Partial<Item> = {
-			name: item.name ?? existingItem.name,
-			description: item.description ?? existingItem.description,
-			priceMin: item.minPrice ?? existingItem.priceMin,
-			priceMax: item.maxPrice ?? existingItem.priceMax,
-			rarity: item.rarity ?? existingItem.rarity,
-			type: item.type ?? existingItem.type,
-		};
-		return await itemsRepo.update(id, updatedItem);
-	}
+  async getAll(filter: FilterItem): Promise<Item[]> {
+    try {
+      return await itemRepository.getAll(filter);
+    } catch (error) {
+      throw new Error('Error fetching items');
+    }
+  }
 
-	// Deleta um item do banco de dados
-	async deleteItem(id: string) {
-		const existingItem = await itemsRepo.findById(id);
-		if (!existingItem) {
-			return null;
-		}
-		await itemsRepo.delete(id);
-		return { message: "Item deletado com sucesso." };
-	}
+  // Busca um item pelo ID.
+
+  async getById(id: number): Promise<Item> {
+    try {
+      return await itemRepository.getById(id);
+    } catch (error) {
+      throw new Error('Error fetching item');
+    }
+  }
+
+  // Cria um novo item a partir do DTO recebido.
+  // Valida campos obrigatórios e enums.
+
+  async create(item: createItemDTO): Promise<Item> {
+    try {
+      // Monta o objeto conforme o modelo/tabela
+      // TODO: Adicionar MAPPER
+      const newItem: createItemDTO = {
+        name: item.name,
+        description: item.description,
+        priceMin: item.priceMin,
+        priceMax: item.priceMax,
+        type: item.type,
+      };
+
+      return await itemRepository.create(newItem);
+    } catch (error) {
+      throw new Error('Error creating item');
+    }
+  }
+
+  // Atualiza um item existente, se ele existir..
+  async update(item: updateItemDTO): Promise<updateItemDTO> {
+
+    // Validação dos enums, se enviados
+    if (item.type && !Object.values(ItemType).includes(item.type)) {
+      throw new Error("Tipo de item inválido.");
+    }
+
+    // Validação de preço mínimo e máximo, se ambos enviados
+    if (
+      item.priceMin != null &&
+      item.priceMax != null &&
+      item.priceMin > item.priceMax
+    ) {
+      throw new Error("O preço mínimo não pode ser maior que o preço máximo.");
+    }
+
+    const existingItem = await itemRepository.getById(item.id);
+    if (!existingItem) {
+      throw new Error('Item not found');
+    }
+
+    // Atualiza apenas os campos enviados
+    // TODO: Adicionar MAPPER
+    const updatedItem: updateItemDTO = {
+      name: item.name ?? existingItem.name,
+      description: item.description ?? existingItem.description,
+      priceMin: item.priceMin ?? existingItem.priceMin,
+      priceMax: item.priceMax ?? existingItem.priceMax,
+      type: item.type ?? existingItem.type,
+      id: item.id
+    };
+
+    return await itemRepository.update(updatedItem);
+  }
+
+  // Deleta um item pelo ID, se ele existir.
+  async delete(id: number): Promise<boolean> {
+    try {
+      const deletedItem = await itemRepository.delete(id);
+      return deletedItem;
+    } catch (error) {
+      throw new Error('Error deleting item');
+    }
+  }
 }

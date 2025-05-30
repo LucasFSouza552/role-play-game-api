@@ -55,7 +55,7 @@ ChampionRoleRoute.get("/", championRoleController.getAll);
  * /api/roles/{id}:
  *   get:
  *     summary: Recuperar uma classe específica
- *     description: Retorna uma classe baseado no ID fornecido.
+ *     description: Retorna uma classe baseada no ID fornecido.
  *     tags:
  *       - Classes (Roles)
  *     parameters:
@@ -71,9 +71,12 @@ ChampionRoleRoute.get("/", championRoleController.getAll);
  *         content:
  *           application/json:
  *             schema:
- *               type: object     
- *               properties:
- *                 id:
+ *               type: object
+ *               $ref: '#/components/schemas/Role'
+ *       404:
+ *         description: Classe não encontrada
+ *       500:
+ *         description: Erro interno do servidor
  */
 ChampionRoleRoute.get("/:id", championRoleController.getById);
 

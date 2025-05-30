@@ -8,7 +8,8 @@ export async function up(knex: Knex): Promise<void> {
     table.string('name').notNullable();
     table.text('description').notNullable();
     table.integer('power').defaultTo(0);
-    table.integer('cost').defaultTo(0);
+    table.integer('EP').defaultTo(0);
+    table.integer('MP').defaultTo(0);
     table.string('target').notNullable();
   });
 }

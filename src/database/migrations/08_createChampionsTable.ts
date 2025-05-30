@@ -17,9 +17,12 @@ export async function up(knex: Knex): Promise<void> {
 		table.integer('intelligence').defaultTo(0);
 		table.integer('vitality').defaultTo(0);
 		table.integer('hp').defaultTo(0);
+		table.integer('mp').defaultTo(0);
+		table.integer('ep').defaultTo(0);
+		table.integer('sp').defaultTo(15);
+		
 		table.integer('level').defaultTo(1);
 		table.integer('xp').defaultTo(0);
-		table.integer('sp').defaultTo(15);
 	});
 }
 

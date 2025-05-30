@@ -5,12 +5,14 @@ import swaggerDocs from "./src/config/swagger";
 import swaggerUi from 'swagger-ui-express';
 import apiRoute from "./src/routes/api.Route";
 
+
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 
 app.use(cors());
+
 
 const PORT = process.env.PORT || "5000";
 

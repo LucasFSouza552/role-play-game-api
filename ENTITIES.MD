@@ -1,0 +1,38 @@
+# Entidades
+
+- Aventureiros
+    - Possui:
+        - Nome
+        - Progressão
+        - Status
+        - Classe
+        - Inventário
+        - Guilda
+        - Missões
+        - Habilidades
+- Missões
+    - Possui:
+        - Titulo
+        - Descrição
+        - Dificuldade
+        - Prazo
+        - Recompensas XP e Moedas
+- Guildas
+    - Possui: 
+        - Nome 
+        - Nível (Baseado no nível de todos os membros)
+        - Membros
+        - Conquistas
+- Lojas
+    - Possui:
+        - Inventário
+        - Rotacionamento dos itens das lojas, baseado no dia.
+- Itens
+    - Possui:
+        - Nome
+        - Descrição
+        - Raridade
+        - Nível
+        - Preço (Mínimo e Máximo)
+
+---

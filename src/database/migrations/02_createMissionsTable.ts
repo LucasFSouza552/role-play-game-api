@@ -1,9 +1,7 @@
 import { Knex } from "knex";
-import { MissionDifficult } from "../src/models/enums/MissionDifficult";
-import { MissionStatus } from "../src/models/enums/MissionStatus";
+import { MissionDifficult } from "../../models/enums/MissionDifficult";
 
 const difficultyKeys = Object.values(MissionDifficult);
-const missionStatus = Object.values(MissionStatus)
 
 const tablename = "missions";
 
@@ -13,11 +11,10 @@ export async function up(knex: Knex): Promise<void> {
         table.string('title').notNullable();
         table.text('description').notNullable();
         table.enu('difficulty', difficultyKeys).notNullable();
-        table.enu('status', missionStatus).notNullable();
-        table.date('targetDate').notNullable();
         table.integer('xp');
+        table.integer('sp');
         table.decimal('money');
-    })
+    });
 }
 
 export async function down(knex: Knex) {

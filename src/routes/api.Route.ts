@@ -10,12 +10,12 @@ import AuthMiddleware from "../middleware/authMiddleware";
 const apiRoute = Router();
 
 apiRoute.get("/", (req, res) => {
-    res.send("API");
+    res.send("API"); 
 });
 
-apiRoute.use("/users", userRoute);
+apiRoute.use("/user", userRoute);
 apiRoute.use("/champions", AuthMiddleware, ChampionRoute);
 apiRoute.use("/roles", ChampionRoleRoute);
-apiRoute.use("/missions", AuthMiddleware, MissionsRoute);
+apiRoute.use("/missions", MissionsRoute);
 
 export default apiRoute;
