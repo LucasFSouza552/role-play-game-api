@@ -4,6 +4,7 @@ import { ItemType } from "../models/enums/ItemType";
 import { ControllerInterface } from "../interfaces/controllerInterface";
 import { Item } from "../models/Item";
 import { FilterDefault, FilterItem } from "../models/Filters";
+import { ItemMapper } from "../utils/mapppers/itemMapping";
 
 const itemService = new ItemService();
 // Controller responsável por gerenciar requisições relacionadas a itens
@@ -14,7 +15,9 @@ export class ItemController implements ControllerInterface {
     try {
       const filter: FilterItem = { ...FilterDefault, ...req.query };
       const items = await itemService.getAll(filter);
-      res.status(200).json(items);
+      // Mapeia a lista de itens para DTOs
+      const itemsDTO = ItemMapper.mapItemToDTOList(items);
+      res.status(200).json(itemsDTO);
     } catch (error) {
       res.status(500).json({ error: "Erro ao listar itens." });
     }
@@ -35,7 +38,9 @@ export class ItemController implements ControllerInterface {
         res.status(404).json({ error: "Item não encontrado." });
         return;
       }
-      res.status(200).json(item);
+      // Mapeia o item para DTO
+      const itemDTO = ItemMapper.mapItemToDTO(item);
+      res.status(200).json(itemDTO);
     } catch {
       res.status(500).json({ error: "Erro ao buscar o item." });
     }
@@ -71,9 +76,9 @@ export class ItemController implements ControllerInterface {
         return;
       }
 
-      
-			// TODO: Criar MAPPER
-      const newItem = await itemService.create(item);
+      // Utiliza o mapper para criar o DTO
+      const itemDTO = ItemMapper.mapCreateItemToDTO(item);
+      const newItem = await itemService.create(itemDTO);
       res.status(201).json(newItem);
     } catch {
       res.status(500).json({ error: "Erro ao criar o item." });
@@ -104,7 +109,9 @@ export class ItemController implements ControllerInterface {
       }
       item.id = parseInt(ItemId, 10);
 
-      const updatedItem = await itemService.update(item);
+      // Utiliza o mapper para criar o DTO de atualização
+      const itemDTO = ItemMapper.mapItemToUpdateDTO(item);
+      const updatedItem = await itemService.update(itemDTO);
       if (!updatedItem) {
         res.status(404).json({ error: "Item não encontrado ou erro ao atualizar." });
         return;
