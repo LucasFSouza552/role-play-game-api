@@ -5,7 +5,7 @@ export async function seed(knex: Knex): Promise<void> {
 
 	const inventories = shop.map((shop) => ({
 		capacity: 5,
-		shopId: shop.id
+		ownerId: shop.id
 	}));
 
 	await knex('shop_inventory').insert(inventories);

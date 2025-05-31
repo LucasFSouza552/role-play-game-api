@@ -31,15 +31,13 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 	}
 
 	async getById(championId: number, userId: number): Promise<ChampionDTO> {
-		const champion = await db(this.tableName).where({ id:championId, userId }).first();
-		const championSkills = await db('champion_skills').where({ championId });
-		const skills = await db('skills').whereIn('id', championSkills.map((cs: any) => cs.skillId));
-		const role = await db('champion_roles').where({ id: champion.roleId }).first();
-		champion.xp_max = getMaxExperience(champion.level);
-		champion.role = role;
-		champion.skills = skills;
-		console.log(champion);
-		return champion;
+		try {
+			const champion = await db(this.tableName).where({ id: championId, userId: userId }).first();
+			champion.xp_max = getMaxExperience(champion.level);
+			return champion;
+		} catch (error) {
+			throw new Error('Error while searching for champion');
+		}
 	}
 
 	async create(champion: createChampionDTO): Promise<ChampionDTO> {
@@ -54,7 +52,7 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 	async update(champion: updateChampionDTO): Promise<ChampionDTO> {
 		try {
 			const updatedChampion = await db(this.tableName)
-				.where({ id:champion.id, userId: champion.userId })
+				.where({ id: champion.id, userId: champion.userId })
 				.update(champion).returning('*');
 			return updatedChampion[0];
 		} catch (error) {
@@ -96,8 +94,8 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 	async updateGuild(Champion: updateChampionGuildDTO) {
 		try {
 			const updatedChampion = await db(this.tableName)
-			.where({ id: Champion.id, userId: Champion.userId })
-			.update({ guildId: Champion.guildId });
+				.where({ id: Champion.id, userId: Champion.userId })
+				.update({ guildId: Champion.guildId });
 			return updatedChampion;
 		} catch (error) {
 			throw new Error('Erro ao atualizar guild do campeão');
@@ -107,14 +105,14 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 	async updateStatus(champion: updatedChampionStatusDTO) {
 		try {
 			const updatedChampion = await db(this.tableName)
-			.where({ id: champion.id, userId: champion.userId })
-			.update({
-				strength: champion.strength,
-				dexterity: champion.dexterity,
-				intelligence: champion.intelligence,
-				vitality: champion.vitality,
-				sp: champion.sp
-			});
+				.where({ id: champion.id, userId: champion.userId })
+				.update({
+					strength: champion.strength,
+					dexterity: champion.dexterity,
+					intelligence: champion.intelligence,
+					vitality: champion.vitality,
+					sp: champion.sp
+				});
 			return updatedChampion;
 		} catch (error) {
 			throw new Error('Erro ao atualizar status do campeão');

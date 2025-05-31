@@ -4,6 +4,7 @@ import ChampionRoute from "./Champion.Route"
 import MissionsRoute from "./Missions.Route";
 import ChampionRoleRoute from "./ChampionRole.Route";
 import userRoute from "./user.Route";
+import ChampionInventory from "./ChampionInventory.Route";
 
 import AuthMiddleware from "../middleware/authMiddleware";
 
@@ -17,5 +18,6 @@ apiRoute.use("/user", userRoute);
 apiRoute.use("/champions", AuthMiddleware, ChampionRoute);
 apiRoute.use("/roles", ChampionRoleRoute);
 apiRoute.use("/missions", MissionsRoute);
+apiRoute.use("/inventory",ChampionInventory);
 
 export default apiRoute;

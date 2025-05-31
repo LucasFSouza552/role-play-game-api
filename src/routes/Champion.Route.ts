@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {ChampionController} from "../controllers/ChampionController";
+import { ChampionController } from "../controllers/ChampionController";
 
 const championController = new ChampionController();
 const ChampionRoute = Router();
@@ -532,5 +532,7 @@ ChampionRoute.post("/:id/guild", championController.joinGuild);
 
 // Sair de Guildas
 // ChampionRoute.delete("/:id/guild", championController.leaveGuild);
+
+ChampionRoute.get("/:id/inventory", championController.getInventory);
 
 export default ChampionRoute;

@@ -1,11 +1,12 @@
 import { ChampionMapper } from './../utils/mapppers/championMapping';
 import { FilterChampion } from "../models/Filters";
 import { ChampionRole } from "../models/ChampionRole";
-import { championRepo, roleRepo, skillRepo } from "../repositories/RepositoryManager";
+import { championRepo, roleRepo, skillRepo, championInventoryRepo } from "../repositories/RepositoryManager";
 import { ServiceInterface } from "../interfaces/serviceInterface";
 import { ChampionDTO, createChampionDTO, updateChampionDTO, updateChampionGuildDTO, updatedChampionStatusDTO } from "../DTOS/ChampionDTO";
 
 export class ChampionService implements ServiceInterface<createChampionDTO, updateChampionDTO, ChampionDTO> {
+
 	async getAll(filter: FilterChampion): Promise<ChampionDTO[]> {
 		try {
 			return await championRepo.getAll(filter);
@@ -16,7 +17,8 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 
 	async getById(id: number, userId: number): Promise<ChampionDTO> {
 		try {
-			return await championRepo.getById(id, userId);
+			const champion = await championRepo.getById(id, userId);
+			return champion;
 		} catch (error) {
 			throw new Error('Champion not found');
 		}
@@ -69,7 +71,7 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 		return await championRepo.updateGuild(champion);
 	}
 
-	async delete(championId: number,  userId: number): Promise<boolean> {
+	async delete(championId: number, userId: number): Promise<boolean> {
 		try {
 			const deletedChampion = await championRepo.delete(championId, userId);
 			return deletedChampion;
@@ -102,6 +104,14 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 			return await skillRepo.getById(skillId);
 		} catch (error) {
 			throw new Error('Error getting skill by id');
+		}
+	}
+
+	async getInventory(championId: number, userId: number) {
+		try {
+			return await championInventoryRepo.getById(championId, userId);
+		} catch (error) {
+			throw new Error('Error getting inventory');
 		}
 	}
 

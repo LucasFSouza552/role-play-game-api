@@ -1,3 +1,4 @@
+import { error } from "console";
 import { Request, Response } from "express";
 import { ChampionService } from "../services/ChampionsService";
 
@@ -6,7 +7,7 @@ import { GuildService } from "../services/GuildService";
 import { FilterChampion, FilterDefault } from "../models/Filters";
 import { ControllerInterface } from "../interfaces/controllerInterface";
 import { ChampionDTO, createChampionDTO, updatedChampionStatusDTO } from "../DTOS/ChampionDTO";
-import { ChampionInventoryService } from "../services/InventoryService";
+import { ChampionInventoryService } from "../services/ChampionInventoryService";
 
 const championService = new ChampionService();
 const guildService = new GuildService();
@@ -31,17 +32,22 @@ export class ChampionController implements ControllerInterface {
 			const userId: number = req.userId as number;
 
 			if (!championId) {
-				res.status(400).send({ error: "ID é inválido" })
+				res.status(400).json({ error: "Invalid champion ID" });
 				return;
 			}
 
-			if(!userId) {
-				res.status(400).json({ errror: "Usuário inválido" })
+			if (!userId) {
+				res.status(400).json({ error: "Invalid user ID" });
 				return;
 			}
 
 			const champion = await championService.getById(championId, userId);
-			console.log(champion);
+
+			if (!champion) {
+				res.status(404).json({ error: "Champion not found" });
+				return;
+			}
+
 			res.status(200).json(champion);
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
@@ -58,7 +64,7 @@ export class ChampionController implements ControllerInterface {
 				return;
 			}
 
-			if(!userId) {
+			if (!userId) {
 				res.status(400).json({ errror: "Usuário inválido" })
 				return;
 			}
@@ -67,7 +73,7 @@ export class ChampionController implements ControllerInterface {
 
 			const newChampion = await championService.create(champion);
 			//TODO: fazer Mapper
-			
+
 			await championInventoryService.create({
 				ownerId: newChampion.id,
 				capacity: 20,
@@ -102,8 +108,8 @@ export class ChampionController implements ControllerInterface {
 				dexterity == null &&
 				intelligence == null &&
 				vitality == null) {
-					res.status(400).json({ error: "Nenhum atributo foi enviado para atualizar" });
-					return;
+				res.status(400).json({ error: "Nenhum atributo foi enviado para atualizar" });
+				return;
 			}
 
 			const status = [strength, dexterity, intelligence, vitality];
@@ -124,7 +130,7 @@ export class ChampionController implements ControllerInterface {
 				return;
 			}
 
-			
+
 			// TODO: Criar MAPPER
 			const championData: updatedChampionStatusDTO = {
 				id: championId,
@@ -178,7 +184,7 @@ export class ChampionController implements ControllerInterface {
 			return;
 		}
 
-		if(!userId) {
+		if (!userId) {
 			res.status(400).json({ errror: "Usuário inválido" })
 			return;
 		}
@@ -209,7 +215,7 @@ export class ChampionController implements ControllerInterface {
 	}
 
 	async getSkills(req: Request, res: Response): Promise<void> {
-		const championId = parseInt(req.params.championId);
+		const championId = parseInt(req.params.id);
 
 		if (!championId) {
 			res.status(400).json({ errror: "ID do campeão inválido" })
@@ -235,7 +241,7 @@ export class ChampionController implements ControllerInterface {
 			return;
 		}
 
-		if(!userId) {
+		if (!userId) {
 			res.status(400).json({ errror: "Usuário inválido" })
 			return;
 		}
@@ -272,6 +278,23 @@ export class ChampionController implements ControllerInterface {
 
 	}
 
+	async leaveGuild(req: Request, res: Response): Promise<void> { }
 
+	async getInventory(req: Request, res: Response): Promise<void> {
+		try {
+			const championId = parseInt(req.params.id);
+			const userId = req.userId as number;
+
+			if (!championId) {
+				res.status(400).json({ error: "Invalid champion ID" })
+				return;
+			}
+
+			const inventory = await championService.getInventory(championId, userId);
+			res.status(200).json(inventory);
+		} catch (error) {
+			res.status(400).json({ error: "Error fetching champion's inventory" });
+		}
+	}
 
 }

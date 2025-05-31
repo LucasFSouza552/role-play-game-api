@@ -37,5 +37,9 @@ export interface FilterShop extends Filter {
     type?: ItemType;
 }
 
+export interface FilterInventory extends Filter {
+    championId?: number;
+}
+
 
 

@@ -1,4 +1,5 @@
 import AuthMiddleware from "../middleware/authMiddleware";
+import authorizationMiddleware from "../middleware/autorizationMiddleware";
 import { validateAllowedFields } from "../middleware/validateAllowedFields";
 import { UserController } from "./../controllers/UserController";
 import { Router } from "express";
@@ -6,6 +7,8 @@ import { Router } from "express";
 const userRoute = Router();
 
 const userController = new UserController();
+
+userRoute.get('/users', AuthMiddleware, authorizationMiddleware(["admin"]), userController.getAll);
 
 /**
  * @swagger
@@ -200,6 +203,6 @@ userRoute.post("/login", userController.authenticateUser);
  *                   type: string
  *                   description: Mensagem de sucesso.
  */
-userRoute.patch("/update",AuthMiddleware, validateAllowedFields,userController.update);
+userRoute.patch("/update", AuthMiddleware, validateAllowedFields, userController.update);
 
 export default userRoute;
