@@ -1,11 +1,14 @@
 import { ChampionMapper } from './../utils/mapppers/championMapping';
 import { FilterChampion } from "../models/Filters";
 import { ChampionRole } from "../models/ChampionRole";
-import { championRepo, roleRepo, skillRepo } from "../repositories/RepositoryManager";
+import { championRepo, roleRepo, skillRepo, championInventoryRepo } from "../repositories/RepositoryManager";
 import { ServiceInterface } from "../interfaces/serviceInterface";
 import { ChampionDTO, createChampionDTO, updateChampionDTO, updateChampionGuildDTO, updatedChampionStatusDTO } from "../DTOS/ChampionDTO";
+import { Inventory } from '../models/Inventory';
+import { InventoryItens } from '../models/InventoryItens';
 
 export class ChampionService implements ServiceInterface<createChampionDTO, updateChampionDTO, ChampionDTO> {
+
 	async getAll(filter: FilterChampion): Promise<ChampionDTO[]> {
 		try {
 			return await championRepo.getAll(filter);
@@ -16,7 +19,8 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 
 	async getById(id: number, userId: number): Promise<ChampionDTO> {
 		try {
-			return await championRepo.getById(id, userId);
+			const champion = await championRepo.getById(id, userId);
+			return champion;
 		} catch (error) {
 			throw new Error('Champion not found');
 		}
@@ -69,7 +73,7 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 		return await championRepo.updateGuild(champion);
 	}
 
-	async delete(championId: number,  userId: number): Promise<boolean> {
+	async delete(championId: number, userId: number): Promise<boolean> {
 		try {
 			const deletedChampion = await championRepo.delete(championId, userId);
 			return deletedChampion;
@@ -102,6 +106,60 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 			return await skillRepo.getById(skillId);
 		} catch (error) {
 			throw new Error('Error getting skill by id');
+		}
+	}
+
+	async getInventory(championId: number, userId: number) {
+		try {
+			const inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId);
+			return inventory;
+		} catch (error) {
+			throw new Error('Error getting inventory');
+		}
+	}
+
+	async createInventoryItem(championId: number, userId: number, itemId: number, quantity: number): Promise<InventoryItens> {
+		try {
+			const inventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId);
+
+			if(!inventory) {
+				throw new Error('Inventory not found');
+			}
+
+			const newItem: InventoryItens = await championInventoryRepo.createInventoryItem(inventory.id, itemId, quantity);
+			return newItem;
+		} catch (error) {
+			throw new Error('Error creating inventory item');
+		}
+	}
+
+	async updateInventoryItem(championId: number, userId: number, itemId: number, quantity: number): Promise<InventoryItens> {
+		try {
+			const inventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId);
+
+			if(!inventory) {
+				throw new Error('Inventory not found');
+			}
+
+			const item: InventoryItens = await championInventoryRepo.updateInventoryItem(inventory.id, itemId, quantity);
+			return item;
+		} catch (error) {
+			throw new Error('Error updating inventory item');
+		}
+	}
+
+	async removeInventoryItem(championId: number, userId: number, itemId: number): Promise<boolean> {
+		try {
+
+			const inventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId);
+
+			if(!inventory) {
+				throw new Error('Inventory not found');
+			}
+
+			return await championInventoryRepo.removeInventoryItem(inventory.id, itemId);
+		} catch (error) {
+			throw new Error('Error removing item from inventory');
 		}
 	}
 

@@ -1,9 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import { validateAuthorizationHeader } from "../utils/jwt";
+import { ChampionDTO } from "../DTOS/ChampionDTO";
+import { userDTO } from "../DTOS/UserDTO";
 
 declare module "express-serve-static-core" {
     interface Request {
         userId?: number;
+        user?: userDTO;
+        champion?: ChampionDTO;
     }
 }
 

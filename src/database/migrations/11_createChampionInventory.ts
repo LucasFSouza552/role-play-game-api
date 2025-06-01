@@ -5,7 +5,7 @@ const tablename = 'champion_inventory';
 export async function up(knex: Knex): Promise<void> {
     await knex.schema.createTable(tablename, (table) => {
         table.increments('id').primary();
-        table.integer('championId')
+        table.integer('ownerId')
             .notNullable()
             .references('id')
             .inTable('champions')

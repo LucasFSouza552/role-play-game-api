@@ -7,5 +7,5 @@ export interface Mission {
     difficulty: MissionDifficult;
     XP?: number;
     SP?: number; 
-    money?: number;
+    money: number;
 }

@@ -15,14 +15,14 @@ export class UserController implements ControllerInterface {
 			const user = req.body;
 
 			if (!user || !user.name || !user.email || !user.password) {
-				res.status(400).json({ error: "Falta informação necessária para criar um usuário" });
+				res.status(400).json({ error: "Missing information to create a user" });
 				return;
 			}
 
 			const userExists = await userService.getByEmail(user.email);
 
 			if (userExists) {
-				res.status(400).json({ error: "Usuário já cadastrado" });
+				res.status(400).json({ error: "User already registered" });
 				return;
 			}
 
@@ -52,21 +52,21 @@ export class UserController implements ControllerInterface {
 			const user = req.body;
 
 			if (!user.email || !user.password) {
-				res.status(400).json({ error: "Falta informação necessária para criar um usuário" });
+				res.status(400).json({ error: "Missing information to authenticate a user" });
 				return;
 			}
 
 			const User = await userService.getByEmail(user.email);
 
 			if (!User) {
-				res.status(400).json({ error: "Usuário não encontrado" });
+				res.status(400).json({ error: "User not found" });
 				return;
 			}
 
 			const passwordEncoded = await validatePassword(user.password, User.password);
 
 			if (!passwordEncoded) {
-				res.status(400).json({ error: "Credenciais inválidas" });
+				res.status(400).json({ error: "Invalid credentials" });
 				return;
 			}
 
@@ -80,10 +80,20 @@ export class UserController implements ControllerInterface {
 
 	async getById(req: Request, res: Response) {
 		try {
+			const userId = req.userId;
 
-			const userId: number = req.userId as number;
+			if (!userId) {
+				res.status(400).json({ error: "Missing information to find a user" });
+				return;
+			}
 
 			const user = await userService.getById(userId);
+
+			if (!user) {
+				res.status(400).json({ error: "User not found" });
+				return;
+			}
+
 			res.status(200).json({ user });
 		} catch (err: any) {
 			console.error(err);
@@ -97,30 +107,30 @@ export class UserController implements ControllerInterface {
 		const userBody: updateUserDTO = req.body;
 
 		if (!userId) {
-			res.status(400).json({ error: "Falta informação necessária para atualizar o usuário" });
+			res.status(400).json({ error: "Missing information to update a user" });
 			return;
 		}
 
 		const User = await userService.getById(userId);
 
 		if (!User) {
-			res.status(400).json({ error: "Usuário não encontrado" });
+			res.status(400).json({ error: "User not found" });
 			return;
 		}
 
-		
+
 		if (!userBody) {
-			res.status(400).json({ error: "Falta informação necessária para atualizar o usuário" });
+			res.status(400).json({ error: "Missing information to update a user" });
 			return;
 		}
-		
-		
+
+
 		userBody.id = userId;
-		const userData: updateUserDTO = UserMapper.mapUserToUpdateDTO(userBody); 
+		const userData: updateUserDTO = UserMapper.mapUserToUpdateDTO(userBody);
 
 		const userUpdated = await userService.update(userData);
 		if (!userUpdated || userUpdated.id !== userId) {
-			res.status(400).json({ error: "Erro ao atualizar o usuário" });
+			res.status(400).json({ error: "Error updating the user" });
 			return;
 		}
 
@@ -134,3 +144,4 @@ export class UserController implements ControllerInterface {
 		throw new Error("Method not implemented.");
 	}
 }
+

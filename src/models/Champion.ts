@@ -1,5 +1,6 @@
 import { ChampionRole } from "./ChampionRole";
 import { ChampionSkill } from "./ChampionSkill";
+import { Inventory } from "./Inventory";
 import { Mission } from "./Mission";
 
 export interface Champion {
@@ -21,7 +22,7 @@ export interface Champion {
 	roleId: number;
 	role?: ChampionRole;
 	missions?: Mission[];
-	inventory?: [];
+	inventory?: Inventory;
 	guildId?: number | null;
 	skills?: ChampionSkill[];
 }

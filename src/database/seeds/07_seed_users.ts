@@ -2,8 +2,8 @@ import { Knex } from "knex";
 import { cryptPassword } from "../../utils/bcryptPassword";
 
 export async function seed(knex: Knex): Promise<void> {
-	const password = cryptPassword('admin');
-
+	const password = await cryptPassword('admin');
+	
 	await knex('users').insert([
 		{ name: 'Admin', email: 'admin', password: password, role: 'admin' },
 		{ name: 'User', email: 'user', password: password, role: 'user' },
