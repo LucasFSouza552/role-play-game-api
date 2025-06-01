@@ -8,9 +8,10 @@ import getMaxExperience from "../utils/getMaxExperience";
 export class ChampionRepository implements RepositoryInterface<createChampionDTO, updateChampionDTO, ChampionDTO> {
 	private tableName = 'champions';
 	async getAll(filter: FilterChampion): Promise<Champion[]> {
-		const allChampions = await db(this.tableName).select('*')
-			.limit(filter.size)
-			.offset(filter.offset)
+		const allChampions = await db(this.tableName)
+			.select('*')
+			.limit(filter.limit)
+			.offset((filter.page - 1) * filter.limit)
 			.where({ userId: filter.userId })
 			.modify((query) => {
 				if (filter.name) {

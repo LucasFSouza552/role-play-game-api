@@ -49,13 +49,18 @@ export class ChampionRoleController implements ControllerInterface {
     async create(req: Request, res: Response): Promise<void> {
         try {
             const role = req.body;
+            const requiredFields = ['name', 'description', 'hp', 'mp', 'ep'];
+            const missingFields = requiredFields.filter(field => !role[field]);
 
-            if (!role.name) {
-                res.status(400).send({ error: "Classe inválida" })
+            if (missingFields.length > 0) {
+                res.status(400).send({ 
+                    error: "Campos obrigatórios faltando", 
+                    missingFields: missingFields 
+                });
                 return;
             }
 
-			// TODO: Criar MAPPER
+            // TODO: Criar MAPPER
             const newRole = await championRoleService.create(role);
             res.status(201).json(newRole);
         } catch (error: any) {

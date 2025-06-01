@@ -8,7 +8,81 @@ const userRoute = Router();
 
 const userController = new UserController();
 
-userRoute.get('/users', AuthMiddleware, authorizationMiddleware(["admin"]), userController.getAll);
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: number
+ *           description: Identificador único do usuário
+ *         name:
+ *           type: string
+ *           description: Nome do usuário
+ *         email:
+ *           type: string
+ *           description: Email do usuário
+ *         role:
+ *           type: string
+ *           description: Papel do usuário (admin ou user)
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: Data de criação do usuário
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: Data da última atualização do usuário
+ */
+
+/**
+ * @swagger
+ * /api/user/all:
+ *   get:
+ *     summary: Listar todos os usuários (apenas Administradores)
+ *     description: Retorna uma lista de todos os usuários cadastrados. Acesso restrito para administradores.
+ *     tags:
+ *       - Usuários (Users)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Número da página
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Quantidade de itens por página
+ *     responses:
+ *       200:
+ *         description: Lista de usuários retornada com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 users:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/User'
+ *                 length:
+ *                   type: integer
+ *                   description: Total de usuários retornados
+ *       401:
+ *         description: Não autorizado
+ *       403:
+ *         description: Acesso proibido - Apenas administradores podem acessar
+ *       500:
+ *         description: Erro interno do servidor
+ */
+userRoute.get('/all', AuthMiddleware, authorizationMiddleware(["admin"]), userController.getAll);
 
 /**
  * @swagger

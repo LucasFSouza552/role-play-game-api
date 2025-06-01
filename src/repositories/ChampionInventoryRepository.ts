@@ -32,53 +32,36 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 	}
 	async getAll(filter: Filter): Promise<Inventory[]> {
 		try {
-			const inventories = await db(this.tableName).select("*")
-				.limit(filter.size)
-				.offset(filter.offset)
+			const inventories = await db(this.tableName)
+				.select("*")
+				.limit(filter.limit)
+				.offset((filter.page - 1) * filter.limit)
 				.orderBy(filter.orderBy, filter.order);
 			return inventories;
 		} catch (error) {
 			throw new Error("Error fetching inventories");
 		}
 	}
-	async getByIdWithItems(id: number, ownerId?: number): Promise<Inventory> {
+	async getItemsById(inventoryId: number): Promise<InventoryItens[]> {
 		try {
-			const inventory: Inventory = await db(this.tableName).where({ id, ownerId }).first();
-			if (!inventory) throw new Error("Inventory not found");
-			const itens = await db("champion_items").where({ inventoryId: id }).select("*");
-			inventory.itens = itens || [];
-			return inventory;
-		} catch (error) {
-			throw new Error("Error fetching inventory");
-		}
-	}
-	async getByChampionId(userId: number, championId: number): Promise<Inventory> {
-		try {
-			const inventory: Inventory = await db(this.tableName).where({ championId, ownerId: userId }).first();
-			if (!inventory) throw new Error("Inventory not found");
-			return inventory;
+			const itens = await db("champion_items")
+				.join('items', 'champion_items.itemId', '=', 'items.id')
+				.select("items.id", "items.name", "items.description","champion_items.quantity", "items.type", "items.rarity")
+				.where({ inventoryId: inventoryId });
+			return itens || [];
 		} catch (error) {
 			throw new Error("Error fetching inventory");
 		}
 	}
 
-	async getById(championId: number, userId: number): Promise<Inventory> {
+	/**
+	* Busca um inventario pelo id
+	* @param inventoryId id do inventário
+	*/
+	async getById(inventoryId: number): Promise<Inventory> {
 		try {
-			const inventory: Inventory = await db(this.tableName)
-				.join("champions", "champions.id", "champion_inventory.championId")
-				.where({ ownerId: championId })
-				.first();
-
-			if (!inventory) {
-				//Cria o invetário
-				const newInventory: createInventoryDTO = {
-					ownerId: userId,
-					capacity: 20
-				}
-
-				const createdInventory = await this.create(newInventory);
-				return createdInventory;
-			}
+			const inventory: Inventory = await db(this.tableName).where({ id: inventoryId }).first();
+			if (!inventory) throw new Error("Inventory not found");
 			return inventory;
 		} catch (error) {
 			throw new Error("Error fetching inventory");
@@ -93,6 +76,25 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 			return updatedInventory[0];
 		} catch (error) {
 			throw new Error("Error updating inventory");
+		}
+	}
+
+	async getInventoryByOwnerAndChampionId(championId: number, userId: number): Promise<Inventory> {
+		try {
+			const inventory: Inventory = await db("champion_inventory as i")
+				.select("i.*")
+				.join("champions as c", "i.ownerId", "=", "c.id")
+				.where("c.userId", userId)
+				.andWhere("i.ownerId", championId)
+				.first();
+
+			const items = await this.getItemsById(inventory.id);
+
+			inventory.itens = items;
+
+			return inventory;
+		} catch (error) {
+			throw new Error("Error fetching inventory");
 		}
 	}
 
@@ -116,12 +118,7 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 
 	async removeInventoryItem(inventoryId: number, itemId: number): Promise<boolean> {
 		try {
-			const itemInventory: InventoryItens = await db("champion_items").where({ inventoryId, itemId }).first();
-			if (!itemInventory) {
-				throw new Error("Item not found in inventory");
-			}
 			const deletedItem = await db("champion_items").where({ inventoryId, itemId }).del();
-
 			return deletedItem == 1;
 		} catch (error) {
 			throw new Error("Error adding item to inventory");

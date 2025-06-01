@@ -12,6 +12,7 @@ export class ItemController implements ControllerInterface {
   // Lista todos os itens, com filtros opcionais por nome e preço
   async getAll(req: Request, res: Response): Promise<void> {
     try {
+      console.log("tste")
       const filter: FilterItem = { ...FilterDefault, ...req.query };
       const items = await itemService.getAll(filter);
       res.status(200).json(items);

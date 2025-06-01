@@ -10,8 +10,8 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
     async getAll(filter: FilterChampionRole): Promise<ChampionRole[]> {
         return await db(this.tableName)
             .select('*')
-            .limit(filter.size)
-            .offset(filter.offset)
+            .limit(filter.limit)
+            .offset((filter.page - 1) * filter.limit)
             .modify((query) => {
                 if (filter.name) {
                     query.whereILike('champion_roles.name', `%${filter.name}%`);

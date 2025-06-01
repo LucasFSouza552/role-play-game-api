@@ -1,7 +1,5 @@
-import { error } from "console";
 import { Request, Response } from "express";
 import { ChampionService } from "../services/ChampionsService";
-
 import { ChampionSkill } from "../models/ChampionSkill";
 import { GuildService } from "../services/GuildService";
 import { FilterChampion, FilterDefault } from "../models/Filters";
@@ -14,7 +12,6 @@ const guildService = new GuildService();
 const championInventoryService = new ChampionInventoryService();
 
 export class ChampionController implements ControllerInterface {
-
 	async getAll(req: Request, res: Response): Promise<void> {
 		try {
 			const filters: FilterChampion = { ...FilterDefault, ...req.query, userId: req.userId };
@@ -33,11 +30,6 @@ export class ChampionController implements ControllerInterface {
 
 			if (!championId) {
 				res.status(400).json({ error: "Invalid champion ID" });
-				return;
-			}
-
-			if (!userId) {
-				res.status(400).json({ error: "Invalid user ID" });
 				return;
 			}
 
@@ -65,7 +57,7 @@ export class ChampionController implements ControllerInterface {
 			}
 
 			if (!userId) {
-				res.status(400).json({ errror: "Usuário inválido" })
+				res.status(400).json({ error: "Usuário inválido" });
 				return;
 			}
 
@@ -84,6 +76,7 @@ export class ChampionController implements ControllerInterface {
 			res.status(400).json({ error: err.message });
 		}
 	}
+
 	async update(req: Request, res: Response): Promise<void> {
 		throw new Error("Method not implemented.");
 	}
@@ -95,19 +88,16 @@ export class ChampionController implements ControllerInterface {
 			const { strength, dexterity, intelligence, vitality } = req.body;
 
 			if (!userId) {
-				res.status(400).json({ error: "Usuário inválido" })
+				res.status(400).json({ error: "Usuário inválido" });
 				return;
 			}
 
 			if (!championId) {
-				res.status(400).json({ error: "ID do campeão inválido" })
+				res.status(400).json({ error: "ID do campeão inválido" });
 				return;
 			}
 
-			if (strength == null &&
-				dexterity == null &&
-				intelligence == null &&
-				vitality == null) {
+			if (strength == null && dexterity == null && intelligence == null && vitality == null) {
 				res.status(400).json({ error: "Nenhum atributo foi enviado para atualizar" });
 				return;
 			}
@@ -120,18 +110,18 @@ export class ChampionController implements ControllerInterface {
 
 			const championExists = await championService.getById(championId, userId);
 			if (!championExists) {
-				res.status(400).json({ error: "Campeão não encontrado" })
+				res.status(404).json({ error: "Campeão não encontrado" });
 				return;
 			}
 
 			const totalSP = status.reduce((acc, stat) => acc + (stat || 0), 0);
+
+			// TODO: Criar MAPPER
 			if (totalSP > championExists.sp) {
 				res.status(400).json({ error: `O total de SP não pode ser maior que ${championExists.sp} pontos` });
 				return;
 			}
 
-
-			// TODO: Criar MAPPER
 			const championData: updatedChampionStatusDTO = {
 				id: championId,
 				userId: userId,
@@ -143,9 +133,7 @@ export class ChampionController implements ControllerInterface {
 			};
 
 			const updatedChampion = await championService.updateChampionStatus(championData);
-
 			res.status(200).json(updatedChampion);
-
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
 		}
@@ -157,46 +145,46 @@ export class ChampionController implements ControllerInterface {
 			const userId: number = req.userId as number;
 
 			if (!userId) {
-				res.status(400).json({ errror: "Usuário inválido" })
+				res.status(400).json({ error: "Usuário inválido" });
 				return;
 			}
 
 			if (!championId) {
-				res.status(400).json({ error: "ID do campeão inválido" })
+				res.status(400).json({ error: "ID do campeão inválido" });
 				return;
 			}
 
-			const deletedChampion: boolean = await championService.delete(userId, championId);
-
-			res.status(200).json({ deletedChampion: deletedChampion });
+			const deletedChampion = await championService.delete(userId, championId);
+			res.status(200).json({ success: deletedChampion });
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
 		}
 	}
 
 	async addSkill(req: Request, res: Response): Promise<void> {
+		try {
 		const championId = parseInt(req.params.id);
-		const skillId = req.body.skillId;
+			const skillId = parseInt(req.body.skillId);
 		const userId: number = req.userId as number;
 
 		if (!championId) {
-			res.status(400).json({ errror: "ID do campeão inválido" })
+				res.status(400).json({ error: "ID do campeão inválido" });
 			return;
 		}
 
 		if (!userId) {
-			res.status(400).json({ errror: "Usuário inválido" })
+				res.status(400).json({ error: "Usuário inválido" });
 			return;
 		}
 
-		const championExists: ChampionDTO = await championService.getById(championId, userId);
+			const championExists = await championService.getById(championId, userId);
 		if (!championExists) {
-			res.status(400).json({ errror: "Campião não encontrado" })
+				res.status(404).json({ error: "Campeão não encontrado" });
 			return;
 		}
 
 		if (!skillId) {
-			res.status(400).json({ error: "Falta informação necessária para criar um campeão" });
+				res.status(400).json({ error: "ID da habilidade inválido" });
 			return;
 		}
 
@@ -206,79 +194,109 @@ export class ChampionController implements ControllerInterface {
 			return;
 		}
 
-		try {
 			const addedSkill = await championService.addSkill(championId, skillId);
 			res.status(200).json(addedSkill);
-		} catch (error) {
-			res.status(400).json({ error: "Erro ao adicionar habilidade ao campeão" });
+		} catch (err: any) {
+			res.status(400).json({ error: err.message });
 		}
 	}
 
 	async getSkills(req: Request, res: Response): Promise<void> {
+		try {
 		const championId = parseInt(req.params.id);
 
 		if (!championId) {
-			res.status(400).json({ errror: "ID do campeão inválido" })
+				res.status(400).json({ error: "ID do campeão inválido" });
 			return;
 		}
 
-		try {
 			const championSkills = await championService.getSkills(championId);
 			res.status(200).json(championSkills);
-		} catch (error) {
-			res.status(400).json({ error: "Erro ao obter habilidades do campeão" });
+		} catch (err: any) {
+			res.status(400).json({ error: err.message });
 		}
-
 	}
 
 	async joinGuild(req: Request, res: Response): Promise<void> {
+		try {
 		const championId = parseInt(req.params.id);
-		const guildId = req.body.guildId && parseInt(req.body.guildId);
-		const userId: number = req?.userId as number;
+			const guildId = parseInt(req.body.guildId);
+			const userId: number = req.userId as number;
 
 		if (!championId || !guildId) {
-			res.status(400).json({ error: "Falta informação necessária entrar na guilda" });
+				res.status(400).json({ error: "Falta informação necessária para entrar na guilda" });
 			return;
 		}
 
 		if (!userId) {
-			res.status(400).json({ errror: "Usuário inválido" })
+				res.status(400).json({ error: "Usuário inválido" });
 			return;
 		}
 
 		const guildExists = await guildService.getById(guildId);
-
 		if (!guildExists) {
-			res.status(400).json({ error: "Guilda não encontrada" });
+				res.status(404).json({ error: "Guilda não encontrada" });
 			return;
 		}
 
-		const championExists: ChampionDTO = await championService.getById(championId, userId);
+			const championExists = await championService.getById(championId, userId);
 		if (!championExists) {
-			res.status(400).json({ errror: "Campião não encontrado" })
+				res.status(404).json({ error: "Campeão não encontrado" });
 			return;
 		}
 
-		const hasGuild = championExists.guildId;
-		if (hasGuild) {
-			res.status(400).json({ error: "O campeão ja pertence a uma guilda" });
+			if (championExists.guildId) {
+				res.status(400).json({ error: "O campeão já pertence a uma guilda" });
 			return;
 		}
 
-		try {
 			const joinedGuild = await championService.updateChampionGuild({
 				id: championId,
 				guildId: guildId,
 				userId: userId
 			});
 			res.status(200).json(joinedGuild);
-		} catch (error) {
-			res.status(400).json({ error: "Erro ao entrar na guilda" });
+		} catch (err: any) {
+			res.status(400).json({ error: err.message });
 		}
-
 	}
 
-	async leaveGuild(req: Request, res: Response): Promise<void> { }
+	async leaveGuild(req: Request, res: Response): Promise<void> {
+		try {
+			const championId = parseInt(req.params.id);
+			const userId: number = req.userId as number;
+
+			if (!championId) {
+				res.status(400).json({ error: "ID do campeão inválido" });
+				return;
+			}
+
+			if (!userId) {
+				res.status(400).json({ error: "Usuário inválido" });
+				return;
+			}
+
+			const championExists = await championService.getById(championId, userId);
+			if (!championExists) {
+				res.status(404).json({ error: "Campeão não encontrado" });
+				return;
+			}
+
+			if (!championExists.guildId) {
+				res.status(400).json({ error: "O campeão não pertence a nenhuma guilda" });
+				return;
+			}
+
+			const updatedChampion = await championService.updateChampionGuild({
+				id: championId,
+				guildId: null,
+				userId: userId
+			});
+			res.status(200).json(updatedChampion);
+		} catch (err: any) {
+			res.status(400).json({ error: err.message });
+		}
+	}
 
 	async getInventory(req: Request, res: Response): Promise<void> {
 		try {
@@ -286,15 +304,70 @@ export class ChampionController implements ControllerInterface {
 			const userId = req.userId as number;
 
 			if (!championId) {
-				res.status(400).json({ error: "Invalid champion ID" })
+				res.status(400).json({ error: "ID do campeão inválido" });
 				return;
 			}
 
 			const inventory = await championService.getInventory(championId, userId);
 			res.status(200).json(inventory);
-		} catch (error) {
-			res.status(400).json({ error: "Error fetching champion's inventory" });
+		} catch (err: any) {
+			res.status(400).json({ error: err.message });
 		}
 	}
 
+	async createInventoryItem(req: Request, res: Response): Promise<void> {
+		try {
+			const championId = parseInt(req.params.id);
+			const userId = req.userId as number;
+			const { itemId, quantity } = req.body;
+
+			if (!championId) {
+				res.status(400).json({ error: "ID do campeão inválido" });
+				return;
+			}
+
+			if (!itemId) {
+				res.status(400).json({ error: "ID do item inválido" });
+				return;
+			}
+
+			if (!quantity || isNaN(quantity) || quantity <= 0) {
+				res.status(400).json({ error: "Quantidade inválida" });
+				return;
+			}
+
+			const inventory = await championService.createInventoryItem(championId, userId, itemId, quantity);
+			res.status(200).json(inventory);
+		} catch (err: any) {
+			res.status(400).json({ error: err.message });
+		}
+	}
+
+	async updateInventoryItem(req: Request, res: Response): Promise<void> {
+		try {
+			const championId = parseInt(req.params.id);
+			const userId = req.userId as number;
+			const { itemId, quantity } = req.body;
+
+			if (!championId) {
+				res.status(400).json({ error: "ID do campeão inválido" });
+				return;
+			}
+
+			if (!itemId) {
+				res.status(400).json({ error: "ID do item inválido" });
+				return;
+			}
+
+			if (!quantity || isNaN(quantity) || quantity < 0) {
+				res.status(400).json({ error: "Quantidade inválida" });
+				return;
+			}
+
+			const inventory = await championService.updateInventoryItem(championId, userId, itemId, quantity);
+			res.status(200).json(inventory);
+		} catch (err: any) {
+			res.status(400).json({ error: err.message });
+		}
+	}
 }
