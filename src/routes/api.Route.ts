@@ -6,6 +6,7 @@ import ChampionRoleRoute from "./ChampionRole.Route";
 import userRoute from "./User.Route";
 import ChampionInventory from "./ChampionInventory.Route";
 import ItemRoute from "./Item.Route";
+import ShopRoute from "./Shop.Route";
 
 import AuthMiddleware from "../middleware/authMiddleware";
 import authorizationMiddleware from "../middleware/autorizationMiddleware";
@@ -27,5 +28,6 @@ apiRoute.use("/missions", MissionsRoute);
 // Rotas que requerem autenticação e autorização de admin
 apiRoute.use("/inventory", AuthMiddleware, authorizationMiddleware(["admin"]), ChampionInventory);
 apiRoute.use("/items", AuthMiddleware, authorizationMiddleware(["admin"]), ItemRoute);
+apiRoute.use("/shop", AuthMiddleware, authorizationMiddleware(["admin"]), ShopRoute);
 
 export default apiRoute;

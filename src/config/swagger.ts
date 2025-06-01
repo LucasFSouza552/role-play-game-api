@@ -282,6 +282,30 @@ const swaggerOptions = {
             }
           },
           required: ["id", "ownerId", "capacity"]
+        },
+        Shop: {
+          type: "object",
+          properties: {
+            id: {
+              type: "integer",
+              description: "ID da loja"
+            },
+            ownerId: {
+              type: "integer",
+              description: "Referência a UserId"
+            },
+            name: {
+              type: "string",
+              description: "Nome da loja"
+            },
+            inventory: {
+              type: "array",
+              description: "Inventário da loja",
+              items: {
+                $ref: "#/components/schemas/Inventory"
+              }
+            }
+          }
         }
       }
     },
@@ -318,6 +342,10 @@ const swaggerOptions = {
       {
         name: "Guildas (Guilds)",
         description: "Operações de guildas"
+      },
+      {
+        name: "Lojas (Shops)",
+        description: "Operações de lojas"
       }
     ]
   },

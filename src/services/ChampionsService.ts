@@ -3,7 +3,7 @@ import { FilterChampion } from "../models/Filters";
 import { ChampionRole } from "../models/ChampionRole";
 import { championRepo, roleRepo, skillRepo, championInventoryRepo } from "../repositories/RepositoryManager";
 import { ServiceInterface } from "../interfaces/serviceInterface";
-import { ChampionDTO, createChampionDTO, updateChampionDTO, updateChampionGuildDTO, updatedChampionStatusDTO } from "../DTOS/ChampionDTO";
+import { ChampionDTO, createChampionDTO, updateChampionDTO, updatedChampionStatusDTO } from "../DTOS/ChampionDTO";
 import { Inventory } from '../models/Inventory';
 import { InventoryItens } from '../models/InventoryItens';
 
@@ -19,7 +19,7 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 
 	async getById(id: number, userId: number): Promise<ChampionDTO> {
 		try {
-			const champion = await championRepo.getById(id, userId);
+			const champion: ChampionDTO = await championRepo.getById(id, userId);
 			return champion;
 		} catch (error) {
 			throw new Error('Champion not found');
@@ -36,7 +36,7 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 				throw new Error('Role not found');
 			}
 
-			const newChampion: createChampionDTO = ChampionMapper.mapChampionToDTO({
+			const newChampion: createChampionDTO = ChampionMapper.mapCreateChampionToDTO({
 				name: champion.name,
 				userId: champion.userId,
 				roleId: roleExists.id,
@@ -45,12 +45,9 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 				mp: roleExists.mp
 			});
 
-			const createdChampion = await championRepo.create(newChampion);
-			if (!createdChampion) {
-				throw new Error('Champion not created');
-			}
+			const createdChampion: ChampionDTO = await championRepo.create(newChampion);
 
-			const RetrievedChampion = await championRepo.getById(createdChampion.id, champion.userId);
+			const RetrievedChampion: ChampionDTO = await championRepo.getById(createdChampion.id, champion.userId);
 			return RetrievedChampion;
 		} catch (error) {
 			throw new Error('Champion not created');
@@ -69,7 +66,7 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 		return await championRepo.updateStatus(champion);
 	}
 
-	async updateChampionGuild(champion: updateChampionGuildDTO) {
+	async updateChampionGuild(champion: updateChampionDTO) {
 		return await championRepo.updateGuild(champion);
 	}
 

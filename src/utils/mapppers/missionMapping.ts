@@ -14,7 +14,7 @@ export class MissionMapper {
         }
     }
 
-    public static mapUpdateMissionToDTO(mission: updateMissionDTO): updateMissionDTO {
+    public static mapUpdateMissionToDTO(mission: Mission | updateMissionDTO): updateMissionDTO {
         return {
             id: mission.id!,
             ...(mission.title && {title: mission.title}),
@@ -26,7 +26,7 @@ export class MissionMapper {
         }
     }
 
-    public static mapMissionToDTO(mission: Mission): missionDTO {
+    public static mapMissionToDTO(mission: Mission | missionDTO): missionDTO {
         return {
             title: mission.title,
             description: mission.description,
@@ -37,7 +37,7 @@ export class MissionMapper {
         }
     }
 
-    public static mapMissionToDTOList(missions: Mission[]): missionDTO[] {
+    public static mapMissionToDTOList(missions: Mission[] | missionDTO[]): missionDTO[] {
         return missions.map(mission => this.mapMissionToDTO(mission));
     }
 }

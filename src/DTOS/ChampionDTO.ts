@@ -9,6 +9,6 @@ export type updatedChampionStatusDTO =
 	Required<Pick<Champion, 'id' | 'userId'>> &
 	Partial<Pick<Champion, 'sp'|'strength' | 'dexterity' | 'intelligence' | 'vitality'>>;
 
-export type updateChampionGuildDTO = Required<Pick<Champion, 'id' | 'guildId' | 'userId'>>;
+export type updateChampionStatusDTO = Required<Pick<Champion, 'id' | 'userId'>> & Partial<Pick<Champion, 'sp'| 'strength' | 'dexterity' | 'intelligence' | 'vitality'>>;
 
-export type updateChampionDTO = Pick<Champion, 'userId' | 'id' |'name'>;
+export type updateChampionDTO = Required<Pick<Champion, 'id' | 'userId'>> & Partial<Pick<Champion, 'name' | 'guildId'>>;

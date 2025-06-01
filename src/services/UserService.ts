@@ -4,12 +4,13 @@ import { UserMapper } from "../utils/mapppers/userMapping";
 import { cryptPassword } from "../utils/bcryptPassword";
 import { ServiceInterface } from "../interfaces/serviceInterface";
 import { user } from "../models/User";
+import { FilterUser } from "../models/Filters";
 
 export class UserService implements ServiceInterface<createUserDTO, updateUserDTO, userDTO> {
 
-	async getAll(): Promise<userDTO[]> {
+	async getAll(filter: FilterUser): Promise<userDTO[]> {
 		try {
-			return await userRepo.getAll();
+			return await userRepo.getAll(filter);
 		} catch (error) {
 			throw new Error("Error fetching users");
 		}

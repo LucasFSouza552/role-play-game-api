@@ -14,6 +14,20 @@ export const FilterDefault: Filter = {
     order: 'asc',
 };
 
+export interface FilterUser extends Filter {
+    name?: string;
+    role?: 'admin' | 'user';
+}
+
+export interface FilterGuild extends Filter {
+    name?: string;
+}
+
+export interface FilterMission extends Filter {
+    name?: string;
+    difficulty?: number;
+}
+
 export interface FilterChampion extends Filter {
     name?: string;
     role?: number;
@@ -33,7 +47,6 @@ export interface FilterItem extends Filter {
 
 export interface FilterShop extends Filter {
     name?: string;
-    userId?: number;
     type?: ItemType;
 }
 
