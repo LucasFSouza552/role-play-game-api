@@ -1,48 +1,83 @@
 import db from "../database/db";
+import { createItemDTO, updateItemDTO } from "../DTOS/ItemDTO";
+import { RepositoryInterface } from "../interfaces/repositoryInterface";
+import { FilterItem } from "../models/Filters";
 import { Item } from "../models/Item";
 
-export class ItemRepository {
-	// Lista todos os itens do banco de dados com filtros opcionais
-	async findAll(filter: { name?: string; minPrice?: number; maxPrice?: number }) {
-		const query = db("items").select("*");
-
-		// Aplicar filtros, se fornecidos
-		if (filter.name) {
-			query.whereILike("name", `%${filter.name}%`);
+// Responsável por acessar e manipular os dados dos itens no banco
+export class ItemRepository implements RepositoryInterface<createItemDTO, updateItemDTO, Item> {
+	private tableName = "items";
+	// Busca todos os itens, aplicando filtros opcionais
+	async getAll(filter: FilterItem): Promise<Item[]> {
+		try {
+			const allItems = await db(this.tableName)
+				.select("*")
+				.limit(filter.limit)
+				.offset((filter.page - 1) * filter.limit)
+				.modify((query) => {
+					if (filter.name) {
+						query.whereILike("items.name", `%${filter.name}%`);
+					}
+					if (filter.minPrice !== undefined) {
+						query.where("items.priceMin", ">=", filter.minPrice);
+					}
+					if (filter.maxPrice !== undefined) {
+						query.where("items.priceMax", "<=", filter.maxPrice);
+					}
+				}).orderBy(filter.orderBy, filter.order);
+			return allItems;
+		} catch (error) {
+			throw new Error("Error fetching items");
 		}
-		if (filter.minPrice !== undefined) {
-			query.where("minPrice", ">=", filter.minPrice);
+	}
+
+	// Busca um item pelo ID
+	async getById(id: number): Promise<Item> {
+		try {
+			const item = await db(this.tableName).where({ id }).first();
+			if (!item) throw new Error("Item not found");
+			return item;
+		} catch (error) {
+			throw new Error("Error fetching item");
 		}
-		if (filter.maxPrice !== undefined) {
-			query.where("maxPrice", "<=", filter.maxPrice);
+	}
+
+	// Cria um novo item no banco
+	async create(item: createItemDTO): Promise<Item> {
+		try {
+			const newItem = await db(this.tableName).insert(item).returning("*");
+			if (!newItem || newItem.length === 0) {
+				throw new Error("Item not created");
+			}
+			return newItem[0];
+		} catch (error) {
+			throw new Error("Error creating item");
 		}
-
-		// Ordenar os resultados pelo nome em ordem ascendente
-		return await query.orderBy("name", "asc");
 	}
 
-	// Busca um item específico pelo ID
-	async findById(id: string): Promise<Item | null> {
-		return await db("items").where({ id }).first();
+	// Atualiza um item existente pelo ID
+	async update(item: updateItemDTO): Promise<Item> {
+		try {
+			const updatedItem = await db(this.tableName)
+				.where({ id: item.id })
+				.update(item)
+				.returning("*");
+			if (!updatedItem || updatedItem.length === 0) {
+				throw new Error("Item not updated");
+			}
+			return updatedItem[0];
+		} catch (error) {
+			throw new Error("Error updating item");
+		}
 	}
 
-	// Cria um novo item no banco de dados
-	async create(item: Item): Promise<Item> {
-		const [newItem] = await db("items").insert(item).returning("*");
-		return newItem;
-	}
-
-	// Atualiza um item existente no banco de dados
-	async update(id: string, item: Partial<Item>): Promise<Item> {
-		const [updatedItem] = await db("items")
-			.where({ id })
-			.update(item)
-			.returning("*");
-		return updatedItem;
-	}
-
-	// Deleta um item do banco de dados
-	async delete(id: string): Promise<number> {
-		return await db("items").where({ id }).del();
+	// Deleta um item pelo ID
+	async delete(id: number): Promise<boolean> {
+		try {
+			const deletedItem = await db(this.tableName).where({ id }).del();
+			return deletedItem == 1;
+		} catch (error) {
+			throw new Error("Erro ao deletar item");
+		}
 	}
 }
