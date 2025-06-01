@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import swaggerDocs from "./src/config/swagger";
 import swaggerUi from 'swagger-ui-express';
-import apiRoute from "./src/routes/api.Route";
+import apiRoute from "./src/routes/Api.Route";
 
 
 dotenv.config();
@@ -21,5 +21,5 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use('/api', apiRoute);
 
 app.listen(PORT, () => {
-    console.log(`API rodando na porta http://localhost:${PORT}\nVeja a documentação em http://localhost:${PORT}/docs`);
+    console.log(`API rodando na porta http://localhost:${PORT}\nVeja a documentação em http://localhost:${PORT}/docs`);
 });

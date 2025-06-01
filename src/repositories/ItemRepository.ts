@@ -10,9 +10,10 @@ export class ItemRepository implements RepositoryInterface<createItemDTO, update
 	// Busca todos os itens, aplicando filtros opcionais
 	async getAll(filter: FilterItem): Promise<Item[]> {
 		try {
-			const allItems = await db(this.tableName).select("*")
-				.limit(filter.size)
-				.offset(filter.offset)
+			const allItems = await db(this.tableName)
+				.select("*")
+				.limit(filter.limit)
+				.offset((filter.page - 1) * filter.limit)
 				.modify((query) => {
 					if (filter.name) {
 						query.whereILike("items.name", `%${filter.name}%`);
