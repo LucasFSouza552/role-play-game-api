@@ -8,20 +8,24 @@ export class GuildService implements ServiceInterface<createGuildDTO, updateGuil
 	async getAll(): Promise<Guild[]> {
 		return await guildRepo.getAll();
 	}
+
 	async getByGuildName(name: string): Promise<Guild> {
 		try {
 			return await guildRepo.findGuildByName(name);
-			} catch (error) {
-				throw new Error("Erro ao buscar guilda");
-			}
+		} catch (error) {
+			throw new Error("Erro ao buscar guilda");
+		}
 	}
+
 	async getById(id: number): Promise<Guild> {
 		try {
-		return await guildRepo.getById(id);
-			} catch (error) {
-				throw new Error("Erro ao buscar guilda");
-			}
+			const guild = await guildRepo.getById(id);
+			return guild;
+		} catch (error) {
+			throw new Error("Erro ao buscar guilda");
+		}
 	}
+
 	async create(guild: Guild) {
 		if (guild.name.trim() === '' || !guild.name) {
 			throw new Error('Nome da Guilda inválido');
@@ -31,9 +35,11 @@ export class GuildService implements ServiceInterface<createGuildDTO, updateGuil
 		}
 		return await guildRepo.create(guild);
 	}
+
 	async update(guild: updateGuildDTO): Promise<updateGuildDTO> {
 		return await guildRepo.update(guild);
 	}
+	
 	async delete(id: number): Promise<boolean> {
 		return await guildRepo.delete(id);
 	}

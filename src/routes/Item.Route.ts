@@ -8,48 +8,6 @@ const ItemRoute = Router();
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     Item:
- *       type: object
- *       required:
- *         - name
- *         - description
- *         - type
- *         - priceMin
- *         - priceMax
- *       properties:
- *         id:
- *           type: integer
- *           description: Identificador único do item
- *           example: 1
- *         name:
- *           type: string
- *           description: Nome do item
- *           example: "Espada Longa"
- *         description:
- *           type: string
- *           description: Descrição detalhada do item
- *           example: "Uma espada longa forjada em aço valiriano"
- *         type:
- *           type: string
- *           description: Tipo do item
- *           enum: [Spells, Armour, Weapons, Potions]
- *           example: "Weapons"
- *         priceMin:
- *           type: number
- *           format: float
- *           description: Preço mínimo do item
- *           example: 50.00
- *         priceMax:
- *           type: number
- *           format: float
- *           description: Preço máximo do item
- *           example: 150.00
- */
-
-/**
- * @swagger
  * /api/items:
  *   get:
  *     summary: Listar todos os itens (Apenas Administradores)

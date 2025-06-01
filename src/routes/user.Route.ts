@@ -1,7 +1,7 @@
 import AuthMiddleware from "../middleware/authMiddleware";
 import authorizationMiddleware from "../middleware/autorizationMiddleware";
 import { validateAllowedFields } from "../middleware/validateAllowedFields";
-import { UserController } from "./../controllers/UserController";
+import { UserController } from "../controllers/UserController";
 import { Router } from "express";
 
 const userRoute = Router();
@@ -10,36 +10,7 @@ const userController = new UserController();
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     User:
- *       type: object
- *       properties:
- *         id:
- *           type: number
- *           description: Identificador único do usuário
- *         name:
- *           type: string
- *           description: Nome do usuário
- *         email:
- *           type: string
- *           description: Email do usuário
- *         role:
- *           type: string
- *           description: Papel do usuário (admin ou user)
- *         createdAt:
- *           type: string
- *           format: date-time
- *           description: Data de criação do usuário
- *         updatedAt:
- *           type: string
- *           format: date-time
- *           description: Data da última atualização do usuário
- */
-
-/**
- * @swagger
- * /api/user/all:
+ * /api/user:
  *   get:
  *     summary: Listar todos os usuários (apenas Administradores)
  *     description: Retorna uma lista de todos os usuários cadastrados. Acesso restrito para administradores.
@@ -82,11 +53,11 @@ const userController = new UserController();
  *       500:
  *         description: Erro interno do servidor
  */
-userRoute.get('/all', AuthMiddleware, authorizationMiddleware(["admin"]), userController.getAll);
+userRoute.get('/', AuthMiddleware, authorizationMiddleware(["admin"]), userController.getAll);
 
 /**
  * @swagger
- * /api/user:
+ * /api/user/profile:
  *   get:
  *     summary: Pegar dados do usuário logado
  *     description: Retorna os dados do usuário logado.
@@ -124,7 +95,7 @@ userRoute.get('/all', AuthMiddleware, authorizationMiddleware(["admin"]), userCo
  *       500:
  *         description: Erro interno do servidor.
  */
-userRoute.get("/", AuthMiddleware, userController.getById);
+userRoute.get("/profile", AuthMiddleware, userController.getById);
 
 /**
  * @swagger
