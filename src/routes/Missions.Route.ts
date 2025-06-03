@@ -8,84 +8,6 @@ const missionsRoute = Router();
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     Mission:
- *       type: object
- *       required:
- *         - name
- *         - description
- *         - reward
- *         - difficulty
- *       properties:
- *         id:
- *           type: integer
- *           description: Identificador único da missão
- *           example: 1
- *         name:
- *           type: string
- *           description: Nome da missão
- *           example: "Caça ao Dragão"
- *         description:
- *           type: string
- *           description: Descrição detalhada da missão
- *           example: "Caçar um dragão perigoso que está aterrorizando a vila"
- *         reward:
- *           type: number
- *           format: float
- *           description: Valor da recompensa da missão
- *           example: 1000.00
- *         difficulty:
- *           type: string
- *           description: Nível de dificuldade da missão
- *           enum: [Easy, Medium, Hard, Expert]
- *           example: "Hard"
- *         status:
- *           type: string
- *           description: Status atual da missão
- *           enum: [Available, In Progress, Completed, Failed]
- *           example: "Available"
- *         createdAt:
- *           type: string
- *           format: date-time
- *           description: Data de criação da missão
- *           example: "2024-03-20T10:00:00Z"
- *         updatedAt:
- *           type: string
- *           format: date-time
- *           description: Data da última atualização
- *           example: "2024-03-20T10:00:00Z"
- *     CreateMissionDTO:
- *       type: object
- *       required:
- *         - name
- *         - description
- *         - reward
- *         - difficulty
- *       properties:
- *         name:
- *           type: string
- *           description: Nome da missão
- *           example: "Caça ao Dragão"
- *         description:
- *           type: string
- *           description: Descrição da missão
- *           example: "Caçar um dragão perigoso que está aterrorizando a vila"
- *         reward:
- *           type: number
- *           format: float
- *           description: Valor da recompensa da missão
- *           minimum: 0
- *           example: 1000.00
- *         difficulty:
- *           type: string
- *           description: Nível de dificuldade da missão
- *           enum: [Easy, Medium, Hard, Expert]
- *           example: "Hard"
- */
-
-/**
- * @swagger
  * /api/missions:
  *   get:
  *     summary: Listar todas as missões
@@ -117,8 +39,6 @@ const missionsRoute = Router();
  *                   reward: 1000.00
  *                   difficulty: "Hard"
  *                   status: "Available"
- *                   createdAt: "2024-03-20T10:00:00Z"
- *                   updatedAt: "2024-03-20T10:00:00Z"
  *               length: 1
  *       401:
  *         description: Não autorizado
@@ -178,8 +98,6 @@ missionsRoute.get("/", AuthMiddleware, missionsController.getAll);
  *               reward: 1000.00
  *               difficulty: "Hard"
  *               status: "Available"
- *               createdAt: "2024-03-20T10:00:00Z"
- *               updatedAt: "2024-03-20T10:00:00Z"
  *       401:
  *         description: Não autorizado
  *         content:
@@ -246,8 +164,6 @@ missionsRoute.get("/:id", AuthMiddleware, missionsController.getById);
  *               reward: 1000.00
  *               difficulty: "Hard"
  *               status: "Available"
- *               createdAt: "2024-03-20T10:00:00Z"
- *               updatedAt: "2024-03-20T10:00:00Z"
  *       400:
  *         description: Dados inválidos
  *         content:
@@ -356,8 +272,6 @@ missionsRoute.post("/", AuthMiddleware, authorizationMiddleware(["admin"]), miss
  *               reward: 1500.00
  *               difficulty: "Expert"
  *               status: "Available"
- *               createdAt: "2024-03-20T10:00:00Z"
- *               updatedAt: "2024-03-20T11:00:00Z"
  *       400:
  *         description: Dados inválidos
  *         content:

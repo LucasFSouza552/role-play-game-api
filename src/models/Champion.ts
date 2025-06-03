@@ -8,10 +8,10 @@ export interface Champion {
 	userId: number;
 	name: string;
 	money?: number | 0;
-	strength?: number;
-	dexterity?: number;
-	intelligence?: number;
-	vitality?: number;
+	strength: number;
+	dexterity: number;
+	intelligence: number;
+	vitality: number;
 	hp: number; // Pontos de Vida
 	mp: number; // Pontos de Magia
 	ep: number; // Pontos de Energia

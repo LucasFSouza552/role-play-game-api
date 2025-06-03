@@ -22,24 +22,27 @@ const championRoleController = new ChampionRoleController();
  *           type: string
  *           example: "mage"
  *       - in: query
- *         name: size
+ *         name: page
  *         required: false
- *         description: Número de itens por página.
+ *         description: Número da página para paginação
  *         schema:
  *           type: integer
- *           default: 5
  *           minimum: 1
+ *           default: 1
+ *           example: 1
  *       - in: query
- *         name: offset
+ *         name: limit
  *         required: false
- *         description: Número de itens a pular para paginação.
+ *         description: Número de itens por página
  *         schema:
  *           type: integer
- *           default: 0
- *           minimum: 0
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 10
+ *           example: 10
  *     responses:
  *       200:
- *         description: Lista de papeis
+ *         description: Lista de classes (roles)
  *         content:
  *           application/json:
  *             schema:

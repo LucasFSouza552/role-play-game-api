@@ -13,14 +13,13 @@ export class ItemController implements ControllerInterface {
   // Lista todos os itens, com filtros opcionais por nome e preço
   async getAll(req: Request, res: Response): Promise<void> {
     try {
-      console.log("tste")
       const filter: FilterItem = { ...FilterDefault, ...req.query };
       const items = await itemService.getAll(filter);
       // Mapeia a lista de itens para DTOs
       const itemsDTO = ItemMapper.mapItemToDTOList(items);
       res.status(200).json(itemsDTO);
     } catch (error) {
-      res.status(500).json({ error: "Erro ao listar itens." });
+      res.status(500).json({ error: "Error fetching items" });
     }
   }
 
@@ -30,20 +29,20 @@ export class ItemController implements ControllerInterface {
       const ItemId = parseInt(req.params.id, 10);
 
       if (!ItemId) {
-        res.status(400).json({ error: "ID inválido." });
+        res.status(400).json({ error: "Invalid ID" });
         return;
       }
 
       const item = await itemService.getById(ItemId);
       if (!item) {
-        res.status(404).json({ error: "Item não encontrado." });
+        res.status(404).json({ error: "Item not found" });
         return;
       }
       // Mapeia o item para DTO
       const itemDTO = ItemMapper.mapItemToDTO(item);
       res.status(200).json(itemDTO);
     } catch {
-      res.status(500).json({ error: "Erro ao buscar o item." });
+      res.status(500).json({ error: "Error fetching item" });
     }
   }
 
@@ -60,20 +59,20 @@ export class ItemController implements ControllerInterface {
         item.priceMax == null ||
         !item.type
       ) {
-        res.status(400).json({ error: "Todos os campos obrigatórios devem ser preenchidos." });
+        res.status(400).json({ error: "All required fields must be filled." });
         return;
       }
 
       // Validação dos enums
       const validTypes = Object.values(ItemType) as string[];
       if (!validTypes.includes(item.type)) {
-        res.status(400).json({ error: "Tipo de item inválido." });
+        res.status(400).json({ error: "Invalid item type." });
         return;
       }
 
       // Regra de negócio: preço mínimo não pode ser maior que o máximo
       if (item.priceMin > item.priceMax) {
-        res.status(400).json({ error: "O preço mínimo não pode ser maior que o preço máximo." });
+        res.status(400).json({ error: "The minimum price cannot be greater than the maximum price." });
         return;
       }
 
@@ -82,7 +81,7 @@ export class ItemController implements ControllerInterface {
       const newItem = await itemService.create(itemDTO);
       res.status(201).json(newItem);
     } catch {
-      res.status(500).json({ error: "Erro ao criar o item." });
+      res.status(500).json({ error: "Error creating item" });
     }
   }
 
@@ -93,19 +92,19 @@ export class ItemController implements ControllerInterface {
       const item: Item = req.body;
 
       if (!ItemId || !item) {
-        res.status(400).json({ error: "ID ou dados do item inválidos." });
+        res.status(400).json({ error: "Invalid item ID or data." });
         return;
       }
 
       // Validação de preço mínimo e máximo
       if (item.priceMin != null && item.priceMax != null && item.priceMin > item.priceMax && item.priceMin !== item.priceMax) {
-        res.status(400).json({ error: "O preço mínimo não pode ser maior que o preço máximo." });
+        res.status(400).json({ error: "The minimum price cannot be greater than the maximum price." });
         return;
       }
       // Validação dos enums, se enviados
       const validTypes = Object.values(ItemType) as string[];
       if (item.type && !validTypes.includes(item.type)) {
-        res.status(400).json({ error: "Tipo de item inválido." });
+        res.status(400).json({ error: "Invalid item type." });
         return;
       }
       item.id = parseInt(ItemId, 10);
@@ -114,12 +113,12 @@ export class ItemController implements ControllerInterface {
       const itemDTO = ItemMapper.mapItemToUpdateDTO(item);
       const updatedItem = await itemService.update(itemDTO);
       if (!updatedItem) {
-        res.status(404).json({ error: "Item não encontrado ou erro ao atualizar." });
+        res.status(404).json({ error: "Item not found or error updating item" });
         return;
       }
       res.status(200).json(updatedItem);
     } catch {
-      res.status(500).json({ error: "Erro ao atualizar o item." });
+      res.status(500).json({ error: "Error updating item" });
     }
   }
 
@@ -128,18 +127,18 @@ export class ItemController implements ControllerInterface {
     try {
       const id = parseInt(req.params.id);
       if (!id) {
-        res.status(400).json({ error: "ID inválido." });
+        res.status(400).json({ error: "Invalid ID" });
         return;
       }
 
       const deletedItem = await itemService.delete(id);
       if (!deletedItem) {
-        res.status(404).json({ error: "Item não encontrado ou erro ao deletar." });
+        res.status(404).json({ error: "Item not found or error deleting item" });
         return;
       }
       res.status(200).json(deletedItem);
     } catch {
-      res.status(500).json({ error: "Erro ao deletar o item." });
+      res.status(500).json({ error: "Error deleting item" });
     }
   }
 }

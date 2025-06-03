@@ -4,7 +4,7 @@ import { Guild } from "../models/Guild";
 import { createGuildDTO, updateGuildDTO } from '../DTOS/GuildDTO';
 
 export class GuildRepository implements RepositoryInterface<createGuildDTO, updateGuildDTO, Guild> {
-	private tablename = 'guild';
+	private tablename = 'guilds';
 
 	async getAll(): Promise<Guild[]> {
 		try {
@@ -15,7 +15,9 @@ export class GuildRepository implements RepositoryInterface<createGuildDTO, upda
 	}
 	async getById(id: number): Promise<Guild> {
 		try {
-			return await db(this.tablename).where({ id }).first();
+			const guild =  await db(this.tablename).where({ id }).first();
+
+			return guild;
 		} catch (error) {
 			throw new Error('Erro ao buscar a Guilda pelo ID');
 		}

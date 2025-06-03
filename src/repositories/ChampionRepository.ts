@@ -1,5 +1,5 @@
 import db from "../database/db";
-import { ChampionDTO, updatedChampionStatusDTO, updateChampionGuildDTO, createChampionDTO, updateChampionDTO } from "../DTOS/ChampionDTO";
+import { ChampionDTO, updatedChampionStatusDTO, createChampionDTO, updateChampionDTO } from "../DTOS/ChampionDTO";
 import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { Champion } from "../models/Champion";
 import { FilterChampion } from "../models/Filters";
@@ -62,6 +62,9 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 	}
 
 	async delete(championId: number, userId: number): Promise<boolean> {
+		const a = await db(this.tableName).select("*").where({ id: championId });
+
+		console.log(championId, userId);
 		try {
 			const deletedChampion = await db(this.tableName).where({ id: championId, userId }).del();
 			return deletedChampion == 1;
@@ -92,7 +95,7 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 		}
 	}
 
-	async updateGuild(Champion: updateChampionGuildDTO) {
+	async updateGuild(Champion: updateChampionDTO) {
 		try {
 			const updatedChampion = await db(this.tableName)
 				.where({ id: Champion.id, userId: Champion.userId })

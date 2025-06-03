@@ -18,6 +18,7 @@ export async function up(knex: Knex): Promise<void> {
         table.integer('quantity')
             .notNullable()
             .defaultTo(1);
+        table.enu("rarity", ["Common", "Uncommon", "Rare", "Epic", "Legendary"]).notNullable();
 
     });
 }

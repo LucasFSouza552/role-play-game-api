@@ -1,7 +1,7 @@
 import AuthMiddleware from "../middleware/authMiddleware";
 import authorizationMiddleware from "../middleware/autorizationMiddleware";
 import { validateAllowedFields } from "../middleware/validateAllowedFields";
-import { UserController } from "./../controllers/UserController";
+import { UserController } from "../controllers/UserController";
 import { Router } from "express";
 
 const userRoute = Router();
@@ -10,36 +10,7 @@ const userController = new UserController();
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     User:
- *       type: object
- *       properties:
- *         id:
- *           type: number
- *           description: Identificador único do usuário
- *         name:
- *           type: string
- *           description: Nome do usuário
- *         email:
- *           type: string
- *           description: Email do usuário
- *         role:
- *           type: string
- *           description: Papel do usuário (admin ou user)
- *         createdAt:
- *           type: string
- *           format: date-time
- *           description: Data de criação do usuário
- *         updatedAt:
- *           type: string
- *           format: date-time
- *           description: Data da última atualização do usuário
- */
-
-/**
- * @swagger
- * /api/user/all:
+ * /api/user:
  *   get:
  *     summary: Listar todos os usuários (apenas Administradores)
  *     description: Retorna uma lista de todos os usuários cadastrados. Acesso restrito para administradores.
@@ -49,17 +20,57 @@ const userController = new UserController();
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
+ *         name: name
+ *         required: false
+ *         description: Filtrar por nome do usuário
+ *         schema:
+ *           type: string
+ *           example: "João"
+  *       - in: query
+ *         name: role
+ *         required: false
+ *         description: Filtrar por cargo do usuário
+ *         schema:
+ *           type: string
+ *           enum: [admin, user]
+ *           example: "user"
+ *       - in: query
  *         name: page
+ *         required: false
+ *         description: Número da página para paginação
  *         schema:
  *           type: integer
+ *           minimum: 1
  *           default: 1
- *         description: Número da página
+ *           example: 1
  *       - in: query
  *         name: limit
+ *         required: false
+ *         description: Número de usuários por página
  *         schema:
  *           type: integer
+ *           minimum: 1
+ *           maximum: 100
  *           default: 10
- *         description: Quantidade de itens por página
+ *           example: 10
+ *       - in: query
+ *         name: orderBy
+ *         required: false
+ *         description: Campo para ordenação
+ *         schema:
+ *           type: string
+ *           enum: [id, name, role]
+ *           default: "id"
+ *           example: "name"
+ *       - in: query
+ *         name: order
+ *         required: false
+ *         description: Direção da ordenação
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: "asc"
+ *           example: "asc"
  *     responses:
  *       200:
  *         description: Lista de usuários retornada com sucesso
@@ -82,11 +93,11 @@ const userController = new UserController();
  *       500:
  *         description: Erro interno do servidor
  */
-userRoute.get('/all', AuthMiddleware, authorizationMiddleware(["admin"]), userController.getAll);
+userRoute.get('/', AuthMiddleware, authorizationMiddleware(["admin"]), userController.getAll);
 
 /**
  * @swagger
- * /api/user:
+ * /api/user/profile:
  *   get:
  *     summary: Pegar dados do usuário logado
  *     description: Retorna os dados do usuário logado.
@@ -124,7 +135,7 @@ userRoute.get('/all', AuthMiddleware, authorizationMiddleware(["admin"]), userCo
  *       500:
  *         description: Erro interno do servidor.
  */
-userRoute.get("/", AuthMiddleware, userController.getById);
+userRoute.get("/profile", AuthMiddleware, userController.getById);
 
 /**
  * @swagger

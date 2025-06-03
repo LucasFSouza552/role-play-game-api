@@ -5,6 +5,7 @@ import { generateJwtToken } from "../utils/jwt";
 import { UserMapper } from "../utils/mapppers/userMapping";
 import { ControllerInterface } from "../interfaces/controllerInterface";
 import { createUserDTO, updateUserDTO } from "../DTOS/UserDTO";
+import { FilterDefault, FilterUser } from "../models/Filters";
 
 const userService = new UserService();
 
@@ -39,7 +40,8 @@ export class UserController implements ControllerInterface {
 
 	async getAll(req: Request, res: Response) {
 		try {
-			const users = await userService.getAll();
+			const filter: FilterUser = { ...FilterDefault, ...req.query };
+			const users = await userService.getAll(filter);
 			res.status(200).json({ users: users, length: users.length });
 		} catch (err: any) {
 			console.error(err);
