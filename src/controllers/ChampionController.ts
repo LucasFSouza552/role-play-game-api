@@ -176,7 +176,7 @@ export class ChampionController implements ControllerInterface {
 		try {
 			const championId = parseInt(req.params.id);
 			const userId: number = req.userId as number;
-
+			
 			if (!userId) {
 				res.status(400).json({ error: "Usuário inválido" });
 				return;
@@ -187,8 +187,8 @@ export class ChampionController implements ControllerInterface {
 				return;
 			}
 
-			const deletedChampion = await championService.delete(userId, championId);
-			res.status(200).json({ success: deletedChampion });
+			const deletedChampion = await championService.delete(championId,userId);
+			res.status(204).json({ success: deletedChampion });
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
 		}

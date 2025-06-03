@@ -14,7 +14,7 @@ export class ChampionRoleService implements ServiceInterface<createChampionRoleD
 		}
 	}
 
-	async getById(id: number, userId: number): Promise<ChampionRole> {
+	async getById(id: number): Promise<ChampionRole> {
 		try {
 			return await roleRepo.getById(id);
 		} catch (error) {

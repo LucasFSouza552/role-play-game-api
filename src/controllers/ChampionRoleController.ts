@@ -39,7 +39,7 @@ export class ChampionRoleController implements ControllerInterface {
                 return;
             }
             
-            const role = await championRoleService.getById(roleId, userId);
+            const role = await championRoleService.getById(roleId);
             res.status(200).json(role);
         } catch (error) {
             throw new Error("Erro ao buscar classe");

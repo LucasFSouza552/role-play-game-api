@@ -16,6 +16,8 @@ const PORT = process.env.PORT || "5000";
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
+
+app.use(express.static("public")); 
 app.use('/api', apiRoute);
 
 app.listen(PORT, () => {
