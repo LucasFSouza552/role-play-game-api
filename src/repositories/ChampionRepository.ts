@@ -32,6 +32,7 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 	}
 
 	async getById(championId: number, userId: number): Promise<ChampionDTO> {
+		console.log(championId, userId)
 		try {
 			const champion = await db(this.tableName).where({ id: championId, userId: userId }).first();
 			champion.xp_max = getMaxExperience(champion.level);

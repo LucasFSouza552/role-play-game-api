@@ -9,6 +9,16 @@ import { FilterShop } from "../models/Filters";
 import { Inventory } from "../models/Inventory";
 
 export class ShopService implements ServiceInterface<createShopDTO, updateShopDTO, Shop> {
+	async getInventory(shopId: number) {
+		try {
+			const inventory = await shopInventoryRepo.getInventoryAndItemsById(shopId);
+			return inventory;
+		} catch (error: any) {
+			throw new Error(error.message);
+		}
+
+
+	}
 	async getAll(filter: FilterShop): Promise<Shop[]> {
 		try {
 			return shopRepo.getAll(filter);
@@ -51,7 +61,6 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 			const champion: ChampionDTO = await championRepo.getById(championId, userId);
 			
 			if(!champion) {
-				console.log(champion)
 				throw new Error('Champion not found');
 			}
 			
@@ -59,23 +68,18 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 			const championInventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId); 
 
 			if(!inventory || !championInventory) {
-				console.log(inventory, championInventory)
 				throw new Error('Inventory not found');
 			}
 
 			const item: InventoryItens = await shopInventoryRepo.getItemById(inventory.id, itemId);
 
 			if(!item || item.quantity - quantity < 0) {
-				console.log("NÂO TENHO")
 				throw new Error("Item not found in shop inventory");
 			}
 			
 			if(item.price * quantity > champion.money) {
-				console.log("POBRE")
 				throw new Error("Not enough money");
 			}
-
-			console.log(item);
 
 			const updatedShop = await shopInventoryRepo.updateInventoryItem(inventory.id, itemId, -quantity);
 			item.quantity -= quantity;
@@ -86,7 +90,7 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 
 
 			if(!itemExists) {
-				championInventoryRepo.createInventoryItem(championInventory.id, item.id, item.quantity, item.price);
+				championInventoryRepo.createInventoryItem(championInventory.id, item.id, quantity, item.price, item.rarity);
 				return true;
 			}
 

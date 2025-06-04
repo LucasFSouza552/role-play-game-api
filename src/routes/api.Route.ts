@@ -28,6 +28,6 @@ apiRoute.use("/missions", MissionsRoute);
 // Rotas que requerem autenticação e autorização de admin
 apiRoute.use("/inventory", AuthMiddleware, authorizationMiddleware(["admin"]), ChampionInventory);
 apiRoute.use("/items", AuthMiddleware, authorizationMiddleware(["admin"]), ItemRoute);
-apiRoute.use("/shop", AuthMiddleware, authorizationMiddleware(["admin"]), ShopRoute);
+apiRoute.use("/shop", AuthMiddleware, ShopRoute);
 
 export default apiRoute;

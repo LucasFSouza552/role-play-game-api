@@ -43,7 +43,7 @@ export class ChampionInventoryService implements ServiceInterface<createInventor
 		}
 	}
 
-	async createItemInventory(inventoryId: number, item: number, quantity: number, price: number): Promise<InventoryItens> {
+	async createItemInventory(inventoryId: number, item: number, quantity: number, price: number, rarity: string): Promise<InventoryItens> {
 		try {
 			const itemExists = await itemsRepo.getById(item);
 			if (!itemExists) {
@@ -54,7 +54,7 @@ export class ChampionInventoryService implements ServiceInterface<createInventor
 				throw new Error("Invalid item price");
 			}
 
-			const itemInventory = await championInventoryRepo.createInventoryItem(inventoryId, item, quantity, price);
+			const itemInventory = await championInventoryRepo.createInventoryItem(inventoryId, item, quantity, price, rarity);
 			return itemInventory;
 		} catch (error) {
 			throw new Error("Error adding item to inventory");

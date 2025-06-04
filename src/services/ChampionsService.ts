@@ -115,7 +115,7 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 		}
 	}
 
-	async createInventoryItem(championId: number, userId: number, itemId: number, quantity: number, price: number): Promise<InventoryItens> {
+	async createInventoryItem(championId: number, userId: number, itemId: number, quantity: number, price: number, rarity: string): Promise<InventoryItens> {
 		try {
 			const inventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId);
 
@@ -123,7 +123,7 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 				throw new Error('Inventory not found');
 			}
 
-			const newItem: InventoryItens = await championInventoryRepo.createInventoryItem(inventory.id, itemId, quantity, price);
+			const newItem: InventoryItens = await championInventoryRepo.createInventoryItem(inventory.id, itemId, quantity, price, rarity);
 			return newItem;
 		} catch (error) {
 			throw new Error('Error creating inventory item');

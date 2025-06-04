@@ -2,6 +2,7 @@ import db from "../database/db";
 import { ChampionDTO } from "../DTOS/ChampionDTO";
 import { createInventoryDTO, updateInventoryDTO } from "../DTOS/InventoryDTO";
 import { RepositoryInterface } from "../interfaces/repositoryInterface";
+import { ItemRarity } from "../models/enums/ItemRarity";
 import { Filter } from "../models/Filters";
 import { Inventory } from "../models/Inventory";
 import { InventoryItens } from "../models/InventoryItens";
@@ -45,8 +46,8 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 		try {
 			const itens = await db("champion_items")
 				.join('items', 'champion_items.itemId', '=', 'items.id')
-				.select("items.id", "items.name", "items.description","champion_items.quantity", "items.type", "champion_items.rarity")
-				.where({ ownerId: inventoryId });
+				.select("items.id", "items.name", "items.description","champion_items.quantity", "items.type", "champion_items.rarity", "champion_items.price")
+				.where({ inventoryId });
 			return itens || [];
 		} catch (error: any) {
 			throw new Error("Error fetching champion items inventory: " + error.message);
@@ -100,21 +101,22 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 	async getItemById(inventoryId:number, itemId:number): Promise<InventoryItens> {
 		try {
 			const itens = await db("champion_items")
-				.join('items', 'shop_items.itemId', '=', 'items.id')
-				.select("items.id", "items.name", "items.description","champion_items.quantity", "items.type", "items.rarity")
+				.join('items', 'champion_items.itemId', '=', 'items.id')
+				.select("items.id", "items.name", "items.description","champion_items.quantity", "items.type", "rarity")
 				.where({ inventoryId, itemId }).first();
 			return itens;
-		} catch (error) {
-			throw new Error("Error fetching champion inventory");
+		} catch (error: any) {
+			throw new Error(`Error fetching champion inventory: ${error.message}`);
 		}
 	}
 
-	async createInventoryItem(inventoryId: number, itemId: number, quantity: number, price: number): Promise<InventoryItens> {
+	async createInventoryItem(inventoryId: number, itemId: number, quantity: number, price: number, rarity: string): Promise<InventoryItens> {
 		try {
-			const newItem = await db("champion_items").insert({ inventoryId, itemId, quantity, price }).returning("*");
+			console.log({ inventoryId, itemId, quantity, price });
+			const newItem = await db("champion_items").insert({ inventoryId, itemId, quantity, price, rarity }).returning("*");
 			return newItem[0];
-		} catch (error) {
-			throw new Error("Error adding item to inventory");
+		} catch (error: any) {
+			throw new Error(`Error adding item to inventory: ${error.message}`);
 		}
 	}
 

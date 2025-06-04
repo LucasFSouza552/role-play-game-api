@@ -68,11 +68,11 @@ export class ShopInventoryRepository implements RepositoryInterface<createInvent
 		try {
 			const itens = await db("shop_items")
 				.join('items', 'shop_items.itemId', '=', 'items.id')
-				.select("items.id", "items.name", "items.description","shop_items.quantity", "items.type", "items.rarity")
+				.select("items.id", "items.name", "items.description","shop_items.quantity", "items.type", "shop_items.rarity", "shop_items.price")
 				.where({ inventoryId });
 			return itens || [];
-		} catch (error) {
-			throw new Error("Error fetching items inventory");
+		} catch (error: any) {
+			throw new Error(`Error fetching items inventory: ${error.message}`);
 		}
 	}
 
@@ -80,12 +80,25 @@ export class ShopInventoryRepository implements RepositoryInterface<createInvent
 		try {
 			const itens = await db("shop_items")
 				.join('items', 'shop_items.itemId', '=', 'items.id')
-				.select("items.id", "items.name", "items.description","shop_items.quantity", "items.type", "items.rarity")
+				.select("items.id", "items.name", "items.description","shop_items.quantity", "items.type", "shop_items.rarity", "shop_items.price")
 				.where({ inventoryId, itemId }).first();
 			return itens;
-		} catch (error) { 
-			throw new Error("Error fetching item inventory");
+		} catch (error: any) { 
+			throw new Error(`Error fetching item inventory: ${error.message}`);
 		}
+	}
+
+	async getInventoryAndItemsById(inventoryId: number): Promise<Inventory> {
+		try {
+			const inventory = await this.getById(inventoryId);
+			const items = await this.getItemsById(inventoryId);
+			inventory.itens = items;
+			console.log(items);
+			return inventory;
+		} catch (error: any) {
+			throw new Error(`Error fetching inventory and items: ${error.message}`);
+		}
+
 	}
 
 	async getInventoryByShopId(shopId: number): Promise<Inventory> {

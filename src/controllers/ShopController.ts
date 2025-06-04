@@ -6,6 +6,19 @@ import { FilterDefault, FilterShop } from "../models/Filters";
 const shopService = new ShopService();
 
 export class ShopController implements ControllerInterface {
+    async getInventory(req: Request, res: Response): Promise<void> {
+        try{
+			const shopId = parseInt(req.params.id);
+			if (!shopId) {
+				res.status(400).json({ error: "Invalid ID" });
+				return;
+			}
+			const inventory = await shopService.getInventory(shopId);
+			res.status(200).json(inventory);
+		} catch(error: any){ 
+			res.status(500).json({ error: `Error fetching shop inventory: ${error.message}` });
+		}
+    }
 
 	async getAll(req: Request, res: Response): Promise<void> {
 		try {
@@ -87,8 +100,6 @@ export class ShopController implements ControllerInterface {
 			}
 
 			const { championId, itemId, quantity } = req.body;
-
-			console.log(championId, itemId, quantity, userId, shopId);
 
 			if (!championId || !itemId) {
 				res.status(400).json({ error: 'Invalid ID' });

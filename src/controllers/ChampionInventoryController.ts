@@ -93,9 +93,8 @@ export class ChampionInventoryController implements ControllerInterface {
 	async createItemInventory(req: Request, res: Response): Promise<void> {
 		try {
 			const inventoryId = parseInt(req.params.id);
-			const itemId = req.body.item;
-			const quantity = req.body.quantity;
-			const itemPrice = req.body.price;
+
+			const { itemId , quantity, itemPrice, rarity } = req.body;
 
 			if (!itemId || isNaN(itemId)) {
 				res.status(400).json({ error: "Invalid item" });
@@ -112,7 +111,7 @@ export class ChampionInventoryController implements ControllerInterface {
 				return;
 			}
 
-			const inventory = await inventoryService.createItemInventory(inventoryId, itemId, quantity, itemPrice);
+			const inventory = await inventoryService.createItemInventory(inventoryId, itemId, quantity, itemPrice, rarity);
 			res.status(200).json(inventory);
 		} catch (err: any) {
 			res.status(400).json({ error: err.message });

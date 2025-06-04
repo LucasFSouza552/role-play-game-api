@@ -139,6 +139,52 @@ shopRoute.delete('/:id', shopController.delete);
 
 /**
  * @swagger
+ * /api/shop/{id}/inventory:
+ *   get:
+ *     tags:
+ *       - Shop
+ *     summary: Get inventory by shop ID
+ *     description: Retrieves the inventory for a specific shop
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: ID of the shop to retrieve inventory for
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           format: int64
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Inventory'
+ *       '400':
+ *         description: Invalid ID supplied
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid ID"
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Error fetching shop inventory"
+ */
+shopRoute.get('/:id/inventory', shopController.getInventory);
+
+/**
+ * @swagger
  * /api/shop/{id}/purchase:
  *   post:
  *     summary: Realiza a compra de itens em uma loja

@@ -362,7 +362,7 @@ export class ChampionController implements ControllerInterface {
 		try {
 			const championId = parseInt(req.params.id);
 			const userId = req.userId as number;
-			const { itemId, quantity, price } = req.body;
+			const { itemId, quantity, price, rarity } = req.body;
 
 			if (!championId) {
 				res.status(400).json({ error: "ID do campeão inválido" });
@@ -384,7 +384,8 @@ export class ChampionController implements ControllerInterface {
 				userId,
 				itemId,
 				quantity,
-				price
+				price,
+				rarity || "Common"
 			);
 			res.status(200).json(inventory);
 		} catch (err: any) {
