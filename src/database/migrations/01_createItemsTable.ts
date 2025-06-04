@@ -5,8 +5,8 @@ export async function up(knex: Knex): Promise<void> {
         table.increments("id").primary(); // ID único
         table.string("name").notNullable(); // Nome do item
         table.text("description").notNullable(); // Descrição do item
-        table.decimal("priceMin", 10, 2).notNullable(); // Preço mínimo
-        table.decimal("priceMax", 10, 2).notNullable(); // Preço máximo
+        table.integer("priceMin").notNullable(); // Preço mínimo
+        table.integer("priceMax").notNullable(); // Preço máximo
         table.enum("type", ["Spells", "Armour", "Weapons", "Potions"]).notNullable(); // Tipo do item
     });
 }

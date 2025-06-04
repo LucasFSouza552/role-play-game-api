@@ -13,7 +13,7 @@ export async function seed(knex: Knex): Promise<void> {
 			dexterity: 15,
 			intelligence: 10,
 			vitality: 25,
-			money: 100,
+			money: 10000,
 			guildId: null,
 			roleId: 1,
 		},

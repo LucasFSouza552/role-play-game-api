@@ -11,7 +11,6 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 	private tableName = "champion_inventory";
 
 	async create(inventory: createInventoryDTO): Promise<Inventory> {
-		console.log("Creating inventory:", inventory);
 		try {
 			const newInventory = await db(this.tableName).insert(inventory).returning("*");
 			if (!newInventory || newInventory.length === 0) {
@@ -46,11 +45,11 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 		try {
 			const itens = await db("champion_items")
 				.join('items', 'champion_items.itemId', '=', 'items.id')
-				.select("items.id", "items.name", "items.description","champion_items.quantity", "items.type", "items.rarity")
-				.where({ inventoryId: inventoryId });
+				.select("items.id", "items.name", "items.description","champion_items.quantity", "items.type", "champion_items.rarity")
+				.where({ ownerId: inventoryId });
 			return itens || [];
-		} catch (error) {
-			throw new Error("Error fetching inventory");
+		} catch (error: any) {
+			throw new Error("Error fetching champion items inventory: " + error.message);
 		}
 	}
 
@@ -64,7 +63,7 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 			if (!inventory) throw new Error("Inventory not found");
 			return inventory;
 		} catch (error) {
-			throw new Error("Error fetching inventory");
+			throw new Error("Error fetching champion inventory");
 		}
 	}
 	async update(inventory: updateInventoryDTO): Promise<updateInventoryDTO> {
@@ -93,26 +92,38 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 			inventory.itens = items;
 
 			return inventory;
-		} catch (error) {
-			throw new Error("Error fetching inventory");
+		} catch (error: any) {
+			throw new Error(`Error fetching champion inventory: ${error.message}`);
 		}
 	}
 
-	async createInventoryItem(inventoryId: number, itemId: number, quantity: number): Promise<InventoryItens> {
+	async getItemById(inventoryId:number, itemId:number): Promise<InventoryItens> {
 		try {
-			const newItem = await db("champion_items").insert({ inventoryId, itemId, quantity }).returning("*");
+			const itens = await db("champion_items")
+				.join('items', 'shop_items.itemId', '=', 'items.id')
+				.select("items.id", "items.name", "items.description","champion_items.quantity", "items.type", "items.rarity")
+				.where({ inventoryId, itemId }).first();
+			return itens;
+		} catch (error) {
+			throw new Error("Error fetching champion inventory");
+		}
+	}
+
+	async createInventoryItem(inventoryId: number, itemId: number, quantity: number, price: number): Promise<InventoryItens> {
+		try {
+			const newItem = await db("champion_items").insert({ inventoryId, itemId, quantity, price }).returning("*");
 			return newItem[0];
 		} catch (error) {
 			throw new Error("Error adding item to inventory");
 		}
 	}
 
-	async updateInventoryItem(inventoryId: number, itemId: number, quantity: number): Promise<InventoryItens> {
+	async updateInventoryItem(inventoryId: number, itemId: number, quantity?: number, price?: number): Promise<InventoryItens> {
 		try {
-			const updatedItem = await db("champion_items").where({ inventoryId, itemId }).update({ quantity: db.raw(`quantity + ${quantity}`) }).returning("*");
+			const updatedItem = await db("champion_items").where({ inventoryId, itemId }).update({ quantity: db.raw(`quantity + ${quantity || 0}`), price:  db.raw(` ${price || "price"}`)  }).returning("*");
 			return updatedItem[0];
 		} catch (error) {
-			throw new Error("Error adding item to inventory");
+			throw new Error("Error adding item to champion inventory");
 		}
 	}
 
@@ -121,7 +132,7 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 			const deletedItem = await db("champion_items").where({ inventoryId, itemId }).del();
 			return deletedItem == 1;
 		} catch (error) {
-			throw new Error("Error adding item to inventory");
+			throw new Error("Error adding item to champion inventory");
 		}
 	}
 }

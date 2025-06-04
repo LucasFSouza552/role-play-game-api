@@ -362,7 +362,7 @@ export class ChampionController implements ControllerInterface {
 		try {
 			const championId = parseInt(req.params.id);
 			const userId = req.userId as number;
-			const { itemId, quantity } = req.body;
+			const { itemId, quantity, price } = req.body;
 
 			if (!championId) {
 				res.status(400).json({ error: "ID do campeão inválido" });
@@ -374,7 +374,7 @@ export class ChampionController implements ControllerInterface {
 				return;
 			}
 
-			if (!quantity || isNaN(quantity) || quantity <= 0) {
+			if (!quantity || isNaN(quantity) || quantity <= 0 || quantity > 999) {
 				res.status(400).json({ error: "Quantidade inválida" });
 				return;
 			}
@@ -383,7 +383,8 @@ export class ChampionController implements ControllerInterface {
 				championId,
 				userId,
 				itemId,
-				quantity
+				quantity,
+				price
 			);
 			res.status(200).json(inventory);
 		} catch (err: any) {
@@ -395,7 +396,7 @@ export class ChampionController implements ControllerInterface {
 		try {
 			const championId = parseInt(req.params.id);
 			const userId = req.userId as number;
-			const { itemId, quantity } = req.body;
+			const { itemId, quantity, price } = req.body;
 
 			if (!championId) {
 				res.status(400).json({ error: "ID do campeão inválido" });
@@ -404,6 +405,11 @@ export class ChampionController implements ControllerInterface {
 
 			if (!itemId) {
 				res.status(400).json({ error: "ID do item inválido" });
+				return;
+			}
+
+			if (price === undefined || price < 0) {
+				res.status(400).json({ error: "Preço inválido" });
 				return;
 			}
 
@@ -416,7 +422,8 @@ export class ChampionController implements ControllerInterface {
 				championId,
 				userId,
 				itemId,
-				quantity
+				quantity,
+				price
 			);
 			res.status(200).json(inventory);
 		} catch (err: any) {

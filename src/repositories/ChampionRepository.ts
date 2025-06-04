@@ -123,4 +123,14 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 		}
 	}
 
+	async updateMoney(championId: number, newMoney: number) {
+		try {
+			const updatedChampion = await db(this.tableName)
+				.where({ id: championId })
+				.update({ money: newMoney });
+			return updatedChampion;
+		} catch (error) {
+			throw new Error('Erro ao atualizar dinheiro do campeão');
+		}
+	}
 }

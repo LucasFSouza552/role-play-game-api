@@ -137,4 +137,75 @@ shopRoute.patch('/:id', shopController.update);
  */
 shopRoute.delete('/:id', shopController.delete);
 
+/**
+ * @swagger
+ * /api/shop/{id}/purchase:
+ *   post:
+ *     summary: Realiza a compra de itens em uma loja
+ *     tags: [Shop]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID da loja
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - championId
+ *               - itemId
+ *               - quantity
+ *             properties:
+ *               championId:
+ *                 type: integer
+ *                 description: ID do campeão que está realizando a compra
+ *               itemId:
+ *                 type: integer
+ *                 description: ID do item a ser comprado
+ *               quantity:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 999
+ *                 description: Quantidade do item a ser comprado (1-999)
+ *     responses:
+ *       200:
+ *         description: Compra realizada com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       400:
+ *         description: |
+ *           Erro na requisição. Possíveis motivos:
+ *           - IDs inválidos
+ *           - Quantidade inválida
+ *           - Campeão não encontrado
+ *           - Item não encontrado no inventário
+ *           - Dinheiro insuficiente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Mensagem de erro detalhada
+ *       404:
+ *         description: Loja não encontrada
+ *       500:
+ *         description: Erro interno no servidor
+ */
+shopRoute.post('/:id/purchase', shopController.purchase);
+shopRoute.get('/:id/sell', shopController.sell);
+
+
+
 export default shopRoute;

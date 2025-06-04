@@ -6,6 +6,7 @@ import { MissionRepository } from "./MissionRepository";
 import { ItemRepository } from "./ItemRepository";
 import { GuildRepository } from "./GuildRepository";
 import { ChampionInventoryRepository } from "./ChampionInventoryRepository";
+import { ShopInventoryRepository } from "./ShopInventoryRepository";
 import { ShopRepository } from "./ShopRepository";
 
 const championRepo = new ChampionRepository();
@@ -17,6 +18,8 @@ const itemsRepo = new ItemRepository();
 const guildRepo = new GuildRepository();
 const championInventoryRepo = new ChampionInventoryRepository();
 const shopRepo = new ShopRepository();
+const shopInventoryRepo = new ShopInventoryRepository();
+
 export {
   championRepo,
   roleRepo,
@@ -26,5 +29,6 @@ export {
   itemsRepo,
   guildRepo,
   championInventoryRepo,
-  shopRepo
+  shopRepo,
+  shopInventoryRepo
 };

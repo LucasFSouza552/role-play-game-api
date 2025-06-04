@@ -7,7 +7,7 @@ export interface Champion {
 	id: number;
 	userId: number;
 	name: string;
-	money?: number | 0;
+	money: number | 0;
 	strength: number;
 	dexterity: number;
 	intelligence: number;

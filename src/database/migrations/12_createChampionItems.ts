@@ -1,24 +1,35 @@
 import { Knex } from "knex";
+import { ItemRarity } from "../../models/enums/ItemRarity";
 
 const tablename = 'champion_items';
 
 export async function up(knex: Knex): Promise<void> {
+
+	const rarityKeys = Object.values(ItemRarity);
+
     await knex.schema.createTable(tablename, (table) => {
+
         table.integer('inventoryId')
             .notNullable()
             .references('id')
             .inTable('champion_inventory')
             .onDelete('CASCADE');
+
         table.integer('itemId')
             .notNullable()
             .references('id')
             .inTable('items')
             .onDelete('CASCADE');
+
         table.primary(['inventoryId', 'itemId']);
+
         table.integer('quantity')
             .notNullable()
             .defaultTo(1);
-        table.enu("rarity", ["Common", "Uncommon", "Rare", "Epic", "Legendary"]).notNullable();
+            
+        table.integer('price').notNullable().defaultTo(0);
+
+        table.enu('rarity', rarityKeys).notNullable();
 
     });
 }

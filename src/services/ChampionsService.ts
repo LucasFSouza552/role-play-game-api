@@ -115,7 +115,7 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 		}
 	}
 
-	async createInventoryItem(championId: number, userId: number, itemId: number, quantity: number): Promise<InventoryItens> {
+	async createInventoryItem(championId: number, userId: number, itemId: number, quantity: number, price: number): Promise<InventoryItens> {
 		try {
 			const inventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId);
 
@@ -123,14 +123,14 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 				throw new Error('Inventory not found');
 			}
 
-			const newItem: InventoryItens = await championInventoryRepo.createInventoryItem(inventory.id, itemId, quantity);
+			const newItem: InventoryItens = await championInventoryRepo.createInventoryItem(inventory.id, itemId, quantity, price);
 			return newItem;
 		} catch (error) {
 			throw new Error('Error creating inventory item');
 		}
 	}
 
-	async updateInventoryItem(championId: number, userId: number, itemId: number, quantity: number): Promise<InventoryItens> {
+	async updateInventoryItem(championId: number, userId: number, itemId: number, quantity?: number, price?: number): Promise<InventoryItens> {
 		try {
 			const inventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId);
 
@@ -138,7 +138,7 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 				throw new Error('Inventory not found');
 			}
 
-			const item: InventoryItens = await championInventoryRepo.updateInventoryItem(inventory.id, itemId, quantity);
+			const item: InventoryItens = await championInventoryRepo.updateInventoryItem(inventory.id, itemId, quantity, price);
 			return item;
 		} catch (error) {
 			throw new Error('Error updating inventory item');
