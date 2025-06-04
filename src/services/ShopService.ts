@@ -16,9 +16,8 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 		} catch (error: any) {
 			throw new Error(error.message);
 		}
-
-
 	}
+
 	async getAll(filter: FilterShop): Promise<Shop[]> {
 		try {
 			return shopRepo.getAll(filter);
@@ -26,6 +25,7 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 			throw new Error("Error fetching shops");
 		}
 	}
+
 	async getById(id: number): Promise<Shop> {
 		try {
 			return shopRepo.getById(id);
@@ -33,6 +33,7 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 			throw new Error("Error fetching shop");
 		}
 	}
+
 	async create(shop: createShopDTO): Promise<Shop> {
 		try {
 			return shopRepo.create(shop);
@@ -40,6 +41,7 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 			throw new Error("Error creating shop");
 		}
 	}
+
 	async update(shop: updateShopDTO): Promise<updateShopDTO> {
 		try {
 			return shopRepo.update(shop);
@@ -47,6 +49,7 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 			throw new Error("Error updating shop");
 		}
 	}
+
 	async delete(id: number): Promise<boolean> {
 		try {
 			return shopRepo.delete(id);
@@ -100,10 +103,54 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 			}
 			return false;
 		} catch(error:any) { 
-			console.log(error);
 			throw new Error(error.message);
 		} 
 
+	}
+
+	async sell(shopId: number, userId: number, championId: number, itemId: number, quantity: number): Promise<boolean> {
+		try {
+			const champion: ChampionDTO = await championRepo.getById(championId, userId);
+			
+			if(!champion) {
+				throw new Error('Champion not found');
+			}
+
+			const championInventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId); 
+
+			if(!championInventory) {
+				throw new Error('Champion inventory not found');
+			}
+
+			const item: InventoryItens = await championInventoryRepo.getItemById(championInventory.id, itemId);
+
+			if(!item || item.quantity - quantity < 0) {
+				throw new Error("Item not found in champion inventory");
+			}
+
+			const updatedChampion = await championInventoryRepo.updateInventoryItem(championInventory.id, item.id, -quantity);
+			item.quantity -= quantity;
+			const shopInventory: Inventory = await shopInventoryRepo.getInventoryByShopId(shopId);
+
+			if (item.quantity === 0) {
+				await championInventoryRepo.removeInventoryItem(championInventory.id, item.id);
+			}
+
+			if(!shopInventory) {
+				throw new Error('Shop inventory not found');
+			}
+
+			const updatedShop = await shopInventoryRepo.updateInventoryItem(shopInventory.id, item.id, quantity);
+			
+			if(updatedChampion && updatedShop) {
+				await championRepo.updateMoney(championId, champion.money + item.price * quantity);
+				return true;
+			}
+			
+			return false;
+		} catch(error:any) { 
+			throw new Error(error.message);
+		} 
 	}
 
 }

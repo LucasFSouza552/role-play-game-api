@@ -6,8 +6,8 @@ import { FilterDefault, FilterShop } from "../models/Filters";
 const shopService = new ShopService();
 
 export class ShopController implements ControllerInterface {
-    async getInventory(req: Request, res: Response): Promise<void> {
-        try{
+	async getInventory(req: Request, res: Response): Promise<void> {
+		try {
 			const shopId = parseInt(req.params.id);
 			if (!shopId) {
 				res.status(400).json({ error: "Invalid ID" });
@@ -15,10 +15,10 @@ export class ShopController implements ControllerInterface {
 			}
 			const inventory = await shopService.getInventory(shopId);
 			res.status(200).json(inventory);
-		} catch(error: any){ 
+		} catch (error: any) {
 			res.status(500).json({ error: `Error fetching shop inventory: ${error.message}` });
 		}
-    }
+	}
 
 	async getAll(req: Request, res: Response): Promise<void> {
 		try {
@@ -74,18 +74,37 @@ export class ShopController implements ControllerInterface {
 
 	async sell(req: Request, res: Response): Promise<void> {
 		try {
+
+			const userId = req.userId as Number;
+			const shopId = parseInt(req.params.id);
 			const { championId, itemId, quantity } = req.body;
-			
+
+			if (!shopId || !userId) {
+				res.status(400).json({ error: 'Invalid ID' });
+				return;
+			}
+
 			if (!championId || !itemId) {
 				res.status(400).json({ error: 'Invalid ID' });
 				return;
 			}
+
 			if (quantity < 0 && quantity > 999) {
 				res.status(400).json({ error: 'Number of items has to be in 1 to 999' });
 				return;
 			}
-		} catch(error ){
-			throw new Error("adadwa");
+
+			const updatedShop = await shopService.sell(
+				shopId,
+				userId as number,
+				championId,
+				itemId,
+				quantity
+			);
+
+			res.status(200).json(updatedShop);
+		} catch (error: any) {
+			throw new Error("Error selling item: " + error.message);
 		}
 	}
 
@@ -117,11 +136,12 @@ export class ShopController implements ControllerInterface {
 				itemId,
 				quantity
 			);
+			
 			res.status(200).json(updatedShop);
 
-		}catch(error: any ){
+		} catch (error: any) {
 			throw new Error(error.message);
 		}
-    }
+	}
 
 }
