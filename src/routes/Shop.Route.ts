@@ -143,16 +143,15 @@ shopRoute.delete('/:id', shopController.delete);
  *   get:
  *     tags:
  *       - Shop
- *     summary: Get inventory by shop ID
- *     description: Retrieves the inventory for a specific shop
+ *     summary: Recupera o inventário de uma loja pelo seu ID
+ *     description: Recupera o inventário de uma loja específica
  *     parameters:
  *       - name: id
  *         in: path
- *         description: ID of the shop to retrieve inventory for
+ *         description: ID da loja para recuperar o invent rio
  *         required: true
  *         schema:
  *           type: integer
- *           format: int64
  *     responses:
  *       '200':
  *         description: Successful operation
@@ -250,6 +249,8 @@ shopRoute.get('/:id/inventory', shopController.getInventory);
  *         description: Erro interno no servidor
  */
 shopRoute.post('/:id/purchase', shopController.purchase);
+
+
 shopRoute.get('/:id/sell', shopController.sell);
 
 
