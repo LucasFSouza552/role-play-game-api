@@ -102,8 +102,9 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 		try {
 			const itens = await db("champion_items")
 				.join('items', 'champion_items.itemId', '=', 'items.id')
-				.select("items.id", "items.name", "items.description","champion_items.quantity", "items.type", "rarity")
+				.select("items.id", "items.name", "items.description","champion_items.quantity", "items.type", "rarity", "champion_items.price")
 				.where({ inventoryId, itemId }).first();
+				console.log(itens);
 			return itens;
 		} catch (error: any) {
 			throw new Error(`Error fetching champion inventory: ${error.message}`);

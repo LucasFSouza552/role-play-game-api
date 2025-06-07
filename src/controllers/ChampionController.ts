@@ -53,8 +53,10 @@ export class ChampionController implements ControllerInterface {
 			}
 
 			res.status(200).json(champion);
+			return;
 		} catch (err: any) {
-			res.status(500).json({ error: err.message });
+			res.status(500).json({ error: err.message || "Internal server error" });
+			return;
 		}
 	}
 
@@ -94,12 +96,8 @@ export class ChampionController implements ControllerInterface {
 		}
 	}
 
-	async update(req: Request, res: Response): Promise<void> {
-		try {
-
-		} catch (error) {
-
-		}
+	async update(req: Request, res: Response): Promise<void> { // Atualiza o nome do campeão
+		throw new Error("Not implemented");
 	}
 
 	async updateStatus(req: Request, res: Response): Promise<void> {
@@ -201,23 +199,23 @@ export class ChampionController implements ControllerInterface {
 			const userId: number = req.userId as number;
 
 			if (!championId) {
-				res.status(400).json({ error: "ID do campeão inválido" });
+				res.status(400).json({ error: "Invalid champion ID" });
 				return;
 			}
 
 			if (!userId) {
-				res.status(400).json({ error: "Usuário inválido" });
+				res.status(400).json({ error: "Invalid user" });
 				return;
 			}
 
 			const championExists = await championService.getById(championId, userId);
 			if (!championExists) {
-				res.status(404).json({ error: "Campeão não encontrado" });
+				res.status(404).json({ error: "Champion not found" });
 				return;
 			}
 
 			if (!skillId) {
-				res.status(400).json({ error: "ID da habilidade inválido" });
+				res.status(400).json({ error: "Invalid skill ID" });
 				return;
 			}
 
@@ -225,7 +223,7 @@ export class ChampionController implements ControllerInterface {
 				(skill: ChampionSkill) => skill.id === skillId
 			);
 			if (hasSkill) {
-				res.status(400).json({ error: "A habilidade já foi adicionada ao campeão" });
+				res.status(400).json({ error: "A skill already exists" });
 				return;
 			}
 
@@ -241,14 +239,15 @@ export class ChampionController implements ControllerInterface {
 			const championId = parseInt(req.params.id);
 
 			if (!championId) {
-				res.status(400).json({ error: "ID do campeão inválido" });
+				res.status(400).json({ error: "Invalid champion ID" });
 				return;
 			}
 
 			const championSkills = await championService.getSkills(championId);
 			res.status(200).json(championSkills);
 		} catch (err: any) {
-			res.status(400).json({ error: err.message });
+			res.status(500).json({ error: err.message || "Internal server error" });
+			return;
 		}
 	}
 

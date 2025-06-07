@@ -80,7 +80,7 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 			console.log(newChampionSkill);
 			return newChampionSkill;
 		} catch (error) {
-			throw new Error('Erro ao adicionar habilidade ao campeão');
+			throw new Error('Error while adding skill to champion');
 		}
 	}
 
@@ -89,10 +89,11 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 			const championSkills = await db('champion_skills')
 				.where({ championId })
 				.join('skills', 'skills.id', '=', 'champion_skills.skillId')
-				.select('name', 'description', 'power', 'cost', 'target');
+				.select('id', 'name', 'description', 'power', 'MP', 'EP', 'target');
 			return championSkills;
 		} catch (error) {
-			throw new Error('Erro ao buscar habilidades do campeão');
+			console.error(error);
+			throw new Error('Error while searching for champion skills');
 		}
 	}
 
@@ -103,7 +104,7 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 				.update({ guildId: Champion.guildId });
 			return updatedChampion;
 		} catch (error) {
-			throw new Error('Erro ao atualizar guild do campeão');
+			throw new Error('Error while updating champion guild');
 		}
 	}
 
@@ -120,18 +121,19 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 				});
 			return updatedChampion;
 		} catch (error) {
-			throw new Error('Erro ao atualizar status do campeão');
+			throw new Error('Error while updating champion status');
 		}
 	}
 
 	async updateMoney(championId: number, newMoney: number) {
 		try {
+			console.log(championId, newMoney);
 			const updatedChampion = await db(this.tableName)
 				.where({ id: championId })
 				.update({ money: newMoney });
 			return updatedChampion;
-		} catch (error) {
-			throw new Error('Erro ao atualizar dinheiro do campeão');
+		} catch (error: any) {
+			throw new Error(`Error while updating champion money`);
 		}
 	}
 }

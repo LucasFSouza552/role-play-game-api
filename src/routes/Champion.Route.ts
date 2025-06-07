@@ -8,21 +8,82 @@ const ChampionRoute = Router();
  * @swagger
  * /api/champions:
  *   get:
- *     summary: Listar todos os campeões
- *     description: Retorna uma lista de todos os campeões do usuário
+ *     summary: Listar todos os campeões do usuário
+ *     description: Retorna uma lista paginada de campeões do usuário com possibilidade de filtros
  *     tags:
  *       - Campeões (Champions)
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: Número da página para paginação
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 10
+ *         description: Limite de itens por página
+ *       - in: query
+ *         name: name
+ *         schema:
+ *           type: string
+ *         description: Filtro por nome do campeão
+ *       - in: query
+ *         name: role
+ *         schema:
+ *           type: integer
+ *         description: Filtro por ID de role do campeão
+ *       - in: query
+ *         name: level
+ *         schema:
+ *           type: integer
+ *         description: Filtro por nível do campeão
+ *       - in: query
+ *         name: orderBy
+ *         schema:
+ *           type: string
+ *           enum: [name, level, roleId]
+ *           default: name
+ *         description: Campo para ordenação dos resultados
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: asc
+ *         description: Direção da ordenação
  *     responses:
  *       200:
  *         description: Lista de campeões retornada com sucesso
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Champion'
+ *               type: object
+ *               properties:
+ *                 champions:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Champion'
+ *                 length:
+ *                   type: integer
+ *                   description: Número total de campeões retornados
+ *       400:
+ *         description: Parâmetros inválidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid parameters"
  *       401:
  *         description: Não autorizado
  *         content:
@@ -32,7 +93,6 @@ const ChampionRoute = Router();
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Mensagem de erro
  *                   example: "Invalid or expired token"
  *       500:
  *         description: Erro interno do servidor
@@ -43,7 +103,6 @@ const ChampionRoute = Router();
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Mensagem de erro
  *                   example: "Internal server error"
  */
 ChampionRoute.get("/", championController.getAll);
@@ -56,6 +115,8 @@ ChampionRoute.get("/", championController.getAll);
  *     description: Retorna um campeão do usuário baseado no ID fornecido.
  *     tags:
  *       - Campeões (Champions)
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -63,74 +124,61 @@ ChampionRoute.get("/", championController.getAll);
  *         description: Identificador único do campeão
  *         schema:
  *           type: integer
+ *           example: 1
  *     responses:
  *       200:
  *         description: Detalhes do campeão
  *         content:
  *           application/json:
  *             schema:
- *               type: 
-*                  object
+ *               $ref: '#/components/schemas/Champion'
+ *             example:
+ *               id: 1
+ *               userId: 1
+ *               name: "Thorgar"
+ *               money: "6189.00"
+ *               guildId: null
+ *               roleId: 1
+ *               strength: 20
+ *               dexterity: 15
+ *               intelligence: 10
+ *               vitality: 25
+ *               hp: 0
+ *               mp: 0
+ *               ep: 0
+ *               sp: 15
+ *               level: 1
+ *               xp: 0
+ *               xp_max: 150
+ *       400:
+ *         description: Parâmetros inválidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
  *               properties:
- *                 id:
- *                   type: integer
- *                   description: Identificador único do campeão
- *                 name:
+ *                 error:
  *                   type: string
- *                   description: Nome do campeão
- *                 roleId:
- *                   type: integer
- *                   description: Função ou classe do campeão
- *                 guildId:
- *                   type: integer
- *                   nullable: true
- *                   description: Identificador da guilda à qual o campeão pertence (pode ser nulo)
- *                 money:
- *                   type: number
- *                   format: float
- *                   description: Quantidade de dinheiro do campeão
- *                 strength:
- *                   type: integer
- *                   description: Atributo de força física do campeão
- *                 dexterity:
- *                   type: integer   
- *                   description: Atributo de agilidade e precisão do campeão
- *                 intelligence:
- *                   type: integer
- *                   description: Atributo de inteligência e magia do campeão
- *                 vitality:
- *                   type: integer
- *                   description: Atributo de resistência e vida máxima do campeão
- *                 hp:
- *                   type: integer
- *                   description: Pontos de vida atuais do campeão
- *                 level:
- *                   type: integer
- *                   description: Nível atual do campeão
- *                 xp:
- *                   type: integer
- *                   description: Experiência acumulada pelo campeão
- *                 xp_max:
- *                   type: integer
- *                   description: Experiência necessária para o próximo nível
- *                 sp:
- *                   type: integer
- *                   description: Pontos de habilidade disponíveis para distribuição
- *                 skills:
- *                    type: array
- *                    items:
- *                       $ref: '#/components/schemas/Skill'
- *                       description: Habilidade do campeão
- *                    description: Lista de habilidades do campeão
- *                 role:
- *                    type: object
- *                    $ref: '#/components/schemas/Role'
- *                    description: Função ou classe do campeão
-
+ *                   example: "Invalid champion ID"
  *       404:
  *         description: Campeão não encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Champion not found"
  *       500:
  *         description: Erro interno do servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
  */
 ChampionRoute.get("/:id", championController.getById);
 
@@ -157,6 +205,26 @@ ChampionRoute.get("/:id", championController.getById);
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Skill'
+ *       400:
+ *         description: Parâmetros inválidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid champion ID"
+ *       500:
+ *         description: Erro interno do servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
  */
 ChampionRoute.get('/:id/skills', championController.getSkills);
 
@@ -186,8 +254,6 @@ ChampionRoute.get('/:id/skills', championController.getSkills);
  *                 description: Identificador único da classe do campeão.
  *                 default: 1
  *                 minimum: 1
- * 
- * 
  *     responses:
  *       201:
  *         description: Campeão criado com sucesso.

@@ -74,10 +74,11 @@ export class ShopController implements ControllerInterface {
 
 	async sell(req: Request, res: Response): Promise<void> {
 		try {
-
-			const userId = req.userId as Number;
-			const shopId = parseInt(req.params.id);
-			const { championId, itemId, quantity } = req.body;
+			const userId = Number(req.userId);
+			const shopId = Number(req.params.id);
+			const championId = Number(req.body.championId);
+			const itemId = Number(req.body.itemId);
+			const quantity = Number(req.body.quantity);
 
 			if (!shopId || !userId) {
 				res.status(400).json({ error: 'Invalid ID' });
@@ -89,14 +90,14 @@ export class ShopController implements ControllerInterface {
 				return;
 			}
 
-			if (quantity < 0 && quantity > 999) {
+			if (isNaN(quantity) || quantity < 1 || quantity > 999) {
 				res.status(400).json({ error: 'Number of items has to be in 1 to 999' });
 				return;
 			}
 
 			const updatedShop = await shopService.sell(
 				shopId,
-				userId as number,
+				userId,
 				championId,
 				itemId,
 				quantity

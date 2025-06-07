@@ -251,7 +251,7 @@ shopRoute.get('/:id/inventory', shopController.getInventory);
 shopRoute.post('/:id/purchase', shopController.purchase);
 
 
-shopRoute.get('/:id/sell', shopController.sell);
+shopRoute.post('/:id/sell', shopController.sell);
 
 
 
