@@ -11,5 +11,6 @@
             "database": "role-play-game-api"
         }
     ],
-    "postman.settings.dotenv-detection-notification-visibility": false
+    "postman.settings.dotenv-detection-notification-visibility": false,
+    "codetogether.virtualCursorJoin": "sharedVirtualCursor"
 }

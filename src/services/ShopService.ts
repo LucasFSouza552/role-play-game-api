@@ -97,7 +97,7 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 				return true;
 			}
 
-			const updatedChampion = await championInventoryRepo.updateInventoryItem(championInventory.id, item.id, item.quantity);
+			const updatedChampion = await championInventoryRepo.updateInventoryItem(championInventory.id, item.id, quantity);
 			if(updatedChampion) {
 				return true;
 			}
