@@ -12,8 +12,8 @@ const userController = new UserController();
  * @swagger
  * /api/user:
  *   get:
- *     summary: Listar todos os usuários (apenas Administradores)
- *     description: Retorna uma lista de todos os usuários cadastrados. Acesso restrito para administradores.
+ *     summary: Listar todos os usuários
+ *     description: Retorna uma lista de usuários com filtros e paginação.
  *     tags:
  *       - Usuários (Users)
  *     security:
@@ -21,56 +21,40 @@ const userController = new UserController();
  *     parameters:
  *       - in: query
  *         name: name
- *         required: false
+ *         schema:
+ *           type: string
  *         description: Filtrar por nome do usuário
- *         schema:
- *           type: string
- *           example: "João"
-  *       - in: query
+ *       - in: query
  *         name: role
- *         required: false
- *         description: Filtrar por cargo do usuário
  *         schema:
  *           type: string
- *           enum: [admin, user]
- *           example: "user"
+ *         description: Filtrar por cargo do usuário
  *       - in: query
  *         name: page
- *         required: false
- *         description: Número da página para paginação
  *         schema:
  *           type: integer
- *           minimum: 1
  *           default: 1
- *           example: 1
+ *         description: Número da página
  *       - in: query
  *         name: limit
- *         required: false
- *         description: Número de usuários por página
  *         schema:
  *           type: integer
- *           minimum: 1
- *           maximum: 100
  *           default: 10
- *           example: 10
+ *         description: Limite de itens por página
  *       - in: query
  *         name: orderBy
- *         required: false
- *         description: Campo para ordenação
  *         schema:
  *           type: string
  *           enum: [id, name, role]
- *           default: "id"
- *           example: "name"
+ *           default: id
+ *         description: Campo para ordenação
  *       - in: query
  *         name: order
- *         required: false
- *         description: Direção da ordenação
  *         schema:
  *           type: string
  *           enum: [asc, desc]
- *           default: "asc"
- *           example: "asc"
+ *           default: asc
+ *         description: Ordem da ordenação
  *     responses:
  *       200:
  *         description: Lista de usuários retornada com sucesso
@@ -82,46 +66,109 @@ const userController = new UserController();
  *                 users:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/User'
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: number
+ *                         description: Identificador único do usuário
+ *                       name:
+ *                         type: string
+ *                         description: Nome do usuário
+ *                       email:
+ *                         type: string
+ *                         description: Email do usuário
+ *                       role:
+ *                         type: string
+ *                         description: Cargo do usuário
  *                 length:
- *                   type: integer
- *                   description: Total de usuários retornados
+ *                   type: number
+ *                   description: Número total de usuários retornados
  *       401:
- *         description: Não autorizado
+ *         description: Token inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid token. Use format Bearer <token>"
  *       403:
- *         description: Acesso proibido - Apenas administradores podem acessar
+ *         description: Acesso proibido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "You do not have permission to access this resource"
+ *       404:
+ *         description: Usuários não encontrados
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Users not found"
  *       500:
  *         description: Erro interno do servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
  */
-userRoute.get('/', AuthMiddleware, authorizationMiddleware(["admin"]), userController.getAll);
+userRoute.get("/", AuthMiddleware, authorizationMiddleware(["admin"]), userController.getAll);
 
 /**
  * @swagger
  * /api/user/profile:
  *   get:
- *     summary: Pegar dados do usuário logado
- *     description: Retorna os dados do usuário logado.
+ *     summary: Obter dados do usuário logado
+ *     description: Retorna os dados do usuário atualmente logado.
  *     tags:
  *       - Usuários (Users)
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Dados do usuário logado.
+ *         description: Dados do usuário obtidos com sucesso.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 id:
- *                   type: number
- *                   description: Identificador único do usuário.
- *                 name:
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: number
+ *                       description: Identificador único do usuário.
+ *                     name:
+ *                       type: string
+ *                       description: Nome do usuário.
+ *                     email:
+ *                       type: string
+ *                       description: Email do usuário.
+ *                     role:
+ *                       type: string
+ *                       description: Cargo do usuário.
+ *       400:
+ *         description: Falta de informação para encontrar o usuário.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
  *                   type: string
- *                   description: Nome do usuário.
- *                 email:
- *                   type: string
- *                   description: Email do usuário.
+ *                   example: "Missing information to find a user"
  *       401:
  *         description: Token inválido.
  *         content:
@@ -131,9 +178,27 @@ userRoute.get('/', AuthMiddleware, authorizationMiddleware(["admin"]), userContr
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Descrição do erro.
+ *                   example: "Token not found. Use format Bearer <token>"
+ *       404:
+ *         description: Usuário não encontrado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "User not found"
  *       500:
  *         description: Erro interno do servidor.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
  */
 userRoute.get("/profile", AuthMiddleware, userController.getById);
 
@@ -275,7 +340,7 @@ userRoute.post("/login", userController.authenticateUser);
  *                 description: Senha do usuário.
  *               role:
  *                 type: string
- *                 description: Papel do usuário.
+ *                 description: Cargo do usuário.
  *     responses:
  *       200:
  *         description: Dados do usuário atualizados com sucesso.

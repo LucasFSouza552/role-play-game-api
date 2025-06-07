@@ -1,4 +1,5 @@
 import db from "../database/db";
+import { updateChampionDTO } from "../DTOS/ChampionDTO";
 import { createChampionRoleDTO, updateChampionRoleDTO } from "../DTOS/ChampionRoleDTO";
 import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { ChampionRole } from "../models/ChampionRole";
@@ -8,15 +9,19 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 	private tableName = 'champion_roles';
 
 	async getAll(filter: FilterChampionRole): Promise<ChampionRole[]> {
-		return await db(this.tableName)
-			.select('*')
-			.limit(filter.limit)
-			.offset((filter.page - 1) * filter.limit)
-			.modify((query) => {
-				if (filter.name) {
-					query.whereILike('champion_roles.name', `%${filter.name}%`);
-				}
-			});
+		try {
+			return await db(this.tableName)
+				.select('*')
+				.limit(filter.limit)
+				.offset((filter.page - 1) * filter.limit)
+				.modify((query) => {
+					if (filter.name) {
+						query.whereILike('champion_roles.name', `%${filter.name}%`);
+					}
+				});
+		} catch (error) {
+			throw new Error('Error while fetching roles');
+		}
 	}
 
 	async getById(id: number): Promise<ChampionRole> {
@@ -25,7 +30,7 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 				.where({ id })
 				.select('*').first();
 		} catch (error) {
-			throw new Error('Erro ao buscar role pelo id');
+			throw new Error('Error while searching for role by id');
 		}
 	}
 
@@ -35,7 +40,7 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 				.whereILike({ name })
 				.first();
 		} catch (error) {
-			throw new Error('Erro ao buscar role pelo nome');
+			throw new Error('Error while searching for role by name');
 		}
 	}
 
@@ -44,16 +49,16 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 			const createdRole = await db(this.tableName).insert(role).returning('*');
 			return createdRole[0];
 		} catch (error) {
-			console.log(error);
-			throw new Error('Erro ao criar role');
+			throw new Error('Error while creating role');
 		}
 	}
 
-	async update(championRole: updateChampionRoleDTO): Promise<ChampionRole> {
+	async update(championRole: updateChampionRoleDTO): Promise<updateChampionDTO> {
 		try {
-			return await db(this.tableName).where({ id: championRole.id }).update(championRole);
+			const updatedRole = await db(this.tableName).where({ id: championRole.id }).update(championRole).returning('*');
+			return updatedRole[0];
 		} catch (error) {
-			throw new Error('Erro ao atualizar role');
+			throw new Error('Error while updating role');
 		}
 	}
 
@@ -62,7 +67,7 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 			const deletedRole = await db(this.tableName).where({ id }).del();
 			return deletedRole == 1;
 		} catch (error) {
-			throw new Error('Erro ao deletar role');
+			throw new Error('Error while deleting role');
 		}
 	}
 }

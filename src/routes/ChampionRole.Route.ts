@@ -47,8 +47,12 @@ const championRoleController = new ChampionRoleController();
  *           application/json:
  *             schema:
  *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Role'
+ *       400:
+ *         description: Invalid ID
  *       500:
- *         description: Erro interno do servidor
+ *         description: Internal server error
  */
 ChampionRoleRoute.get("/", championRoleController.getAll);
 
@@ -76,9 +80,27 @@ ChampionRoleRoute.get("/", championRoleController.getAll);
  *               type: object
  *               $ref: '#/components/schemas/Role'
  *       404:
- *         description: Classe não encontrada
+ *         description: Class not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message
+ *                   example: "Class not found"
  *       500:
- *         description: Erro interno do servidor
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message
+ *                   example: "Internal server error"
  */
 ChampionRoleRoute.get("/:id", championRoleController.getById);
 
@@ -209,41 +231,60 @@ ChampionRoleRoute.patch("/", championRoleController.update);
 
 /**
  * @swagger
- * /api/roles:
+ * /api/roles/{id}:
  *   delete:
  *     summary: Excluir classe
- *     description: Remove uma classe existente.
+ *     description: Remove uma classe existente pelo ID.
  *     tags:
  *       - Classes (Roles)
  *     security:
  *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - id
- *             properties:
- *               id:
- *                 type: integer
- *                 description: ID da classe a ser excluída
- *                 example: 1
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID da classe a ser excluída
+ *         example: 1
  *     responses:
  *       200:
  *         description: Classe excluída com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Role deleted successfully
  *       400:
  *         description: Dados inválidos fornecidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Invalid ID
  *       401:
  *         description: Não autorizado
  *       403:
  *         description: Acesso proibido
  *       404:
  *         description: Classe não encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Role not found
  *       500:
  *         description: Erro interno do servidor
  */
-ChampionRoleRoute.delete("/", championRoleController.delete);
+ChampionRoleRoute.delete("/:id", championRoleController.delete);
 
 export default ChampionRoleRoute;

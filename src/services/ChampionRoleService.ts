@@ -30,11 +30,19 @@ export class ChampionRoleService implements ServiceInterface<createChampionRoleD
 		}
 	}
 
-	update(role: updateChampionDTO): Promise<updateChampionDTO> {
-		throw new Error("Method not implemented.");
+	async update(role: updateChampionDTO): Promise<updateChampionDTO> {
+		try {
+			return await roleRepo.update(role);
+		} catch (error) {
+			throw new Error("Error updating role");
+		}
 	}
 
-	delete(id: number, userId?: number): Promise<boolean> {
-		throw new Error("Method not implemented.");
+	async delete(id: number): Promise<boolean> {
+		try {
+			return await roleRepo.delete(id);
+		} catch (error) {
+			throw new Error("Error deleting role");
+		}
 	}
 }

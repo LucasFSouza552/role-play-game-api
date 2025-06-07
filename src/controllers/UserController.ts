@@ -6,6 +6,7 @@ import { UserMapper } from "../utils/mapppers/userMapping";
 import { ControllerInterface } from "../interfaces/controllerInterface";
 import { createUserDTO, updateUserDTO } from "../DTOS/UserDTO";
 import { FilterDefault, FilterUser } from "../models/Filters";
+import { ThrowsError } from "../errors/ThrowsError";
 
 const userService = new UserService();
 
@@ -16,25 +17,33 @@ export class UserController implements ControllerInterface {
 			const user = req.body;
 
 			if (!user || !user.name || !user.email || !user.password) {
-				res.status(400).json({ error: "Missing information to create a user" });
-				return;
+				throw new ThrowsError('Missing information to create a user', 400);
 			}
 
 			const userExists = await userService.getByEmail(user.email);
 
 			if (userExists) {
-				res.status(400).json({ error: "User already registered" });
-				return;
+				throw new ThrowsError('User already registered', 409);
 			}
 
 			const userData: createUserDTO = UserMapper.mapCreateUserToDTO(user);
 
 			const newUser = await userService.create(userData);
+
+			if (!newUser) {
+				throw new ThrowsError('Error creating user', 404);
+			}
+
 			const token = generateJwtToken(newUser.id);
 			res.status(201).json({ token });
-		} catch (err: any) {
-			console.error(err);
-			res.status(400).json({ error: err.message });
+			return;
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				console.error(error);
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 
@@ -42,10 +51,20 @@ export class UserController implements ControllerInterface {
 		try {
 			const filter: FilterUser = { ...FilterDefault, ...req.query };
 			const users = await userService.getAll(filter);
+
+			if (!users) {
+				throw new ThrowsError('Error getting users', 404);
+			}
+
 			res.status(200).json({ users: users, length: users.length });
-		} catch (err: any) {
-			console.error(err);
-			res.status(400).json({ error: err.message });
+			return;
+		} catch (error) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				console.error(error);
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 
@@ -54,29 +73,31 @@ export class UserController implements ControllerInterface {
 			const user = req.body;
 
 			if (!user.email || !user.password) {
-				res.status(400).json({ error: "Missing information to authenticate a user" });
-				return;
+				throw new ThrowsError('Missing information to authenticate a user', 400);
 			}
 
 			const User = await userService.getByEmail(user.email);
 
 			if (!User) {
-				res.status(400).json({ error: "User not found" });
-				return;
+				throw new ThrowsError('User not found', 404);
 			}
 
 			const passwordEncoded = await validatePassword(user.password, User.password);
 
 			if (!passwordEncoded) {
-				res.status(400).json({ error: "Invalid credentials" });
-				return;
+				throw new ThrowsError('Invalid credentials', 400);
 			}
 
 			const token = generateJwtToken(User.id);
 			res.status(200).json({ token: token });
-		} catch (err: any) {
-			console.error(err);
-			res.status(400).json({ error: err.message });
+			return;
+		} catch (error) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				console.error(error);
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 
@@ -85,65 +106,92 @@ export class UserController implements ControllerInterface {
 			const userId = req.userId;
 
 			if (!userId) {
-				res.status(400).json({ error: "Missing information to find a user" });
-				return;
+				throw new ThrowsError('Missing information to find a user', 400);
 			}
 
 			const user = await userService.getById(userId);
 
 			if (!user) {
-				res.status(400).json({ error: "User not found" });
-				return;
+				throw new ThrowsError('User not found', 404);
 			}
 
 			res.status(200).json({ user });
-		} catch (err: any) {
-			console.error(err);
-			res.status(400).json({ error: err.message });
+			return;
+		} catch (error) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				console.error(error);
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 
 	async update(req: Request, res: Response) {
 
-		const userId = req.userId;
-		const userBody: updateUserDTO = req.body;
+		try {
+			const userId = req.userId;
+			const userBody: updateUserDTO = req.body;
 
-		if (!userId) {
-			res.status(400).json({ error: "Missing information to update a user" });
+			if (!userId) {
+				throw new ThrowsError("Missing information to update a user", 400);
+			}
+
+			const User = await userService.getById(userId);
+
+			if (!User) {
+				throw new ThrowsError("User not found", 404);
+			}
+
+			if (!userBody) {
+				throw new ThrowsError("Missing information to update a user", 400);
+			}
+
+			userBody.id = userId;
+			const userData: updateUserDTO = UserMapper.mapUserToUpdateDTO(userBody);
+
+			const userUpdated = await userService.update(userData);
+			if (!userUpdated || userUpdated.id !== userId) {
+				throw new ThrowsError("Error updating the user", 400);
+			}
+
+			const token = generateJwtToken(userUpdated.id);
+
+			res.status(200).json({ token });
 			return;
+		} catch (error) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				console.error(error);
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
-
-		const User = await userService.getById(userId);
-
-		if (!User) {
-			res.status(400).json({ error: "User not found" });
-			return;
-		}
-
-
-		if (!userBody) {
-			res.status(400).json({ error: "Missing information to update a user" });
-			return;
-		}
-
-
-		userBody.id = userId;
-		const userData: updateUserDTO = UserMapper.mapUserToUpdateDTO(userBody);
-
-		const userUpdated = await userService.update(userData);
-		if (!userUpdated || userUpdated.id !== userId) {
-			res.status(400).json({ error: "Error updating the user" });
-			return;
-		}
-
-
-		const token = generateJwtToken(userUpdated.id);
-
-		res.status(200).json({ token });
 	}
 
-	delete(req: Request, res: Response): Promise<void> {
-		throw new Error("Method not implemented.");
+	async delete(req: Request, res: Response): Promise<void> {
+		try {
+			const userId = req.userId as number;
+
+			if (!userId) {
+				throw new ThrowsError("Missing information to delete a user", 400);
+			}
+
+			const userDeleted = await userService.delete(userId);
+			if (!userDeleted) {
+				throw new ThrowsError("Error deleting the user", 400);
+			}
+
+			res.status(200).json({ message: "User deleted successfully" });
+			return;
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				console.error(error);
+				res.status(500).json({ error: 'Internal server error' });
+			}
+		}
 	}
 }
 

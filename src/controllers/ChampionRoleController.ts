@@ -8,14 +8,53 @@ const championRoleService = new ChampionRoleService();
 
 export class ChampionRoleController implements ControllerInterface {
 
-    update(req: Request, res: Response): Promise<void> {
+    async update(req: Request, res: Response): Promise<void> {
+        try {
+            const roleId = req.params.id && !isNaN(Number(req.params.id)) ? parseInt(req.params.id) : null;
 
-        // TODO: Implementar
-        throw new Error("Method not implemented.");
+            if (!roleId) {
+                res.status(400).send({ error: "Invalid ID" })
+                return;
+            }
+
+            const role = req.body;
+            const requiredFields = ['name', 'description', 'hp', 'mp', 'ep'];
+            const missingFields = requiredFields.filter(field => !role[field]);
+
+            if (missingFields.length > 0) {
+                res.status(400).send({ 
+                    error: "Missing required fields", 
+                    missingFields: missingFields 
+                });
+                return;
+            }
+
+            const updatedRole = await championRoleService.update(role);
+            res.status(200).json(updatedRole);
+        } catch (error: any) {
+            res.status(400).json({ error: error.message });
+        }
     }
-    delete(req: Request, res: Response): Promise<void> {
-        // TODO: Implementar
-        throw new Error("Method not implemented.");
+    async delete(req: Request, res: Response): Promise<void> {
+        try {
+            const roleId = req.params.id && !isNaN(Number(req.params.id)) ? parseInt(req.params.id) : null;
+
+            if (!roleId) {
+                res.status(400).send({ error: "Invalid ID" })
+                return;
+            }
+
+            const deletedRole = await championRoleService.delete(roleId);
+
+            if (!deletedRole) {
+                res.status(404).send({ error: "Role not found" });
+                return;
+            }
+
+            res.status(200).json({ message: "Role deleted successfully" });
+        } catch (error: any) {
+            res.status(400).json({ error: error.message });
+        }
     }
 
     async getAll(req: Request, res: Response): Promise<void> {
@@ -32,7 +71,6 @@ export class ChampionRoleController implements ControllerInterface {
     async getById(req: Request, res: Response): Promise<void> {
         try {
             const roleId = req.params.id ? parseInt(req.params.id) : null;
-            const userId: number = req.userId as number;
 
             if (!roleId) {
                 res.status(400).send({ error: "Invalid ID" })
@@ -40,9 +78,13 @@ export class ChampionRoleController implements ControllerInterface {
             }
             
             const role = await championRoleService.getById(roleId);
+            if(!role) {
+                res.status(404).send({ error: "Role not found" });
+                return;
+            }
             res.status(200).json(role);
-        } catch (error) {
-            throw new Error("Error fetching role");
+        } catch (error: any) {
+            res.status(400).json({ error: error.message });
         }
     }
 
