@@ -76,11 +76,11 @@ export class UserService implements ServiceInterface<createUserDTO, updateUserDT
 		}
 	}
 
-	async getByEmail(email: string): Promise<user> {
+	async getByEmail(email: string): Promise<user | null> {
 		try {
 			const user = await userRepo.findByEmail(email);
 			if (!user) {
-				throw new ThrowsError("User not found", 404);
+				return null;
 			}
 			return user;
 		} catch (error: any) {

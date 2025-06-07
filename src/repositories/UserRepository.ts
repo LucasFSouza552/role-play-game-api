@@ -79,11 +79,11 @@ export class UserRepository implements RepositoryInterface<createUserDTO, update
 		}
 	}
 
-	async findByEmail(email: string): Promise<user> {
+	async findByEmail(email: string): Promise<user | null> {
 		try {
 			const user = await db(this.tableName).where({ email }).first();
 			if (!user) {
-				throw new ThrowsError('User not found', 404);
+				return null;
 			}
 			return user;
 		} catch (error: any) {
