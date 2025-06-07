@@ -372,7 +372,7 @@ userRoute.post("/login", userController.authenticateUser);
  * /api/user/update:
  *   patch:
  *     summary: Atualizar dados do usuário
- *     description: Atualiza os dados do usuário logado com as informações fornecidas.
+ *     description: Atualiza os dados do usuário. Apenas administradores podem alterar o campo 'role' de outros usuários.
  *     tags:
  *       - Usuários (Users)
  *     security:
@@ -384,26 +384,91 @@ userRoute.post("/login", userController.authenticateUser);
  *           schema:
  *             type: object
  *             properties:
+ *               id:
+ *                 type: integer
+ *                 description: ID do usuário a ser atualizado (apenas para admin)
  *               name:
  *                 type: string
- *                 description: Nome do usuário.
+ *                 description: Nome do usuário
  *               password:
  *                 type: string
- *                 description: Senha do usuário.
+ *                 format: password
+ *                 description: Nova senha do usuário
  *               role:
  *                 type: string
- *                 description: Cargo do usuário.
+ *                 enum: [user, admin]
+ *                 description: Cargo do usuário (apenas para admin)
  *     responses:
  *       200:
- *         description: Dados do usuário atualizados com sucesso.
+ *         description: Dados do usuário atualizados com sucesso
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 message:
+ *                 token:
  *                   type: string
- *                   description: Mensagem de sucesso.
+ *                   description: Novo token JWT de autenticação
+ *       400:
+ *         description: Dados inválidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "The field email is not allowed."
+ *                 allowedFields:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["id", "name", "password", "role"]
+ *                 invalidFields:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["email"]
+ *       401:
+ *         description: Não autorizado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "User not authenticated."
+ *       403:
+ *         description: Acesso proibido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "You do not have permission to change the 'role' field."
+ *       404:
+ *         description: Usuário não encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "User not found."
+ *       500:
+ *         description: Erro interno do servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
  */
 userRoute.patch("/update", AuthMiddleware, validateAllowedFields, userController.update);
 

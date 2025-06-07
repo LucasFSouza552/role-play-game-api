@@ -71,18 +71,20 @@ export class UserController implements ControllerInterface {
 	async authenticateUser(req: Request, res: Response) {
 		try {
 			const user = req.body;
+			const email = user.email.trim();
+			const password = user.password.trim();
 
-			if (!user.email || !user.password) {
+			if (!email || !password) {
 				throw new ThrowsError('Missing information to authenticate a user', 400);
 			}
 
-			const User = await userService.getByEmail(user.email);
+			const User = await userService.getByEmail(email);
 
 			if (!User) {
 				throw new ThrowsError('User not found', 404);
 			}
 
-			const passwordEncoded = await validatePassword(user.password, User.password);
+			const passwordEncoded = await validatePassword(password, User.password);
 
 			if (!passwordEncoded) {
 				throw new ThrowsError('Invalid credentials', 400);
@@ -137,7 +139,9 @@ export class UserController implements ControllerInterface {
 				throw new ThrowsError("Missing information to update a user", 400);
 			}
 
-			const User = await userService.getById(userId);
+			const otherUserId: number = userBody.id || userId;
+
+			const User = await userService.getById(otherUserId);
 
 			if (!User) {
 				throw new ThrowsError("User not found", 404);
@@ -147,11 +151,11 @@ export class UserController implements ControllerInterface {
 				throw new ThrowsError("Missing information to update a user", 400);
 			}
 
-			userBody.id = userId;
+			userBody.id = otherUserId;
 			const userData: updateUserDTO = UserMapper.mapUserToUpdateDTO(userBody);
 
 			const userUpdated = await userService.update(userData);
-			if (!userUpdated || userUpdated.id !== userId) {
+			if (!userUpdated || userUpdated.id !== otherUserId) {
 				throw new ThrowsError("Error updating the user", 400);
 			}
 
