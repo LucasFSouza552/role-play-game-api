@@ -36,7 +36,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --watch src --watch index.ts --exec ts-node index.ts",
-    "reset": "npx ts-node scripts/resetMigrations.ts"
+    "reset": "npx ts-node scripts/resetMigrations.ts",
+    "seed": "npx knex seed:run"
   },
   "keywords": [],
   "author": "",
