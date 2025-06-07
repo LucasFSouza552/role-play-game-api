@@ -48,7 +48,7 @@ export class ItemService implements ServiceInterface<createItemDTO, updateItemDT
 
     // Validação dos enums, se enviados
     if (item.type && !Object.values(ItemType).includes(item.type)) {
-      throw new Error("Tipo de item inválido.");
+      throw new Error("Invalid item type.");
     }
 
     // Validação de preço mínimo e máximo, se ambos enviados
@@ -57,7 +57,7 @@ export class ItemService implements ServiceInterface<createItemDTO, updateItemDT
       item.priceMax != null &&
       item.priceMin > item.priceMax
     ) {
-      throw new Error("O preço mínimo não pode ser maior que o preço máximo.");
+      throw new Error("The minimum price cannot be greater than the maximum price.");
     }
 
     const existingItem = await itemsRepo.getById(item.id);

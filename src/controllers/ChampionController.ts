@@ -68,7 +68,7 @@ export class ChampionController implements ControllerInterface {
 			if (!champion.name || !champion.roleId) {
 				res
 					.status(400)
-					.json({ error: "Falta informação necessária para criar um campeão" });
+					.json({ error: "Missing required information to create a champion" });
 				return;
 			}
 
@@ -107,12 +107,12 @@ export class ChampionController implements ControllerInterface {
 			const { strength, dexterity, intelligence, vitality } = req.body;
 
 			if (!userId) {
-				res.status(400).json({ error: "Usuário inválido" });
+				res.status(400).json({ error: "Invalid user" });
 				return;
 			}
 
 			if (!championId) {
-				res.status(400).json({ error: "ID do campeão inválido" });
+				res.status(400).json({ error: "Invalid champion ID" });
 				return;
 			}
 
@@ -124,7 +124,7 @@ export class ChampionController implements ControllerInterface {
 			) {
 				res
 					.status(400)
-					.json({ error: "Nenhum atributo foi enviado para atualizar" });
+					.json({ error: "No attributes were sent to update" });
 				return;
 			}
 
@@ -132,13 +132,13 @@ export class ChampionController implements ControllerInterface {
 			if (status.some((stat) => stat < 0)) {
 				res
 					.status(400)
-					.json({ error: "O valor do status deve ser maior que zero" });
+					.json({ error: "The status value must be greater than zero" });
 				return;
 			}
 
 			const championExists = await championService.getById(championId, userId);
 			if (!championExists) {
-				res.status(404).json({ error: "Campeão não encontrado" });
+				res.status(404).json({ error: "Champion not found" });
 				return;
 			}
 
@@ -148,7 +148,7 @@ export class ChampionController implements ControllerInterface {
 				res
 					.status(400)
 					.json({
-						error: `O total de SP não pode ser maior que ${championExists.sp} pontos`,
+						error: `The total of SP cannot be greater than ${championExists.sp} points`,
 					});
 				return;
 			}
@@ -174,19 +174,25 @@ export class ChampionController implements ControllerInterface {
 		try {
 			const championId = parseInt(req.params.id);
 			const userId: number = req.userId as number;
-			
+
 			if (!userId) {
-				res.status(400).json({ error: "Usuário inválido" });
+				res.status(400).json({ error: "Invalid User" });
 				return;
 			}
 
 			if (!championId) {
-				res.status(400).json({ error: "ID do campeão inválido" });
+				res.status(400).json({ error: "Invalid Champion ID" });
+				return;
+			}
+
+			const championExists = await championService.getById(championId, userId);
+			if (!championExists) {
+				res.status(404).json({ error: "Champion not found" });
 				return;
 			}
 
 			const deletedChampion = await championService.delete(championId,userId);
-			res.status(204).json({ success: deletedChampion });
+			res.status(200).json({ deleted: deletedChampion});
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
 		}
@@ -260,30 +266,30 @@ export class ChampionController implements ControllerInterface {
 			if (!championId || !guildId) {
 				res
 					.status(400)
-					.json({ error: "Falta informação necessária para entrar na guilda" });
+					.json({ error: "Missing required information to join the guild" });
 				return;
 			}
 
 			if (!userId) {
-				res.status(400).json({ error: "Usuário inválido" });
+				res.status(400).json({ error: "Invalid user" });
 				return;
 			}
 
 			const guildExists = await guildService.getById(guildId);
 
 			if (!guildExists) {
-				res.status(404).json({ error: "Guilda não encontrada" });
+				res.status(404).json({ error: "Guild not found" });
 				return;
 			}
 
 			const championExists = await championService.getById(championId, userId);
 			if (!championExists) {
-				res.status(404).json({ error: "Campeão não encontrado" });
+				res.status(404).json({ error: "Champion not found" });
 				return;
 			}
 
 			if (championExists.guildId) {
-				res.status(400).json({ error: "O campeão já pertence a uma guilda" });
+				res.status(400).json({ error: "The champion already belongs to a guild" });
 				return;
 			}
 
@@ -304,25 +310,25 @@ export class ChampionController implements ControllerInterface {
 			const userId: number = req.userId as number;
 
 			if (!championId) {
-				res.status(400).json({ error: "ID do campeão inválido" });
+				res.status(400).json({ error: "Invalid champion ID" });
 				return;
 			}
 
 			if (!userId) {
-				res.status(400).json({ error: "Usuário inválido" });
+				res.status(400).json({ error: "Invalid user" });
 				return;
 			}
 
 			const championExists = await championService.getById(championId, userId);
 			if (!championExists) {
-				res.status(404).json({ error: "Campeão não encontrado" });
+				res.status(404).json({ error: "Champion not found" });
 				return;
 			}
 
 			if (!championExists.guildId) {
 				res
 					.status(400)
-					.json({ error: "O campeão não pertence a nenhuma guilda" });
+					.json({ error: "The champion does not belong to any guild" });
 				return;
 			}
 
@@ -346,7 +352,7 @@ export class ChampionController implements ControllerInterface {
 			const userId = req.userId as number;
 
 			if (!championId) {
-				res.status(400).json({ error: "ID do campeão inválido" });
+				res.status(400).json({ error: "Invalid champion ID" });
 				return;
 			}
 
@@ -364,17 +370,17 @@ export class ChampionController implements ControllerInterface {
 			const { itemId, quantity, price, rarity } = req.body;
 
 			if (!championId) {
-				res.status(400).json({ error: "ID do campeão inválido" });
+				res.status(400).json({ error: "Invalid champion ID" });
 				return;
 			}
 
 			if (!itemId) {
-				res.status(400).json({ error: "ID do item inválido" });
+				res.status(400).json({ error: "Invalid item ID" });
 				return;
 			}
 
 			if (!quantity || isNaN(quantity) || quantity <= 0 || quantity > 999) {
-				res.status(400).json({ error: "Quantidade inválida" });
+				res.status(400).json({ error: "Invalid quantity" });
 				return;
 			}
 
@@ -399,22 +405,22 @@ export class ChampionController implements ControllerInterface {
 			const { itemId, quantity, price } = req.body;
 
 			if (!championId) {
-				res.status(400).json({ error: "ID do campeão inválido" });
+				res.status(400).json({ error: "Invalid champion ID" });
 				return;
 			}
 
 			if (!itemId) {
-				res.status(400).json({ error: "ID do item inválido" });
+				res.status(400).json({ error: "Invalid item ID" });
 				return;
 			}
 
 			if (price === undefined || price < 0) {
-				res.status(400).json({ error: "Preço inválido" });
+				res.status(400).json({ error: "Invalid price" });
 				return;
 			}
 
 			if (!quantity || isNaN(quantity) || quantity < 0) {
-				res.status(400).json({ error: "Quantidade inválida" });
+				res.status(400).json({ error: "Invalid quantity" });
 				return;
 			}
 
@@ -425,6 +431,7 @@ export class ChampionController implements ControllerInterface {
 				quantity,
 				price
 			);
+			
 			res.status(200).json(inventory);
 		} catch (err: any) {
 			res.status(400).json({ error: err.message });

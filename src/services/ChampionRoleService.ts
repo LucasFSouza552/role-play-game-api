@@ -10,7 +10,7 @@ export class ChampionRoleService implements ServiceInterface<createChampionRoleD
 		try {
 			return await roleRepo.getAll(filter);
 		} catch (error) {
-			throw new Error("Error fetching roles: " + error);
+			throw new Error("Error fetching roles");
 		}
 	}
 

@@ -13,7 +13,7 @@ export class GuildService implements ServiceInterface<createGuildDTO, updateGuil
 		try {
 			return await guildRepo.findGuildByName(name);
 		} catch (error) {
-			throw new Error("Erro ao buscar guilda");
+			throw new Error("Error fetching guild");
 		}
 	}
 
@@ -22,16 +22,16 @@ export class GuildService implements ServiceInterface<createGuildDTO, updateGuil
 			const guild = await guildRepo.getById(id);
 			return guild;
 		} catch (error) {
-			throw new Error("Erro ao buscar guilda");
+			throw new Error("Error fetching guild");
 		}
 	}
 
 	async create(guild: Guild) {
 		if (guild.name.trim() === '' || !guild.name) {
-			throw new Error('Nome da Guilda inválido');
+			throw new Error('Invalid guild name');
 		}
 		if (guild.level <= 0) {
-			throw new Error('Level da Guilda inválido');
+			throw new Error('Invalid guild level');
 		}
 		return await guildRepo.create(guild);
 	}

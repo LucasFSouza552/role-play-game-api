@@ -185,10 +185,13 @@ ChampionRoute.get("/:id", championController.getById);
 /**
  * @swagger
  * /api/champions/{id}/skills:
- *   get:
- *     summary: Recuperar todas as habilidades de um campeão
+ *   post:
+ *     summary: Adicionar habilidade ao campeão
+ *     description: Adiciona uma nova habilidade ao campeão especificado pelo ID. O usuário só pode adicionar habilidades aos seus próprios campeões.
  *     tags:
  *       - Campeões (Champions)
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -196,17 +199,26 @@ ChampionRoute.get("/:id", championController.getById);
  *         description: Identificador único do campeão
  *         schema:
  *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               skillId:
+ *                 type: integer
+ *                 description: Identificador da habilidade a ser adicionada.
+ *                 example: 5
  *     responses:
  *       200:
- *         description: Lista de habilidades do campeão
+ *         description: Habilidade adicionada com sucesso.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Skill'
+ *               $ref: '#/components/schemas/Skill'
  *       400:
- *         description: Parâmetros inválidos
+ *         description: Erro na requisição.
  *         content:
  *           application/json:
  *             schema:
@@ -214,9 +226,29 @@ ChampionRoute.get("/:id", championController.getById);
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Invalid champion ID"
+ *                   example: "A skill already exists"
+ *       403:
+ *         description: Acesso proibido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "You do not have permission to access this resource"
+ *       404:
+ *         description: Campeão não encontrado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Champion not found"
  *       500:
- *         description: Erro interno do servidor
+ *         description: Erro interno do servidor.
  *         content:
  *           application/json:
  *             schema:
@@ -226,16 +258,18 @@ ChampionRoute.get("/:id", championController.getById);
  *                   type: string
  *                   example: "Internal server error"
  */
-ChampionRoute.get('/:id/skills', championController.getSkills);
+ChampionRoute.post("/:id/skills", championController.addSkill);
 
 /**
  * @swagger
  * /api/champions:
  *   post:
  *     summary: Criar um novo campeão
- *     description: Cria um novo campeão com as informações fornecidas.
+ *     description: Cria um novo campeão com as informações fornecidas. O usuário autenticado será automaticamente associado ao campeão criado.
  *     tags:
  *       - Campeões (Champions)
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -249,74 +283,38 @@ ChampionRoute.get('/:id/skills', championController.getSkills);
  *               name:
  *                 type: string
  *                 description: Nome do campeão.
+ *                 example: Thorgar
  *               roleId:
  *                 type: integer
- *                 description: Identificador único da classe do campeão.
- *                 default: 1
- *                 minimum: 1
+ *                 description: ID da classe do campeão (role).
+ *                 example: 1
  *     responses:
  *       201:
  *         description: Campeão criado com sucesso.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   description: Identificador único do campeão
- *                 name:
- *                   type: string
- *                   description: Nome do campeão
- *                 roleId:
- *                   type: integer
- *                   description: Função ou classe do campeão
- *                 guildId:
- *                   type: integer
- *                   nullable: true
- *                   description: Identificador da guilda à qual o campeão pertence (pode ser nulo)
- *                 money:
- *                   type: number
- *                   format: float
- *                   description: Quantidade de dinheiro do campeão
- *                 strength:
- *                   type: integer
- *                   description: Atributo de força física do campeão
- *                 dexterity:
- *                   type: integer   
- *                   description: Atributo de agilidade e precisão do campeão
- *                 intelligence:
- *                   type: integer
- *                   description: Atributo de inteligência e magia do campeão
- *                 vitality:
- *                   type: integer
- *                   description: Atributo de resistência e vida máxima do campeão
- *                 hp:
- *                   type: integer
- *                   description: Pontos de vida atuais do campeão
- *                 level:
- *                   type: integer
- *                   description: Nível atual do campeão
- *                 xp:
- *                   type: integer
- *                   description: Experiência acumulada pelo campeão
- *                 xp_max:
- *                   type: integer
- *                   description: Experiência necessária para o próximo nível
- *                 sp:
- *                   type: integer
- *                   description: Pontos de habilidade disponíveis para distribuição
- *                 skills:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Skill'
- *                   description: Lista de habilidades do campeão
- *                 role:
- *                   type: object
- *                   $ref: '#/components/schemas/Role'
- *                   description: Função ou classe do campeão
+ *               $ref: '#/components/schemas/Champion'
+ *             example:
+ *               id: 1
+ *               userId: 1
+ *               name: "Thorgar"
+ *               money: 0
+ *               strength: 0
+ *               dexterity: 0
+ *               intelligence: 0
+ *               vitality: 0
+ *               hp: 100
+ *               mp: 50
+ *               ep: 30
+ *               sp: 15
+ *               level: 1
+ *               xp: 0
+ *               xp_max: 150
+ *               roleId: 1
+ *               guildId: null
  *       400:
- *         description: Erro na requisição.
+ *         description: Erro na requisição (campos obrigatórios ausentes ou inválidos).
  *         content:
  *           application/json:
  *             schema:
@@ -324,9 +322,27 @@ ChampionRoute.get('/:id/skills', championController.getSkills);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Descrição do erro.
+ *                   example: "Falta informação necessária para criar um campeão"
+ *       401:
+ *         description: Usuário não autenticado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid User"
  *       500:
  *         description: Erro interno do servidor.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
  */
 ChampionRoute.post("/", championController.create);
 
@@ -404,36 +420,12 @@ ChampionRoute.post("/", championController.create);
  */
 ChampionRoute.patch("/:id/status", championController.updateStatus);
 
-
 /**
  * @swagger
  * /api/champions/{id}:
  *   delete:
  *     summary: Excluir um campeão
- *     description: Remove um campeão baseado no ID fornecido.
- *     tags:
- *       - Campeões (Champions)
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: Identificador único do campeão
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Campeão excluído com sucesso.
- *       500:
- *         description: Erro interno do servidor.
- */
-ChampionRoute.delete("/:id", championController.delete);
-
-/**
- * @swagger
- * /api/champions/{id}/skill:
- *   post:
- *     summary: Adicionar habilidades ao campeão
- *     description: Adiciona novas habilidades ao campeão especificado pelo ID. O usuário só pode adicionar habilidades aos seus próprios campeões.
+ *     description: Remove um campeão do usuário autenticado baseado no ID fornecido.
  *     tags:
  *       - Campeões (Champions)
  *     security:
@@ -445,25 +437,20 @@ ChampionRoute.delete("/:id", championController.delete);
  *         description: Identificador único do campeão
  *         schema:
  *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               skillId:
- *                 type: integer
- *                 description: Identificador da habilidade a ser adicionada.
+ *           example: 1
  *     responses:
  *       200:
- *         description: Habilidade adicionada com sucesso.
+ *         description: Campeão excluído com sucesso.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Skill'
+ *               type: object
+ *               properties:
+ *                 deleted:
+ *                   type: boolean
+ *                   example: true
  *       400:
- *         description: Erro na requisição.
+ *         description: Requisição inválida (usuário ou ID do campeão inválido).
  *         content:
  *           application/json:
  *             schema:
@@ -471,9 +458,9 @@ ChampionRoute.delete("/:id", championController.delete);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Descrição do erro.
- *       403:
- *         description: Acesso proibido
+ *                   example: "Invalid User"
+ *       401:
+ *         description: Usuário não autenticado.
  *         content:
  *           application/json:
  *             schema:
@@ -481,15 +468,19 @@ ChampionRoute.delete("/:id", championController.delete);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Descrição do erro
- *                   example: "You do not have permission to access this resource"
- *       404:
- *         description: Campeão não encontrado.
+ *                   example: "Invalid User"
  *       500:
  *         description: Erro interno do servidor.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
  */
-ChampionRoute.patch("/:id/skill", championController.addSkill);
-
+ChampionRoute.delete("/:id", championController.delete);
 
 /**
  * @swagger

@@ -63,9 +63,6 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 	}
 
 	async delete(championId: number, userId: number): Promise<boolean> {
-		const a = await db(this.tableName).select("*").where({ id: championId });
-
-		console.log(championId, userId);
 		try {
 			const deletedChampion = await db(this.tableName).where({ id: championId, userId }).del();
 			return deletedChampion == 1;

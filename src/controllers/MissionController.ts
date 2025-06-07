@@ -26,7 +26,7 @@ export class MissionsController implements ControllerInterface {
             const missionsId: number = parseInt(req.params.id);
 
             if (!missionsId) {
-                res.status(400).send({ error: "ID inválido." });
+                res.status(400).send({ error: "Invalid ID." });
                 return;
             }
             const mission = await missionsServices.getById(missionsId);
@@ -41,12 +41,12 @@ export class MissionsController implements ControllerInterface {
             const mission: createMissionDTO = req.body;
 
             if (!mission.title || !mission.difficulty || !mission.description) {
-                res.status(400).json({ error: 'Falta informação necessária para criar uma missão' });
+                res.status(400).json({ error: 'Missing required information to create a mission' });
                 return;
             }
 
             if(!mission.SP && !mission.XP && !mission.money) {
-                res.status(400).json({ error: 'A missão precisa de recompensas' });
+                res.status(400).json({ error: 'The mission needs rewards' });
                 return;
             }
             
@@ -65,13 +65,13 @@ export class MissionsController implements ControllerInterface {
             const mission: updateMissionDTO = req.body;
 
             if (!missionId) {
-                res.status(400).json({ error: 'ID inválido para missão' });
+                res.status(400).json({ error: 'Invalid mission ID' });
             }
 
             const missionExists: Mission = await missionsServices.getById(missionId);
 
             if (!missionExists) {
-                res.status(400).json({ error: 'Missão não encontrada' });
+                res.status(400).json({ error: 'Mission not found' });
                 return;
             }
         
@@ -90,12 +90,12 @@ export class MissionsController implements ControllerInterface {
             const userId = req.userId as number;
 
             if(!userId) {
-                res.status(400).json({ error: 'Usuário inválido.' });
+                res.status(400).json({ error: 'Invalid user.' });
                 return;
             }
 
             if (!missionId) {
-                res.status(400).json({ error: 'ID inválido para missões.' });
+                res.status(400).json({ error: 'Invalid mission ID.' });
                 return;
             }
 

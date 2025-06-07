@@ -9,7 +9,7 @@ export class MissionsService implements ServiceInterface<createMissionDTO, updat
 		try {
 			return await missionRepo.getAll();
 		} catch (error) {
-			throw new Error('Erro ao buscar todas as missões');
+			throw new Error('Error fetching all missions');
 		}
 	}
 
@@ -17,7 +17,7 @@ export class MissionsService implements ServiceInterface<createMissionDTO, updat
 		try {
 			return await missionRepo.getById(id);
 		} catch (error) {
-			throw new Error('Erro ao buscar a missão pelo ID');
+			throw new Error('Error fetching mission by ID');
 		}
 	}
 
@@ -30,17 +30,17 @@ export class MissionsService implements ServiceInterface<createMissionDTO, updat
 			}
 
 			if (!mission.title || mission.title.trim() === '') {
-				throw new Error('Título não encontrado!');
+				throw new Error('Title not found!');
 			}
 			if (!isValidMissionDifficult(mission.difficulty)) {
-				throw new Error('Dificuldade inválida!');
+				throw new Error('Invalid difficulty!');
 			}
 			if (!mission.description || mission.description.trim() === '') {
-				throw new Error('Descrição vazia!');
+				throw new Error('Empty description!');
 			}
 			return await missionRepo.create(mission);
 		} catch (error) {
-			throw new Error('Erro ao criar a missão');
+			throw new Error('Error creating mission');
 		}
 	}
 
@@ -48,7 +48,7 @@ export class MissionsService implements ServiceInterface<createMissionDTO, updat
 		try {
 			return await missionRepo.update(mission);
 		} catch (error) {
-			throw new Error('Erro ao atualizar a missão');
+			throw new Error('Error updating mission');
 		}
 	}
 
@@ -56,7 +56,7 @@ export class MissionsService implements ServiceInterface<createMissionDTO, updat
 		try {
 			return await missionRepo.delete(id, userId);
 		} catch (error) {
-			throw new Error('Erro ao deletar a missão');
+			throw new Error('Error deleting mission');
 		}
 	}
 }

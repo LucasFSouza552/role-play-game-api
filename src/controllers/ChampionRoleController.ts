@@ -35,14 +35,14 @@ export class ChampionRoleController implements ControllerInterface {
             const userId: number = req.userId as number;
 
             if (!roleId) {
-                res.status(400).send({ error: "ID é inválido" })
+                res.status(400).send({ error: "Invalid ID" })
                 return;
             }
             
             const role = await championRoleService.getById(roleId);
             res.status(200).json(role);
         } catch (error) {
-            throw new Error("Erro ao buscar classe");
+            throw new Error("Error fetching role");
         }
     }
 
@@ -54,7 +54,7 @@ export class ChampionRoleController implements ControllerInterface {
 
             if (missingFields.length > 0) {
                 res.status(400).send({ 
-                    error: "Campos obrigatórios faltando", 
+                    error: "Missing required fields", 
                     missingFields: missingFields 
                 });
                 return;
