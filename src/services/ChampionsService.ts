@@ -22,6 +22,7 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
+			console.error(error);
 			throw new ThrowsError("Internal server error", 500);
 		}
 	}

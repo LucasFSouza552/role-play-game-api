@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import { ChampionService } from "../services/ChampionsService";
 import { ChampionSkill } from "../models/ChampionSkill";
 import { GuildService } from "../services/GuildService";
-import { FilterChampion, FilterDefault } from "../models/Filters";
+import { FilterChampion } from "../models/Filters";
 import { ControllerInterface } from "../interfaces/controllerInterface";
-import {
+import {	
 	ChampionDTO,
 	createChampionDTO,
 	updateChampionDTO,
@@ -16,6 +16,8 @@ import { ChampionMapper } from "../utils/mapppers/championMapping";
 import { createInventoryDTO } from "../DTOS/InventoryDTO";
 import filterConfig from "../utils/FilterConfig";
 
+import { ThrowsError } from "../errors/ThrowsError";
+
 const championService = new ChampionService();
 const guildService = new GuildService();
 const championInventoryService = new ChampionInventoryService();
@@ -23,9 +25,12 @@ const championInventoryService = new ChampionInventoryService();
 export class ChampionController implements ControllerInterface {
 	async getAll(req: Request, res: Response): Promise<void> {
 		try {
-			const filters: FilterChampion = filterConfig(req.query);
+			const filters: FilterChampion = filterConfig({...req.query, userId: req.userId});
+			
 			const champions: ChampionDTO[] = await championService.getAll(filters);
-
+			if(!champions) {
+				throw new ThrowsError("Champions not found", 404);
+			}
 			res.status(200).json({ champions: champions, length: champions.length });
 		} catch (err: any) {
 			res.status(500).json({ error: err.message });
