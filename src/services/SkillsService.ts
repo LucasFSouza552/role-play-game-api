@@ -2,6 +2,7 @@ import { createSkillDTO, updateSkillDTO } from "../DTOS/SkillDTO";
 import { ThrowsError } from "../errors/ThrowsError";
 import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { ChampionSkill } from "../models/ChampionSkill";
+import { Filter } from "../models/Filters";
 import { skillRepo } from "../repositories/RepositoryManager";
 
 export class SkillsService implements RepositoryInterface<createSkillDTO, updateSkillDTO, ChampionSkill> {
@@ -47,9 +48,9 @@ export class SkillsService implements RepositoryInterface<createSkillDTO, update
             throw new ThrowsError("Internal server error", 500);
         }
     }
-    async getAll(): Promise<ChampionSkill[]> {
+    async getAll(filter: Filter): Promise<ChampionSkill[]> {
         try {
-            const skills = await skillRepo.getAll();
+            const skills = await skillRepo.getAll(filter);
             if (!skills) {
                 throw new ThrowsError("Skills not found", 404);
             }

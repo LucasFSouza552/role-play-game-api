@@ -3,14 +3,19 @@ import { createSkillDTO, updateSkillDTO } from "../DTOS/SkillDTO";
 import { ThrowsError } from "../errors/ThrowsError";
 import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { ChampionSkill } from "../models/ChampionSkill";
+import { Filter } from "../models/Filters";
 
 export class SkillRepository implements RepositoryInterface<createSkillDTO, updateSkillDTO, ChampionSkill> {
 
     private tableName = 'champion_skills';
 
-    async getAll(): Promise<ChampionSkill[]> {
+    async getAll(filter: Filter): Promise<ChampionSkill[]> {
         try {
-            const skills = await db(this.tableName).select('*');
+            const skills = await db(this.tableName)
+                .select('*')
+                .limit(filter.limit)
+				.offset((filter.page - 1) * filter.limit)
+				.orderBy(filter.orderBy, filter.order);;
             if (!skills) {
                 throw new ThrowsError("Skills not found", 404);
             }

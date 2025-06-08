@@ -19,7 +19,7 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 					if (filter.name) {
 						query.whereILike('champion_roles.name', `%${filter.name}%`);
 					}
-				});
+				}).orderBy(filter.orderBy, filter.order);
 
 			if (!roles) {
 				throw new ThrowsError("Roles not found", 404);
