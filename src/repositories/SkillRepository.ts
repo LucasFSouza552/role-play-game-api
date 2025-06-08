@@ -1,5 +1,6 @@
 import db from "../database/db";
 import { createSkillDTO, updateSkillDTO } from "../DTOS/SkillDTO";
+import { ThrowsError } from "../errors/ThrowsError";
 import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { ChampionSkill } from "../models/ChampionSkill";
 
@@ -9,17 +10,31 @@ export class SkillRepository implements RepositoryInterface<createSkillDTO, upda
 
     async getAll(): Promise<ChampionSkill[]> {
         try {
-            return await db(this.tableName).select('*');
+            const skills = await db(this.tableName).select('*');
+            if (!skills) {
+                throw new ThrowsError("Skills not found", 404);
+            }
+            return skills;
         } catch (error) {
-            throw new Error('Erro ao buscar todas as habilidades');
+            if (error instanceof ThrowsError) {
+                throw error;
+            }
+            throw new ThrowsError("Error while fetching all skills", 500);
         }
     }
 
     async getById(id: number): Promise<ChampionSkill> {
         try {
-            return await db(this.tableName).where({ id }).first();
+            const skill = await db(this.tableName).where({ id }).first();
+            if (!skill) {
+                throw new ThrowsError("Skill not found", 404);
+            }
+            return skill;
         } catch (error) {
-            throw new Error('Erro ao buscar habilidade pelo id');
+            if (error instanceof ThrowsError) {
+                throw error;
+            }
+            throw new ThrowsError("Error while fetching skill by id", 500);
         }
     }
 
@@ -27,11 +42,14 @@ export class SkillRepository implements RepositoryInterface<createSkillDTO, upda
         try {
             const Skill = await db(this.tableName).insert(skill).returning('*');
             if (!Skill || Skill.length === 0) {
-                throw new Error('Habilidade não criada');
+                throw new ThrowsError("Skill not created", 404);
             }
             return Skill[0];
         } catch (error) {
-            throw new Error('Erro ao criar habilidade');
+            if (error instanceof ThrowsError) {
+                throw error;
+            }
+            throw new ThrowsError("Error while creating skill", 500);
         }
     }
 
@@ -42,20 +60,29 @@ export class SkillRepository implements RepositoryInterface<createSkillDTO, upda
                 .update(skill)
                 .returning('*');
             if (!updatedSkill || updatedSkill.length === 0) {
-                throw new Error('Habilidade não atualizada');
+                throw new ThrowsError("Skill not updated", 404);
             }
             return updatedSkill[0];
         } catch (error) {
-            throw new Error('Erro ao atualizar habilidade');
+            if (error instanceof ThrowsError) {
+                throw error;
+            }
+            throw new ThrowsError("Error while updating skill", 500);
         }
     }
 
     async delete(id: number): Promise<boolean> {
         try {
             const deletedSkill = await db(this.tableName).where({ id }).del();
+            if (!deletedSkill) {
+                throw new ThrowsError("Skill not deleted", 404);
+            }
             return deletedSkill == 1;
         } catch (error) {
-            throw new Error('Erro ao deletar habilidade');
+            if (error instanceof ThrowsError) {
+                throw error;
+            }
+            throw new ThrowsError("Error while deleting skill", 500);
         }
     }
 }

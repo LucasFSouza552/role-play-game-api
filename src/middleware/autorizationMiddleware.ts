@@ -16,6 +16,7 @@ export default function authorizationMiddleware(allowedRoles: string[]) {
             const userProfile = await userService.getById(userId);
 
             if (!allowedRoles.includes(userProfile.role)) {
+                console.log(userProfile.role, allowedRoles);
                 throw new ThrowsError("You do not have permission to access this resource", 403);
             }
             req.user = userProfile;

@@ -2,33 +2,58 @@ import { RepositoryInterface } from './../interfaces/repositoryInterface';
 import db from "../database/db";
 import { Guild } from "../models/Guild";
 import { createGuildDTO, updateGuildDTO } from '../DTOS/GuildDTO';
+import { ThrowsError } from '../errors/ThrowsError';
 
 export class GuildRepository implements RepositoryInterface<createGuildDTO, updateGuildDTO, Guild> {
 	private tablename = 'guilds';
 
 	async getAll(): Promise<Guild[]> {
 		try {
-			return await db(this.tablename).select('*');
+			const guilds = await db(this.tablename).select('*');
+
+			if (!guilds) {
+				throw new ThrowsError("Guilds not found", 404);
+			}
+
+			return guilds;
 		} catch (error) {
-			throw new Error('Erro ao buscar todas as Guildas');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while fetching all guilds", 500);
 		}
 	}
 	async getById(id: number): Promise<Guild> {
 		try {
 			const guild =  await db(this.tablename).where({ id }).first();
 
+			if (!guild) {
+				throw new ThrowsError("Guild not found", 404);
+			}
+
 			return guild;
 		} catch (error) {
-			throw new Error('Erro ao buscar a Guilda pelo ID');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while fetching guild by id", 500);
 		}
 	}
 
 	async create(guild: createGuildDTO): Promise<Guild> {
 		try {
 			const newGuild = await db(this.tablename).insert(guild).returning('*');
+
+			if (!newGuild || newGuild.length === 0) {
+				throw new ThrowsError("Guild not created", 404);
+			}
+
 			return newGuild[0];
 		} catch (error) {
-			throw new Error('Erro ao criar Guilda');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while creating guild", 500);
 		}
 	}
 
@@ -39,26 +64,50 @@ export class GuildRepository implements RepositoryInterface<createGuildDTO, upda
 				.update(guild)
 				.returning('*');
 
+			if (!updatedGuild || updatedGuild.length === 0) {
+				throw new ThrowsError("Guild not updated", 404);
+			}
+
 			return updatedGuild[0];
 		} catch (error) {
-			throw new Error('Erro ao atualizar a Guilda');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while updating guild", 500);
 		}
 	}
 
 	async delete(id: number): Promise<boolean> {
 		try {
 			const deletedGuild = await db(this.tablename).where({ id }).del();
+
+			if (!deletedGuild) {
+				throw new ThrowsError("Guild not deleted", 404);
+			}
+
 			return deletedGuild == 1;
 		} catch (error) {
-			throw new Error('Erro ao deletar a Guilda');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while deleting guild", 500);
 		}
 	}
 
 	async findGuildByName(name: String): Promise<Guild> {
 		try {
-			return await db(this.tablename).where({ name }).first();
+			const guild = await db(this.tablename).where({ name }).first();
+
+			if (!guild) {
+				throw new ThrowsError("Guild not found", 404);
+			}
+
+			return guild;
 		} catch (error) {
-			throw new Error('Erro ao buscar a Guilda pelo nome');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while fetching guild by name", 500);
 		}
 	}
 

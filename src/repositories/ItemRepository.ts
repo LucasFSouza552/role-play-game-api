@@ -3,11 +3,12 @@ import { createItemDTO, updateItemDTO } from "../DTOS/ItemDTO";
 import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { FilterItem } from "../models/Filters";
 import { Item } from "../models/Item";
+import { ThrowsError } from "../errors/ThrowsError";
 
-// Responsável por acessar e manipular os dados dos itens no banco
+
 export class ItemRepository implements RepositoryInterface<createItemDTO, updateItemDTO, Item> {
 	private tableName = "items";
-	// Busca todos os itens, aplicando filtros opcionais
+	
 	async getAll(filter: FilterItem): Promise<Item[]> {
 		try {
 			const allItems = await db(this.tableName)
@@ -25,37 +26,52 @@ export class ItemRepository implements RepositoryInterface<createItemDTO, update
 						query.where("items.priceMax", "<=", filter.maxPrice);
 					}
 				}).orderBy(filter.orderBy, filter.order);
+
+			if (!allItems) {
+				throw new ThrowsError("Items not found", 404);
+			}
+
 			return allItems;
 		} catch (error) {
-			throw new Error("Error fetching items");
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while fetching items", 500);
 		}
 	}
 
-	// Busca um item pelo ID
+	
 	async getById(id: number): Promise<Item> {
 		try {
 			const item = await db(this.tableName).where({ id }).first();
-			if (!item) throw new Error("Item not found");
+			if (!item) {
+				throw new ThrowsError("Item not found", 404);
+			}
 			return item;
 		} catch (error) {
-			throw new Error("Error fetching item");
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while fetching item", 500);
 		}
 	}
 
-	// Cria um novo item no banco
+	
 	async create(item: createItemDTO): Promise<Item> {
 		try {
 			const newItem = await db(this.tableName).insert(item).returning("*");
 			if (!newItem || newItem.length === 0) {
-				throw new Error("Item not created");
+				throw new ThrowsError("Item not created", 404);
 			}
 			return newItem[0];
 		} catch (error) {
-			throw new Error("Error creating item");
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while creating item", 500);
 		}
 	}
 
-	// Atualiza um item existente pelo ID
 	async update(item: updateItemDTO): Promise<Item> {
 		try {
 			const updatedItem = await db(this.tableName)
@@ -63,21 +79,31 @@ export class ItemRepository implements RepositoryInterface<createItemDTO, update
 				.update(item)
 				.returning("*");
 			if (!updatedItem || updatedItem.length === 0) {
-				throw new Error("Item not updated");
+				throw new ThrowsError("Item not updated", 404);
 			}
 			return updatedItem[0];
 		} catch (error) {
-			throw new Error("Error updating item");
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while updating item", 500);
 		}
 	}
 
-	// Deleta um item pelo ID
 	async delete(id: number): Promise<boolean> {
 		try {
 			const deletedItem = await db(this.tableName).where({ id }).del();
+
+			if (!deletedItem) {
+				throw new ThrowsError("Item not deleted", 404);
+			}
+
 			return deletedItem == 1;
 		} catch (error) {
-			throw new Error("Erro ao deletar item");
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while deleting item", 500);
 		}
 	}
 }

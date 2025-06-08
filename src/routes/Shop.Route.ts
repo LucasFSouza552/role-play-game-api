@@ -26,6 +26,7 @@ const shopController = new ShopController();
  *         name: type
  *         schema:
  *           type: string
+ *           enum: [Spells, Armour, Weapons, Potions]
  *         description: Filtrar lojas pelo tipo
  *       - in: query
  *         name: page
@@ -72,6 +73,16 @@ const shopController = new ShopController();
  *                 error:
  *                   type: string
  *                   example: "Invalid token. Use format Bearer <token>"
+ *       404:
+ *         description: Lojas não encontradas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Shops not found"
  *       500:
  *         description: Erro interno do servidor
  *         content:
@@ -83,7 +94,7 @@ const shopController = new ShopController();
  *                   type: string
  *                   example: "Error fetching shops"
  */
-shopRoute.get('/', AuthMiddleware, shopController.getAll);
+shopRoute.get('/', shopController.getAll);
 
 /**
  * @swagger
@@ -150,14 +161,14 @@ shopRoute.get('/', AuthMiddleware, shopController.getAll);
  *                   type: string
  *                   example: "Error fetching shop"
  */
-shopRoute.get('/:id', AuthMiddleware, shopController.getById);
+shopRoute.get('/:id', shopController.getById);
 
 /**
  * @swagger
  * /api/shop:
  *   post:
  *     summary: Criar nova loja
- *     description: Cria uma nova loja no sistema.
+ *     description: Cria uma nova loja no sistema. Apenas administradores podem criar lojas.
  *     tags:
  *       - Lojas (Shops)
  *     security:
@@ -167,7 +178,18 @@ shopRoute.get('/:id', AuthMiddleware, shopController.getById);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Shop'
+ *             type: object
+ *             required:
+ *               - name
+ *               - type
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Nome da loja
+ *               type:
+ *                 type: string
+ *                 enum: [Spells, Armour, Weapons, Potions]
+ *                 description: Tipo da loja
  *     responses:
  *       201:
  *         description: Loja criada com sucesso
@@ -177,10 +199,44 @@ shopRoute.get('/:id', AuthMiddleware, shopController.getById);
  *               $ref: '#/components/schemas/Shop'
  *       400:
  *         description: Dados inválidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Missing required fields"
  *       401:
- *         description: Token inválido
+ *         description: Não autorizado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid user"
  *       403:
  *         description: Acesso proibido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "You do not have permission to access this resource"
+ *       404:
+ *         description: Erro ao criar loja
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Error creating shop"
  *       500:
  *         description: Erro interno do servidor
  *         content:
@@ -190,7 +246,7 @@ shopRoute.get('/:id', AuthMiddleware, shopController.getById);
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Error creating shop"
+ *                   example: "Internal server error"
  */
 shopRoute.post('/', AuthMiddleware, authorizationMiddleware(["admin"]), shopController.create);
 
@@ -199,7 +255,7 @@ shopRoute.post('/', AuthMiddleware, authorizationMiddleware(["admin"]), shopCont
  * /api/shop/{id}:
  *   patch:
  *     summary: Atualizar loja
- *     description: Atualiza os dados de uma loja existente.
+ *     description: Atualiza os dados de uma loja existente. Apenas administradores podem atualizar lojas. O tipo da loja não pode ser alterado.
  *     tags:
  *       - Lojas (Shops)
  *     security:
@@ -210,13 +266,21 @@ shopRoute.post('/', AuthMiddleware, authorizationMiddleware(["admin"]), shopCont
  *         required: true
  *         schema:
  *           type: integer
- *         description: ID da loja
+ *         description: ID da loja a ser atualizada
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Shop'
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Novo nome da loja
+ *               type:
+ *                 type: string
+ *                 enum: [Spells, Armour, Weapons, Potions]
+ *                 description: Tipo da loja (não pode ser alterado)
  *     responses:
  *       200:
  *         description: Loja atualizada com sucesso
@@ -226,12 +290,44 @@ shopRoute.post('/', AuthMiddleware, authorizationMiddleware(["admin"]), shopCont
  *               $ref: '#/components/schemas/Shop'
  *       400:
  *         description: Dados inválidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "You cannot change the type of a shop"
  *       401:
- *         description: Token inválido
+ *         description: Não autorizado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid user"
  *       403:
  *         description: Acesso proibido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "You do not have permission to access this resource"
  *       404:
  *         description: Loja não encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Shop not found"
  *       500:
  *         description: Erro interno do servidor
  *         content:
@@ -241,7 +337,7 @@ shopRoute.post('/', AuthMiddleware, authorizationMiddleware(["admin"]), shopCont
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Error updating shop"
+ *                   example: "Internal server error"
  */
 shopRoute.patch('/:id', AuthMiddleware, authorizationMiddleware(["admin"]), shopController.update);
 
@@ -250,7 +346,7 @@ shopRoute.patch('/:id', AuthMiddleware, authorizationMiddleware(["admin"]), shop
  * /api/shop/{id}:
  *   delete:
  *     summary: Excluir loja
- *     description: Remove uma loja do sistema.
+ *     description: Remove uma loja do sistema. Apenas administradores podem excluir lojas.
  *     tags:
  *       - Lojas (Shops)
  *     security:
@@ -261,7 +357,7 @@ shopRoute.patch('/:id', AuthMiddleware, authorizationMiddleware(["admin"]), shop
  *         required: true
  *         schema:
  *           type: integer
- *         description: ID da loja
+ *         description: ID da loja a ser excluída
  *     responses:
  *       200:
  *         description: Loja excluída com sucesso
@@ -284,11 +380,35 @@ shopRoute.patch('/:id', AuthMiddleware, authorizationMiddleware(["admin"]), shop
  *                   type: string
  *                   example: "Invalid ID"
  *       401:
- *         description: Token inválido
+ *         description: Não autorizado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid user"
  *       403:
  *         description: Acesso proibido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "You do not have permission to access this resource"
  *       404:
  *         description: Loja não encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Error deleting shop"
  *       500:
  *         description: Erro interno do servidor
  *         content:
@@ -298,7 +418,7 @@ shopRoute.patch('/:id', AuthMiddleware, authorizationMiddleware(["admin"]), shop
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Error deleting shop"
+ *                   example: "Internal server error"
  */
 shopRoute.delete('/:id', AuthMiddleware, authorizationMiddleware(["admin"]), shopController.delete);
 
@@ -338,8 +458,24 @@ shopRoute.delete('/:id', AuthMiddleware, authorizationMiddleware(["admin"]), sho
  *                   example: "Invalid ID"
  *       401:
  *         description: Token inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid user"
  *       404:
- *         description: Loja não encontrada
+ *         description: Inventário não encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Inventory not found"
  *       500:
  *         description: Erro interno do servidor
  *         content:
@@ -351,7 +487,7 @@ shopRoute.delete('/:id', AuthMiddleware, authorizationMiddleware(["admin"]), sho
  *                   type: string
  *                   example: "Error fetching shop inventory"
  */
-shopRoute.get('/:id/inventory', AuthMiddleware, shopController.getInventory);
+shopRoute.get('/:id/inventory', shopController.getInventory);
 
 /**
  * @swagger
@@ -415,8 +551,24 @@ shopRoute.get('/:id/inventory', AuthMiddleware, shopController.getInventory);
  *                   example: "Number of items has to be in 1 to 999"
  *       401:
  *         description: Token inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid token. Use format Bearer <token>"
  *       404:
- *         description: Loja não encontrada
+ *         description: Recurso não encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Item not found in shop inventory"
  *       500:
  *         description: Erro interno do servidor
  *         content:
@@ -426,7 +578,7 @@ shopRoute.get('/:id/inventory', AuthMiddleware, shopController.getInventory);
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Not enough money"
+ *                   example: "Internal server error"
  */
 shopRoute.post('/:id/purchase', AuthMiddleware, shopController.purchase);
 
@@ -492,8 +644,24 @@ shopRoute.post('/:id/purchase', AuthMiddleware, shopController.purchase);
  *                   example: "Number of items has to be in 1 to 999"
  *       401:
  *         description: Token inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid token. Use format Bearer <token>"
  *       404:
- *         description: Loja não encontrada
+ *         description: Recurso não encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Item not found in champion inventory"
  *       500:
  *         description: Erro interno do servidor
  *         content:
@@ -503,7 +671,7 @@ shopRoute.post('/:id/purchase', AuthMiddleware, shopController.purchase);
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Not enough items in champion inventory"
+ *                   example: "Internal server error"
  */
 shopRoute.post('/:id/sell', AuthMiddleware, shopController.sell);
 

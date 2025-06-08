@@ -1,6 +1,7 @@
 import db from "../database/db";
 import { updateChampionDTO } from "../DTOS/ChampionDTO";
 import { createChampionRoleDTO, updateChampionRoleDTO } from "../DTOS/ChampionRoleDTO";
+import { ThrowsError } from "../errors/ThrowsError";
 import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { ChampionRole } from "../models/ChampionRole";
 import { FilterChampionRole } from "../models/Filters";
@@ -10,7 +11,7 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 
 	async getAll(filter: FilterChampionRole): Promise<ChampionRole[]> {
 		try {
-			return await db(this.tableName)
+			const roles = await db(this.tableName)
 				.select('*')
 				.limit(filter.limit)
 				.offset((filter.page - 1) * filter.limit)
@@ -19,55 +20,100 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 						query.whereILike('champion_roles.name', `%${filter.name}%`);
 					}
 				});
+
+			if (!roles) {
+				throw new ThrowsError("Roles not found", 404);
+			}
+
+			return roles;
 		} catch (error) {
-			throw new Error('Error while fetching roles');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while fetching roles", 500);
 		}
 	}
 
 	async getById(id: number): Promise<ChampionRole> {
 		try {
-			return await db(this.tableName)
+			const role = await db(this.tableName)
 				.where({ id })
 				.select('*').first();
+
+			if (!role) {
+				throw new ThrowsError("Role not found", 404);
+			}
+
+			return role;
 		} catch (error) {
-			throw new Error('Error while searching for role by id');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while searching for role by id", 500);
 		}
 	}
 
 	async findByName(name: string) {
 		try {
-			return await db(this.tableName)
+			const role = await db(this.tableName)
 				.whereILike({ name })
 				.first();
+
+			if (!role) {
+				throw new ThrowsError("Role not found", 404);
+			}
+
+			return role;
 		} catch (error) {
-			throw new Error('Error while searching for role by name');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while searching for role by name", 500);
 		}
 	}
 
 	async create(role: createChampionRoleDTO): Promise<ChampionRole> {
 		try {
 			const createdRole = await db(this.tableName).insert(role).returning('*');
+			if (!createdRole || createdRole.length === 0) {
+				throw new ThrowsError("Role not created", 404);
+			}
 			return createdRole[0];
 		} catch (error) {
-			throw new Error('Error while creating role');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while creating role", 500);
 		}
 	}
 
 	async update(championRole: updateChampionRoleDTO): Promise<updateChampionDTO> {
 		try {
 			const updatedRole = await db(this.tableName).where({ id: championRole.id }).update(championRole).returning('*');
+			if (!updatedRole || updatedRole.length === 0) {
+				throw new ThrowsError("Role not updated", 404);
+			}
 			return updatedRole[0];
 		} catch (error) {
-			throw new Error('Error while updating role');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while updating role", 500);
 		}
 	}
 
 	async delete(id: number): Promise<boolean> {
 		try {
 			const deletedRole = await db(this.tableName).where({ id }).del();
+			if (!deletedRole) {
+				throw new ThrowsError("Role not deleted", 404);
+			}
 			return deletedRole == 1;
 		} catch (error) {
-			throw new Error('Error while deleting role');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while deleting role", 500);
 		}
 	}
 }

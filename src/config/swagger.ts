@@ -290,20 +290,14 @@ const swaggerOptions = {
               type: "integer",
               description: "ID da loja"
             },
-            ownerId: {
-              type: "integer",
-              description: "Referência a UserId"
-            },
             name: {
               type: "string",
               description: "Nome da loja"
             },
-            inventory: {
-              type: "array",
-              description: "Inventário da loja",
-              items: {
-                $ref: "#/components/schemas/Inventory"
-              }
+            type: {
+              type: "string",
+              description: "Tipo da loja",
+              enum: ["Spells", "Armour", "Weapons", "Potions"]
             }
           }
         }

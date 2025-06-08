@@ -75,7 +75,7 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 			const deletedChampion = await championRepo.delete(championId, userId);
 			return deletedChampion;
 		} catch (error) {
-			throw new Error('Error deleting champion');	
+			throw new Error('Error deleting champion'); 
 		}
 	}
 

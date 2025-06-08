@@ -80,7 +80,7 @@ export class ChampionController implements ControllerInterface {
 			champion.userId = userId;
 
 			const championData: createChampionDTO = ChampionMapper.mapCreateChampionToDTO(champion);
-
+			
 			const newChampion: ChampionDTO = await championService.create(championData);
 
 			const inventoryData: createInventoryDTO = InventoryMapper.mapCreateInventoryToDTO({

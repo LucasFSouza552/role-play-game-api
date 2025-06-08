@@ -36,7 +36,7 @@ export class UserRepository implements RepositoryInterface<createUserDTO, update
 
 	async getById(id: number): Promise<user> {
 		try {
-			const user = await db(this.tableName).where({ id }).first();
+			const user = await db(this.tableName).select('id', 'name', 'role', 'email').where({ id }).first();
 			if(!user) {
 				throw new ThrowsError('User not found', 404);
 			}

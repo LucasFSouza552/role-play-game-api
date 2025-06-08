@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { ControllerInterface } from "../interfaces/controllerInterface";
 import { ShopService } from "../services/ShopService";
 import { FilterDefault, FilterShop } from "../models/Filters";
+import { ThrowsError } from "../errors/ThrowsError";
+import { ItemType } from "../models/enums/ItemType";
 
 const shopService = new ShopService();
 
@@ -10,13 +12,19 @@ export class ShopController implements ControllerInterface {
 		try {
 			const shopId = parseInt(req.params.id);
 			if (!shopId) {
-				res.status(400).json({ error: "Invalid ID" });
-				return;
+				throw new ThrowsError("Invalid ID", 400);
 			}
 			const inventory = await shopService.getInventory(shopId);
+			if(!inventory) {
+				throw new ThrowsError("Inventory not found", 404);
+			}
 			res.status(200).json(inventory);
 		} catch (error: any) {
-			res.status(500).json({ error: `Error fetching shop inventory: ${error.message}` });
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: "Internal server error" });
+			}
 		}
 	}
 
@@ -24,51 +32,99 @@ export class ShopController implements ControllerInterface {
 		try {
 			const filter: FilterShop = { ...FilterDefault, ...req.query };
 			const shops = await shopService.getAll(filter);
+			if(!shops) {
+				throw new ThrowsError("Shops not found", 404);
+			}
 			res.status(200).json(shops);
 		} catch (error) {
-			res.status(500).json({ error: "Error fetching shops" });
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: "Internal server error" });
+			}
 		}
 	}
 	async getById(req: Request, res: Response): Promise<void> {
 		try {
 			const id = parseInt(req.params.id);
 			if (!id) {
-				res.status(400).json({ error: "Invalid ID" });
-				return;
+				throw new ThrowsError("Invalid ID", 400);
 			}
 			const shop = await shopService.getById(id);
+			if(!shop) {
+				throw new ThrowsError("Shop not found", 404);
+			}
 			res.status(200).json(shop);
 		} catch (error) {
-			res.status(500).json({ error: "Error fetching shop" });
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: "Internal server error" });
+			}
 		}
 	}
 	async create(req: Request, res: Response): Promise<void> {
 		try {
-			const shop = await shopService.create(req.body);
+			const { name, type } = req.body;
+			if(!name || !type) {
+				throw new ThrowsError("Missing required fields", 400);
+			}
+			if(!Object.values(ItemType).includes(type as ItemType)) {
+				throw new ThrowsError("Invalid type", 400);
+			}
+
+			const shop = await shopService.create({ name, type });
+			if(!shop) {
+				throw new ThrowsError("Error creating shop", 404);
+			}
 			res.status(201).json(shop);
 		} catch (error) {
-			res.status(500).json({ error: "Error creating shop" });
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: "Internal server error" });
+			}
 		}
 	}
 	async update(req: Request, res: Response): Promise<void> {
 		try {
-			const shop = await shopService.update(req.body);
+			const { id, name, type } = req.body;
+			if(!id || !name || !type) {
+				throw new ThrowsError("Missing required fields", 400);
+			}
+			if(!Object.values(ItemType).includes(type as ItemType)) {
+				throw new ThrowsError("Invalid type", 400);
+			}
+			const shop = await shopService.update({ id, name, type });
+			if(!shop) {
+				throw new ThrowsError("Error updating shop", 404);
+			}
 			res.status(200).json(shop);
 		} catch (error) {
-			res.status(500).json({ error: "Error updating shop" });
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: "Internal server error" });
+			}
 		}
 	}
 	async delete(req: Request, res: Response): Promise<void> {
 		try {
 			const id = parseInt(req.params.id);
 			if (!id) {
-				res.status(400).json({ error: "Invalid ID" });
-				return;
+				throw new ThrowsError("Invalid ID", 400);
 			}
 			const shop = await shopService.delete(id);
+			if(!shop) {
+				throw new ThrowsError("Error deleting shop", 404);
+			}
 			res.status(200).json(shop);
 		} catch (error: any) {
-			res.status(500).json({ error: error.message });
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: "Internal server error" });
+			}
 		}
 	}
 
@@ -81,18 +137,15 @@ export class ShopController implements ControllerInterface {
 			const quantity = Number(req.body.quantity);
 
 			if (!shopId || !userId) {
-				res.status(400).json({ error: 'Invalid ID' });
-				return;
+				throw new ThrowsError("Invalid ID", 400);
 			}
 
 			if (!championId || !itemId) {
-				res.status(400).json({ error: 'Invalid ID' });
-				return;
+				throw new ThrowsError("Invalid ID", 400);
 			}
 
-			if (isNaN(quantity) || quantity < 1 || quantity > 999) {
-				res.status(400).json({ error: 'Number of items has to be in 1 to 999' });
-				return;
+			if (!quantity || isNaN(quantity) || quantity < 1 || quantity > 999) {
+				throw new ThrowsError("Number of items has to be in 1 to 999", 400);
 			}
 
 			const updatedShop = await shopService.sell(
@@ -105,7 +158,11 @@ export class ShopController implements ControllerInterface {
 
 			res.status(200).json(updatedShop);
 		} catch (error: any) {
-			throw new Error("Error selling item: " + error.message);
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: "Internal server error" });
+			}
 		}
 	}
 
@@ -115,19 +172,16 @@ export class ShopController implements ControllerInterface {
 			const shopId = parseInt(req.params.id);
 
 			if (!shopId || !userId) {
-				res.status(400).json({ error: 'Invalid ID' });
-				return;
+				throw new ThrowsError("Invalid ID", 400);
 			}
 
 			const { championId, itemId, quantity } = req.body;
 
 			if (!championId || !itemId) {
-				res.status(400).json({ error: 'Invalid ID' });
-				return;
+				throw new ThrowsError("Invalid ID", 400);
 			}
 			if (!quantity || isNaN(quantity) || quantity <= 0 || quantity > 999) {
-				res.status(400).json({ error: 'Number of items has to be in 1 to 999' });
-				return;
+				throw new ThrowsError("Number of items has to be in 1 to 999", 400);
 			}
 
 			const updatedShop = await shopService.purchase(
@@ -137,12 +191,16 @@ export class ShopController implements ControllerInterface {
 				itemId,
 				quantity
 			);
-			
+
 			res.status(200).json(updatedShop);
 
 		} catch (error: any) {
-			throw new Error(error.message);
-		}
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: "Internal server error" });
+			}
+		} 
 	}
 
 }

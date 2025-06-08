@@ -8,83 +8,149 @@ import { InventoryItens } from "../models/InventoryItens";
 import { FilterShop } from "../models/Filters";
 import { Inventory } from "../models/Inventory";
 import db from '../database/db';
+import { ThrowsError } from "../errors/ThrowsError";
 
 export class ShopService implements ServiceInterface<createShopDTO, updateShopDTO, Shop> {
 	async getInventory(shopId: number) {
 		try {
 			const inventory = await shopInventoryRepo.getInventoryAndItemsById(shopId);
+			if (!inventory) {
+				throw new ThrowsError("Inventory not found", 404);
+			}
 			return inventory;
 		} catch (error: any) {
-			throw new Error(error.message);
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
 	async getAll(filter: FilterShop): Promise<Shop[]> {
 		try {
-			return shopRepo.getAll(filter);
+			const shops = await shopRepo.getAll(filter);
+			if (!shops) {
+				throw new ThrowsError("Shops not found", 404);
+			}
+			return shops;
 		} catch (error) {
-			throw new Error("Error fetching shops");
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
 	async getById(id: number): Promise<Shop> {
 		try {
-			return shopRepo.getById(id);
+			const shop = await shopRepo.getById(id);
+			if (!shop) {
+				throw new ThrowsError("Shop not found", 404);
+			}
+			return shop;
 		} catch (error) {
-			throw new Error("Error fetching shop");
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
 	async create(shop: createShopDTO): Promise<Shop> {
 		try {
-			return shopRepo.create(shop);
+			const createdShop = await shopRepo.create(shop);
+			if (!createdShop) {
+				throw new ThrowsError("Error creating shop", 404);
+			}
+
+			const inventory = await shopInventoryRepo.create({ownerId: createdShop.id,capacity: 100});
+			if(!inventory) {
+				throw new ThrowsError("Error creating inventory", 404);
+			}
+			return createdShop;
 		} catch (error) {
-			throw new Error("Error creating shop");
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
 	async update(shop: updateShopDTO): Promise<updateShopDTO> {
 		try {
-			return shopRepo.update(shop);
+			const shopToUpdate = await shopRepo.getById(shop.id);
+			if(!shopToUpdate) {
+				throw new ThrowsError("Shop not found", 404);
+			}
+			
+			if(shopToUpdate.type !== shop.type) {
+				throw new ThrowsError("You cannot change the type of a shop", 400);
+			}
+
+			if(shop.name) {
+				shopToUpdate.name = shop.name;
+			}
+			if(shop.type) {
+				shopToUpdate.type = shop.type;
+			}
+			
+			const updatedShop = await shopRepo.update(shopToUpdate);
+			if (!updatedShop) {
+				throw new ThrowsError("Error updating shop", 404);
+			}
+			return updatedShop;
 		} catch (error) {
-			throw new Error("Error updating shop");
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
 	async delete(id: number): Promise<boolean> {
 		try {
-			return shopRepo.delete(id);
+			const deletedShop = await shopRepo.delete(id);
+			if (!deletedShop) {
+				throw new ThrowsError("Error deleting shop", 404);
+			}
+			return deletedShop;
 		} catch (error) {
-			throw new Error("Error deleting shop");
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
 	async purchase(shopId: number, userId: number, championId: number, itemId: number, quantity: number): Promise<boolean> {
 		return await db.transaction(async trx => {
 			const champion: ChampionDTO = await championRepo.getById(championId, userId);
-			
+
 			if(!champion) {
-				throw new Error('Champion not found');
+				throw new ThrowsError('Champion not found', 404);
 			}
-			
+
 			const inventory: Inventory = await shopInventoryRepo.getInventoryByShopId(shopId);
 			const championInventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId); 
 
 			if(!inventory || !championInventory) {
-				throw new Error('Inventory not found');
+				throw new ThrowsError('Inventory not found', 404);
 			}
 
 			const item: InventoryItens = await shopInventoryRepo.getItemById(inventory.id, itemId);
 
 			if(!item || item.quantity - quantity < 0) {
-				throw new Error("Item not found in shop inventory");
+				throw new ThrowsError("Item not found in shop inventory", 404);
 			}
-			
+
 			if(item.price * quantity > champion.money) {
-				throw new Error("Not enough money");
+				throw new ThrowsError("Not enough money", 400);
 			}
 
 			const updatedShop = await shopInventoryRepo.updateInventoryItem(inventory.id, itemId, -quantity);
+			if(!updatedShop) {
+				throw new ThrowsError("Error updating shop inventory", 404);
+			}
 			item.quantity -= quantity;
 
 			const itemExists = await championInventoryRepo.getItemById(championInventory.id, itemId);
@@ -104,48 +170,42 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 		});
 	}
 
-	async sell(
-		shopId: number,
-		userId: number,
-		championId: number,
-		itemId: number,
-		quantity: number
-	): Promise<boolean> {
-		return await db.transaction(async trx => {
-			// Busca o campeão
-			const champion: ChampionDTO = await championRepo.getById(championId, userId);
-			if (!champion) throw new Error('Champion not found');
+	async sell(shopId: number,userId: number,championId: number, itemId: number, quantity: number): Promise<boolean> {
+		try {
+			return await db.transaction(async trx => {
 
-			// Busca o inventário do campeão
-			const championInventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId);
-			if (!championInventory) throw new Error('Champion inventory not found');
+				const champion: ChampionDTO = await championRepo.getById(championId, userId);
+				if (!champion) throw new ThrowsError('Champion not found', 404);
 
-			// Busca o item no inventário do campeão
-			const item: InventoryItens = await championInventoryRepo.getItemById(championInventory.id, itemId);
-			if (!item) throw new Error("Item not found in champion inventory");
-			if (item.quantity < quantity) throw new Error("Not enough items in champion inventory");
+				const championInventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId);
+				if (!championInventory) throw new ThrowsError('Champion inventory not found', 404);
 
-			// Atualiza a quantidade do item no inventário do campeão
-			await championInventoryRepo.updateInventoryItem(championInventory.id, item.id, -quantity);
+				const item: InventoryItens = await championInventoryRepo.getItemById(championInventory.id, itemId);
+				if (!item) throw new ThrowsError("Item not found in champion inventory", 404);
+				if (item.quantity < quantity) throw new ThrowsError("Not enough items in champion inventory", 400);
 
-			// Remove o item do inventário do campeão se a quantidade chegar a zero
-			if (item.quantity - quantity <= 0) {
-				await championInventoryRepo.removeInventoryItem(championInventory.id, item.id);
+				await championInventoryRepo.updateInventoryItem(championInventory.id, item.id, -quantity);
+
+				if (item.quantity - quantity <= 0) {
+					await championInventoryRepo.removeInventoryItem(championInventory.id, item.id);
+				}
+
+				const shopInventory: Inventory = await shopInventoryRepo.getInventoryByShopId(shopId);
+				if (!shopInventory) throw new ThrowsError('Shop inventory not found', 404);
+
+				await shopInventoryRepo.updateInventoryItem(shopInventory.id, item.id, quantity);
+
+				const newMoney = parseFloat((parseFloat(champion.money.toString()) + item.price * quantity).toFixed(2));
+				await championRepo.updateMoney(championId, newMoney);
+
+				return true;
+			});
+		} catch (error) {
+			if (error instanceof ThrowsError) {
+				throw error;
 			}
-
-			// Busca o inventário da loja
-			const shopInventory: Inventory = await shopInventoryRepo.getInventoryByShopId(shopId);
-			if (!shopInventory) throw new Error('Shop inventory not found');
-
-			// Atualiza a quantidade do item no inventário da loja
-			await shopInventoryRepo.updateInventoryItem(shopInventory.id, item.id, quantity);
-
-			// Atualiza o dinheiro do campeão
-			const newMoney = parseFloat((parseFloat(champion.money.toString()) + item.price * quantity).toFixed(2));
-			await championRepo.updateMoney(championId, newMoney);
-
-			return true;
-		});
+			throw new ThrowsError("Internal server error", 500);
+		}
 	}
 
 }

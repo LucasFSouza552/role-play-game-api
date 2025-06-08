@@ -67,7 +67,7 @@ export class UserService implements ServiceInterface<createUserDTO, updateUserDT
 			if (!userUpdated) {
 				throw new ThrowsError("Error updating user", 404);
 			}
-			return UserMapper.mapUserToUpdateDTO(userUpdated);
+			return userUpdated;
 		} catch (error: any) {
 			if (error instanceof ThrowsError) {
 				throw error;

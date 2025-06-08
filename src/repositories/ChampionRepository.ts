@@ -4,6 +4,7 @@ import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { Champion } from "../models/Champion";
 import { FilterChampion } from "../models/Filters";
 import getMaxExperience from "../utils/getMaxExperience";
+import { ThrowsError } from "../errors/ThrowsError";
 
 export class ChampionRepository implements RepositoryInterface<createChampionDTO, updateChampionDTO, ChampionDTO> {
 	private tableName = 'champions';
@@ -25,6 +26,10 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 				}
 			}).orderBy(filter.orderBy, filter.order);
 
+		if (!allChampions) {
+			throw new ThrowsError("Champions not found", 404);
+		}
+
 		allChampions.map((champion: any) => {
 			champion.xp_max = getMaxExperience(champion.level);
 		});
@@ -32,22 +37,33 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 	}
 
 	async getById(championId: number, userId: number): Promise<ChampionDTO> {
-		console.log(championId, userId)
 		try {
 			const champion = await db(this.tableName).where({ id: championId, userId: userId }).first();
+			if (!champion) {
+				throw new ThrowsError("Champion not found", 404);
+			}
 			champion.xp_max = getMaxExperience(champion.level);
 			return champion;
 		} catch (error) {
-			throw new Error('Error while searching for champion');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while searching for champion", 500);
 		}
 	}
 
 	async create(champion: createChampionDTO): Promise<ChampionDTO> {
 		try {
 			const newChampion = await db(this.tableName).insert(champion).returning('*');
+			if (!newChampion || newChampion.length === 0) {
+				throw new ThrowsError("Champion not created", 404);
+			}
 			return newChampion[0];
 		} catch (error) {
-			throw new Error('Erro ao criar campeão');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while creating champion", 500);
 		}
 	}
 
@@ -56,28 +72,45 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 			const updatedChampion = await db(this.tableName)
 				.where({ id: champion.id, userId: champion.userId })
 				.update(champion).returning('*');
+			if (!updatedChampion || updatedChampion.length === 0) {
+				throw new ThrowsError("Champion not updated", 404);
+			}
 			return updatedChampion[0];
 		} catch (error) {
-			throw new Error('Erro ao atualizar campeão');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while updating champion", 500);
 		}
 	}
 
 	async delete(championId: number, userId: number): Promise<boolean> {
 		try {
 			const deletedChampion = await db(this.tableName).where({ id: championId, userId }).del();
+			if (!deletedChampion) {
+				throw new ThrowsError("Champion not deleted", 404);
+			}
 			return deletedChampion == 1;
 		} catch (error) {
-			throw new Error('Erro ao deletar campeão');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while deleting champion", 500);
 		}
 	}
 
 	async addSkill(championId: number, skillId: number) {
 		try {
 			const newChampionSkill = await db('champion_skills').insert({ championId, skillId }).returning('*');
-			console.log(newChampionSkill);
+			if (!newChampionSkill || newChampionSkill.length === 0) {
+				throw new ThrowsError("Skill not added to champion", 404);
+			}
 			return newChampionSkill;
 		} catch (error) {
-			throw new Error('Error while adding skill to champion');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while adding skill to champion", 500);
 		}
 	}
 
@@ -87,10 +120,16 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 				.where({ championId })
 				.join('skills', 'skills.id', '=', 'champion_skills.skillId')
 				.select('id', 'name', 'description', 'power', 'MP', 'EP', 'target');
+			if (!championSkills) {
+				throw new ThrowsError("Champion skills not found", 404);
+			}
 			return championSkills;
 		} catch (error) {
 			console.error(error);
-			throw new Error('Error while searching for champion skills');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while searching for champion skills", 500);
 		}
 	}
 
@@ -99,9 +138,15 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 			const updatedChampion = await db(this.tableName)
 				.where({ id: Champion.id, userId: Champion.userId })
 				.update({ guildId: Champion.guildId });
+			if (!updatedChampion) {
+				throw new ThrowsError("Champion not updated", 404);
+			}
 			return updatedChampion;
 		} catch (error) {
-			throw new Error('Error while updating champion guild');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while updating champion guild", 500);
 		}
 	}
 
@@ -116,21 +161,32 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 					vitality: champion.vitality,
 					sp: champion.sp
 				});
+			if (!updatedChampion) {
+				throw new ThrowsError("Champion not updated", 404);
+			}
 			return updatedChampion;
 		} catch (error) {
-			throw new Error('Error while updating champion status');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while updating champion status", 500);
 		}
 	}
 
 	async updateMoney(championId: number, newMoney: number) {
 		try {
-			console.log(championId, newMoney);
 			const updatedChampion = await db(this.tableName)
 				.where({ id: championId })
 				.update({ money: newMoney });
+			if (!updatedChampion) {
+				throw new ThrowsError("Champion not updated", 404);
+			}
 			return updatedChampion;
 		} catch (error: any) {
-			throw new Error(`Error while updating champion money`);
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Error while updating champion money", 500);
 		}
 	}
 }

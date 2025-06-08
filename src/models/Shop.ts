@@ -1,9 +1,9 @@
+import { Inventory } from "./Inventory";
 import { ItemType } from "./enums/ItemType";
 
 export interface Shop {
     id: number;
-    ownerId: number;
     name: string;
-    inventory: [];
+    inventory: Inventory;
     type: ItemType;
 }
