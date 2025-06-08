@@ -171,7 +171,7 @@ const swaggerOptions = {
         },
         Mission: {
           type: "object",
-          required: ["name", "description", "reward", "difficulty"],
+          required: ["name", "description", "reward", "difficulty", "money"],
           properties: {
             id: {
               type: "integer",
@@ -194,6 +194,21 @@ const swaggerOptions = {
               enum: ["Easy", "Medium", "Hard", "Expert"],
               example: "Hard"
             },
+            money: {
+              type: "number",
+              description: "Recompensa em dinheiro",
+              example: 100
+            },
+            sp: {
+              type: "integer",
+              description: "Recompensa em pontos de habilidade",
+              example: 100
+            },
+            xp: {
+              type: "integer",
+              description: "Recompensa em pontos de experiência",
+              example: 100
+            }
           },
         },
         Role: {

@@ -60,6 +60,12 @@ export class MissionsService implements ServiceInterface<createMissionDTO, updat
 
 	async update(mission: updateMissionDTO): Promise<updateMissionDTO> {
 		try {
+
+			const missionDifficult = Object.values(MissionDifficult);
+			if(mission.difficulty && !missionDifficult.includes(mission.difficulty as MissionDifficult)) {
+				throw new ThrowsError('Invalid difficulty!', 400);
+			}
+
 			const updatedMission = await missionRepo.update(mission);
 			if (!updatedMission) {
 				throw new ThrowsError("Mission not updated", 404);
@@ -75,6 +81,12 @@ export class MissionsService implements ServiceInterface<createMissionDTO, updat
 
 	async delete(id: number): Promise<boolean> {
 		try {
+
+			const missionExists = await missionRepo.getById(id);
+			if(!missionExists) {
+				throw new ThrowsError('Mission not found', 404);
+			}
+
 			const deletedMission = await missionRepo.delete(id);
 			if (!deletedMission) {
 				throw new ThrowsError("Mission not deleted", 404);

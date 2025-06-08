@@ -56,11 +56,11 @@ export class MissionsController implements ControllerInterface {
         try {
             const mission: createMissionDTO = req.body;
 
-            if (!mission.title || !mission.difficulty) {
+            if (!mission.title || !mission.difficulty || !mission.money) {
                 throw new ThrowsError('Missing required information to create a mission', 400);
             }
 
-            if(!mission.sp && !mission.xp && !mission.money) {
+            if(!mission.sp && !mission.xp) {
                 throw new ThrowsError('The mission needs rewards', 400);
             }
 

@@ -201,10 +201,10 @@ missionsRoute.get("/:id", AuthMiddleware, missionsController.getById);
  *               description:
  *                 type: string
  *                 description: Descrição detalhada da missão
- *               SP:
+ *               sp:
  *                 type: number
  *                 description: Recompensa em pontos de habilidade
- *               XP:
+ *               xp:
  *                 type: number
  *                 description: Recompensa em pontos de experiência
  *               money:
@@ -214,8 +214,8 @@ missionsRoute.get("/:id", AuthMiddleware, missionsController.getById);
  *               title: "Caça ao Dragão"
  *               difficulty: "Hard"
  *               description: "Caçar um dragão perigoso que está aterrorizando a vila"
- *               SP: 100
- *               XP: 500
+ *               sp: 100
+ *               xp: 500
  *               money: 1000.00
  *     responses:
  *       201:
@@ -314,10 +314,10 @@ missionsRoute.post("/", AuthMiddleware, authorizationMiddleware(["admin"]), miss
  *               description:
  *                 type: string
  *                 description: Nova descrição da missão
- *               SP:
+ *               sp:
  *                 type: number
  *                 description: Nova recompensa em pontos de habilidade
- *               XP:
+ *               xp:
  *                 type: number
  *                 description: Nova recompensa em pontos de experiência
  *               money:
@@ -327,8 +327,8 @@ missionsRoute.post("/", AuthMiddleware, authorizationMiddleware(["admin"]), miss
  *             title: "Caça ao Dragão - Atualizado"
  *             difficulty: "Hard"
  *             description: "Caçar um dragão perigoso que está aterrorizando a vila - Atualizado"
- *             SP: 150
- *             XP: 750
+ *             sp: 150
+ *             xp: 750
  *             money: 1500.00
  *     responses:
  *       200:
@@ -342,8 +342,8 @@ missionsRoute.post("/", AuthMiddleware, authorizationMiddleware(["admin"]), miss
  *               title: "Caça ao Dragão - Atualizado"
  *               description: "Caçar um dragão perigoso que está aterrorizando a vila - Atualizado"
  *               difficulty: "Hard"
- *               SP: 150
- *               XP: 750
+ *               sp: 150
+ *               xp: 750
  *               money: 1500.00
  *               status: "Available"
  *       400:
