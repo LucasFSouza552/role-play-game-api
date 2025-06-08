@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { ControllerInterface } from "../interfaces/controllerInterface";
 import { ShopService } from "../services/ShopService";
-import { FilterDefault, FilterShop } from "../models/Filters";
+import { FilterShop } from "../models/Filters";
 import { ThrowsError } from "../errors/ThrowsError";
 import { ItemType } from "../models/enums/ItemType";
+import filterConfig from "../utils/FilterConfig";
 
 const shopService = new ShopService();
 
@@ -30,12 +31,12 @@ export class ShopController implements ControllerInterface {
 
 	async getAll(req: Request, res: Response): Promise<void> {
 		try {
-			const filter: FilterShop = { ...FilterDefault, ...req.query };
+			const filter: FilterShop = filterConfig(req.query);
 			const shops = await shopService.getAll(filter);
 			if(!shops) {
 				throw new ThrowsError("Shops not found", 404);
 			}
-			res.status(200).json(shops);
+			res.status(200).json({shops, total: shops.length});
 		} catch (error) {
 			if (error instanceof ThrowsError) {
 				res.status(error.statusCode).json({ error: error.message });

@@ -1,97 +1,124 @@
 import { Request, Response } from 'express';
 import { GuildService } from '../services/GuildService';
-import { error } from 'console';
 import { ControllerInterface } from '../interfaces/controllerInterface';
 import { updateGuildDTO } from '../DTOS/GuildDTO';
+import { FilterGuild } from '../models/Filters';
+import { ThrowsError } from '../errors/ThrowsError';
+import { GuildMapper } from '../utils/mapppers/guildMapping';
+import filterConfig from '../utils/FilterConfig';
 
 const guildService = new GuildService();
-
 export class GuildController implements ControllerInterface {
 
-    async getAll(req: Request, res: Response): Promise<void> {
-        try {
-            const guilds = await guildService.getAll();
-            res.json(guilds);
-        } catch (error: any) {
-            res.status(500).json({ error: error.message });
-        }
-    }
+	async getAll(req: Request, res: Response): Promise<void> {
+		try {
+			const filter: FilterGuild = filterConfig(req.query); 
 
-    async getById(req: Request, res: Response): Promise<void> {
-        try {
-            const guildId = req.params.id;
-            res.json(guildId);
-        } catch (error: any) {
-            res.status(400).json({ error: error.message });
-        }
-    }
+			const guilds = await guildService.getAll(filter);
+			if (!guilds) {
+				throw new ThrowsError("Guilds not found", 404);
+			}
+			res.json({ guilds, total: guilds.length });
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: error.message });
+			}
+		}
+	}
 
-    async create(req: Request, res: Response): Promise<void> {
-        try {
-            const guild = req.body;
+	async getById(req: Request, res: Response): Promise<void> {
+		try {
+			const guildId = parseInt(req.params.id);
 
-            if (!guild.name || !guild.level) {
-                res.status(400).json({ error: 'Faltam informações para criar a Guilda' });
-                return;
-            }
+			if (!guildId) {
+				throw new ThrowsError("Invalid ID", 400);
+			}
 
-            guild.userId = req.userId as number;
+			const guild = await guildService.getById(guildId);
+			if (!guild) {
+				throw new ThrowsError("Guild not found", 404);
+			}
+			res.status(200).json(guild);
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: error.message });
+			}
+		}
+	}
 
-            const newGuild = await guildService.create(guild);
+	async create(req: Request, res: Response): Promise<void> {
+		try {
+			const guild = req.body;
 
-            res.status(201).json(newGuild);
-        } catch (error: any) {
-            res.status(400).json({ error: error.message });
-        }
-    }
+			if (!guild.name.trim()) {
+				throw new ThrowsError("Missing information to create guild", 400);
+			}
 
-    async update(req: Request, res: Response): Promise<void> {
-        try {
-          const guildId = parseInt(req.params.id);
-      
-          if (!guildId) {
-            res.status(400).json({ error: 'ID inválido para Guilda.' });
-            return;
-          }
-      
-          const guild = req.body;
-      
-          if (!guild.name || !guild.level) {
-            res.status(400).json({ error: 'Dados incompletos para atualizar a Guilda.' });
-            return;
-          }
+			const newGuild = await guildService.create(guild);
 
-          
-			// TODO: Criar MAPPER
-          const guildData: updateGuildDTO = {
-            id: guildId,
-            name: guild.name,
-            level: guild.level,
-          }
-      
-          const updatedGuild = await guildService.update(guildData);
-          res.status(200).json(updatedGuild);
-        } catch (error: any) {
-          res.status(500).json({ error: error.message });
-        }
-      }
-      
+			res.status(201).json(newGuild);
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: error.message });
+			}
+		}
+	}
 
-    async delete(req: Request, res: Response): Promise<void> {
-        try {
-          const guildId = parseInt(req.params.id);
-      
-          if (!guildId) {
-            res.status(400).json({ error: 'ID inválido.' });
-            return;
-          }
-      
-          const deletedGuild = await guildService.delete(guildId);
-          res.status(200).json({ deletedGuild: !!deletedGuild });
-        } catch (error: any) {
-          res.status(500).json({ error: error.message });
-        }
-      }
-      
+	async update(req: Request, res: Response): Promise<void> {
+		try {
+			const guildId = parseInt(req.params.id);
+
+			if (!guildId) {
+				throw new ThrowsError("Invalid ID", 400);
+			}
+
+			const guild = {...req.body, id: guildId};
+
+			if (!guild.name) {
+				throw new ThrowsError("Missing information to update guild", 400);
+			}
+
+			const guildData: updateGuildDTO = GuildMapper.mapGuildToUpdateDTO(guild);
+
+			const updatedGuild = await guildService.update(guildData);
+			res.status(200).json(updatedGuild);
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				console.error(error);
+				res.status(500).json({ error: error.message });
+			}
+		}
+	}
+
+	async delete(req: Request, res: Response): Promise<void> {
+		try {
+			const guildId = parseInt(req.params.id);
+
+			if (!guildId) {
+				throw new ThrowsError("Invalid ID", 400);
+			}
+
+			const deletedGuild = await guildService.delete(guildId);
+			if (!deletedGuild) {
+				throw new ThrowsError("Guild not deleted", 404);
+			}
+			res.status(204).send();
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: error.message });
+			}
+		}
+	}
+
 
 }

@@ -1,8 +1,11 @@
 import { Request, Response } from "express";
-import { FilterChampionRole, FilterDefault } from "../models/Filters";
+import { FilterChampionRole } from "../models/Filters";
 import { ChampionRoleService } from "../services/ChampionRoleService";
 import { ControllerInterface } from "../interfaces/controllerInterface";
 import { ChampionRole } from "../models/ChampionRole";
+import filterConfig from "../utils/FilterConfig";
+import { ThrowsError } from "../errors/ThrowsError";
+import { ChampionRoleMapper } from "../utils/mapppers/championRoleMapping";
 
 const championRoleService = new ChampionRoleService();
 
@@ -13,8 +16,7 @@ export class ChampionRoleController implements ControllerInterface {
             const roleId = req.params.id && !isNaN(Number(req.params.id)) ? parseInt(req.params.id) : null;
 
             if (!roleId) {
-                res.status(400).send({ error: "Invalid ID" })
-                return;
+                throw new ThrowsError("Invalid ID", 400);
             }
 
             const role = req.body;
@@ -22,17 +24,17 @@ export class ChampionRoleController implements ControllerInterface {
             const missingFields = requiredFields.filter(field => !role[field]);
 
             if (missingFields.length > 0) {
-                res.status(400).send({ 
-                    error: "Missing required fields", 
-                    missingFields: missingFields 
-                });
-                return;
+                throw new ThrowsError("Missing required fields: " + missingFields.join(", "), 400);
             }
 
             const updatedRole = await championRoleService.update(role);
             res.status(200).json(updatedRole);
         } catch (error: any) {
-            res.status(400).json({ error: error.message });
+            if (error instanceof ThrowsError) {
+                res.status(error.statusCode).json({ error: error.message });
+            } else {
+                res.status(500).json({ error: "Internal server error" });
+            }
         }
     }
     async delete(req: Request, res: Response): Promise<void> {
@@ -40,31 +42,37 @@ export class ChampionRoleController implements ControllerInterface {
             const roleId = req.params.id && !isNaN(Number(req.params.id)) ? parseInt(req.params.id) : null;
 
             if (!roleId) {
-                res.status(400).send({ error: "Invalid ID" })
-                return;
+                throw new ThrowsError("Invalid ID", 400);
             }
 
             const deletedRole = await championRoleService.delete(roleId);
 
             if (!deletedRole) {
-                res.status(404).send({ error: "Role not found" });
-                return;
+                throw new ThrowsError("Role not found", 404);
             }
 
             res.status(200).json({ message: "Role deleted successfully" });
         } catch (error: any) {
-            res.status(400).json({ error: error.message });
+            if (error instanceof ThrowsError) {
+                res.status(error.statusCode).json({ error: error.message });
+            } else {
+                res.status(500).json({ error: "Internal server error" });
+            }
         }
     }
 
     async getAll(req: Request, res: Response): Promise<void> {
         try {
-            const filters: FilterChampionRole = { ...FilterDefault, ...req.query };
+            const filters: FilterChampionRole = filterConfig(req.query);
             const roles: ChampionRole[] = await championRoleService.getAll(filters);
 
             res.status(200).json({ roles: roles, length: roles.length });
         } catch (error: any) {
-            res.status(400).json({ error: error.message });
+            if (error instanceof ThrowsError) {
+                res.status(error.statusCode).json({ error: error.message });
+            } else {
+                res.status(500).json({ error: "Internal server error" });
+            }
         }
     }
 
@@ -73,18 +81,21 @@ export class ChampionRoleController implements ControllerInterface {
             const roleId = req.params.id ? parseInt(req.params.id) : null;
 
             if (!roleId) {
-                res.status(400).send({ error: "Invalid ID" })
-                return;
+                throw new ThrowsError("Invalid ID", 400);
             }
             
             const role = await championRoleService.getById(roleId);
             if(!role) {
-                res.status(404).send({ error: "Role not found" });
+                throw new ThrowsError("Role not found", 404);
                 return;
             }
             res.status(200).json(role);
         } catch (error: any) {
-            res.status(400).json({ error: error.message });
+            if (error instanceof ThrowsError) {
+                res.status(error.statusCode).json({ error: error.message });
+            } else {
+                res.status(500).json({ error: "Internal server error" });
+            }
         }
     }
 
@@ -95,18 +106,23 @@ export class ChampionRoleController implements ControllerInterface {
             const missingFields = requiredFields.filter(field => !role[field]);
 
             if (missingFields.length > 0) {
-                res.status(400).send({ 
-                    error: "Missing required fields", 
-                    missingFields: missingFields 
-                });
-                return;
+                throw new ThrowsError("Missing required fields: " + missingFields.join(", "), 400);
             }
 
-            // TODO: Criar MAPPER
-            const newRole = await championRoleService.create(role);
+            const roleMapper = ChampionRoleMapper.mapCreateRoleToDTO(role);
+            const newRole = await championRoleService.create(roleMapper);
+
+            if (!newRole) {
+                throw new ThrowsError("Role not created", 404);
+            }
+
             res.status(201).json(newRole);
         } catch (error: any) {
-            res.status(400).json({ error: error.message });
+            if (error instanceof ThrowsError) {
+                res.status(error.statusCode).json({ error: error.message });
+            } else {
+                res.status(500).json({ error: "Internal server error" });
+            }
         }
     }
 }

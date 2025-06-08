@@ -20,7 +20,6 @@ const championRoleController = new ChampionRoleController();
  *         description: Nome da classe para filtrar
  *         schema:
  *           type: string
- *           example: "mage"
  *       - in: query
  *         name: page
  *         required: false
@@ -40,6 +39,22 @@ const championRoleController = new ChampionRoleController();
  *           maximum: 100
  *           default: 10
  *           example: 10
+ *       - in: query
+ *         name: orderBy
+ *         required: false
+ *         description: Campo para ordenação
+ *         schema:
+ *           type: string
+ *           enum: [id, name]
+ *           default: "id"
+ *       - in: query
+ *         name: order
+ *         required: false
+ *         description: Ordem da ordenação
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: "asc"
  *     responses:
  *       200:
  *         description: Lista de classes (roles)

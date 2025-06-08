@@ -1,15 +1,17 @@
 import { Request, Response } from "express";
 import { ControllerInterface } from "../interfaces/controllerInterface";
 import { ChampionInventoryService } from "../services/ChampionInventoryService";
-import { FilterDefault, FilterInventory } from "../models/Filters";
+import { FilterInventory } from "../models/Filters";
 import { createInventoryDTO, updateInventoryDTO } from "../DTOS/InventoryDTO";
+import filterConfig from "../utils/FilterConfig";
+import { ThrowsError } from "../errors/ThrowsError";
 
 const inventoryService = new ChampionInventoryService();
 
 export class ChampionInventoryController implements ControllerInterface {
 	async getAll(req: Request, res: Response): Promise<void> {
 		try {
-			const filter: FilterInventory = { ...FilterDefault, ...req.query };
+			const filter: FilterInventory = filterConfig(req.query);
 			const inventories = inventoryService.getAll(filter);
 			res.status(200).json(inventories);
 		} catch (error: any) {
@@ -74,19 +76,24 @@ export class ChampionInventoryController implements ControllerInterface {
 			const championId = parseInt(req.params.championId);
 
 			if (!id) {
-				res.status(400).json({ error: "Invalid ID" });
-				return;
+				throw new ThrowsError("Invalid ID", 400);
 			}
 
 			if (!championId) {
-				res.status(400).json({ error: "Invalid champion ID" });
-				return;
+				throw new ThrowsError("Invalid champion ID", 400);
 			}
 
 			const deletedInventory = await inventoryService.delete(id, championId);
-			res.status(204).send({ deletedInventory });
+			if (!deletedInventory) {
+				throw new ThrowsError("Inventory not deleted", 404);
+			}
+			res.status(204).send();
 		} catch (err: any) {
-			res.status(400).json({ error: err.message });
+			if (err instanceof ThrowsError) {
+				res.status(err.statusCode).json({ error: err.message });
+			} else {
+				res.status(500).json({ error: "Internal server error" });
+			}
 		}
 	}
 

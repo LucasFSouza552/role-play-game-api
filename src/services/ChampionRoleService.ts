@@ -1,12 +1,11 @@
-import { updateChampionDTO } from "../DTOS/ChampionDTO";
-import { createChampionRoleDTO } from "../DTOS/ChampionRoleDTO";
+import { createChampionRoleDTO, updateChampionRoleDTO } from "../DTOS/ChampionRoleDTO";
 import { ThrowsError } from "../errors/ThrowsError";
 import { ServiceInterface } from "../interfaces/serviceInterface";
 import { ChampionRole } from "../models/ChampionRole";
 import { FilterChampionRole } from "../models/Filters";
 import { roleRepo } from "../repositories/RepositoryManager";
 
-export class ChampionRoleService implements ServiceInterface<createChampionRoleDTO, updateChampionDTO, ChampionRole> {
+export class ChampionRoleService implements ServiceInterface<createChampionRoleDTO, updateChampionRoleDTO, ChampionRole> {
 	async getAll(filter: FilterChampionRole): Promise<ChampionRole[]> {
 		try {
 			const roles = await roleRepo.getAll(filter);
@@ -43,7 +42,7 @@ export class ChampionRoleService implements ServiceInterface<createChampionRoleD
 		}
 	}
 
-	async update(role: updateChampionDTO): Promise<updateChampionDTO> {
+	async update(role: updateChampionRoleDTO): Promise<updateChampionRoleDTO> {
 		try {
 			const updatedRole = await roleRepo.update(role);
 			if (!updatedRole) {
@@ -57,6 +56,12 @@ export class ChampionRoleService implements ServiceInterface<createChampionRoleD
 
 	async delete(id: number): Promise<boolean> {
 		try {
+
+			const role = await roleRepo.getById(id);
+			if (!role) {
+				throw new ThrowsError("Role not found", 404);
+			}
+
 			const deletedRole = await roleRepo.delete(id);
 			if (!deletedRole) {
 				throw new ThrowsError("Role not deleted", 404);

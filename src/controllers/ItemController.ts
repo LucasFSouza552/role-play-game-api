@@ -1,18 +1,18 @@
 import { Request, Response } from "express";
 import { ItemService } from "../services/ItemService";
-import { ItemType } from "../models/enums/ItemType";
 import { ControllerInterface } from "../interfaces/controllerInterface";
 import { Item } from "../models/Item";
-import { FilterDefault, FilterItem } from "../models/Filters";
+import { FilterItem } from "../models/Filters";
 import { ItemMapper } from "../utils/mapppers/itemMapping";
 import { ThrowsError } from "../errors/ThrowsError";
+import filterConfig from "../utils/FilterConfig";
 
 const itemService = new ItemService();
 export class ItemController implements ControllerInterface {
 
 	async getAll(req: Request, res: Response): Promise<void> {
 		try {
-			const filter: FilterItem = { ...FilterDefault, ...req.query };
+			const filter: FilterItem = filterConfig(req.query);
 			const items = await itemService.getAll(filter);
 			if (!items) {
 				throw new ThrowsError("Items not found", 404);
@@ -121,7 +121,7 @@ export class ItemController implements ControllerInterface {
 			if (!deletedItem) {
 				throw new ThrowsError("Item not found or error deleting item", 404);
 			}
-			res.status(200).json(deletedItem);
+			res.status(204).send();
 		} catch (error) {
 			if (error instanceof ThrowsError) {
 				res.status(error.statusCode).json({ error: error.message });

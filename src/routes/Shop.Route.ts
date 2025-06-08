@@ -60,9 +60,15 @@ const shopController = new ShopController();
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Shop'
+ *               type: object
+ *               properties:
+ *                 shops:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Shop'
+ *                 total:
+ *                   type: integer
+ *                   description: Total de lojas
  *       401:
  *         description: Token inválido
  *         content:

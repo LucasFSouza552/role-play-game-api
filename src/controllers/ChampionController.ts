@@ -14,6 +14,7 @@ import { ChampionInventoryService } from "../services/ChampionInventoryService";
 import { InventoryMapper } from "../utils/mapppers/InventoryMapping";
 import { ChampionMapper } from "../utils/mapppers/championMapping";
 import { createInventoryDTO } from "../DTOS/InventoryDTO";
+import filterConfig from "../utils/FilterConfig";
 
 const championService = new ChampionService();
 const guildService = new GuildService();
@@ -22,11 +23,7 @@ const championInventoryService = new ChampionInventoryService();
 export class ChampionController implements ControllerInterface {
 	async getAll(req: Request, res: Response): Promise<void> {
 		try {
-			const filters: FilterChampion = {
-				...FilterDefault,
-				...req.query,
-				userId: req.userId
-			};
+			const filters: FilterChampion = filterConfig(req.query);
 			const champions: ChampionDTO[] = await championService.getAll(filters);
 
 			res.status(200).json({ champions: champions, length: champions.length });

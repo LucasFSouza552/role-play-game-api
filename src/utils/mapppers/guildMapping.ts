@@ -25,8 +25,8 @@ export class GuildMapper {
   public static mapGuildToUpdateDTO(guild: Guild): updateGuildDTO {
     return {
       id: guild.id,
-      name: guild.name,
-      level: guild.level,
+      ...(guild.name && { name: guild.name }),
+      ...(guild.level && { level: guild.level })
     };
   }
 }

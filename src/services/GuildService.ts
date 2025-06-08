@@ -54,6 +54,11 @@ export class GuildService implements ServiceInterface<createGuildDTO, updateGuil
 
 	async create(guild: createGuildDTO) {
 		try {
+			const guildExists = await guildRepo.findGuildByName(guild.name);
+			if (guildExists) {
+				throw new ThrowsError("Guild already exists", 400);
+			}
+
 			const createdGuild = await guildRepo.create(guild);
 			if (!createdGuild) {
 				throw new ThrowsError("Guild not created", 404);
@@ -69,6 +74,11 @@ export class GuildService implements ServiceInterface<createGuildDTO, updateGuil
 
 	async update(guild: updateGuildDTO): Promise<updateGuildDTO> {
 		try {
+			const guildExists = await guildRepo.getById(guild.id);
+			if (!guildExists) {
+				throw new ThrowsError("Guild not found", 404);
+			}
+
 			const updatedGuild = await guildRepo.update(guild);
 			if (!updatedGuild) {
 				throw new ThrowsError("Guild not updated", 404);
@@ -78,12 +88,19 @@ export class GuildService implements ServiceInterface<createGuildDTO, updateGuil
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
+			console.error(error);
 			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 	
 	async delete(id: number): Promise<boolean> {
 		try {
+
+			const guildExists = await guildRepo.getById(id);
+			if (!guildExists) {
+				throw new ThrowsError("Guild not found", 404);
+			}
+
 			const deletedGuild = await guildRepo.delete(id);
 			if (!deletedGuild) {
 				throw new ThrowsError("Guild not deleted", 404);

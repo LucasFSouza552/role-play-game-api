@@ -5,6 +5,7 @@ import { createGuildDTO, updateGuildDTO } from '../DTOS/GuildDTO';
 import { ThrowsError } from '../errors/ThrowsError';
 import { FilterGuild } from '../models/Filters';
 
+
 export class GuildRepository implements RepositoryInterface<createGuildDTO, updateGuildDTO, Guild> {
 	private tablename = 'guilds';
 
@@ -81,6 +82,7 @@ export class GuildRepository implements RepositoryInterface<createGuildDTO, upda
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
+			console.error(error);
 			throw new ThrowsError("Internal server error", 500);
 		}
 	}
@@ -102,12 +104,12 @@ export class GuildRepository implements RepositoryInterface<createGuildDTO, upda
 		}
 	}
 
-	async findGuildByName(name: String): Promise<Guild> {
+	async findGuildByName(name: String): Promise<Guild | null> {
 		try {
 			const guild = await db(this.tablename).where({ name }).first();
 
 			if (!guild) {
-				throw new ThrowsError("Guild not found", 404);
+				return null;
 			}
 
 			return guild;

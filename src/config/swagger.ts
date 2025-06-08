@@ -315,6 +315,28 @@ const swaggerOptions = {
               enum: ["Spells", "Armour", "Weapons", "Potions"]
             }
           }
+        },
+        Guild: {
+          type: "object",
+          properties: {
+            id: {
+              type: "integer",
+              description: "ID da guilda"
+            },
+            name: {
+              type: "string",
+              description: "Nome da guilda"
+            },
+            level: {
+              type: "integer",
+              description: "Nível da guilda"
+            },
+            created_at: {
+              type: "string",
+              format: "date-time",
+              description: "Data de criação da guilda"
+            }
+          }
         }
       }
     },

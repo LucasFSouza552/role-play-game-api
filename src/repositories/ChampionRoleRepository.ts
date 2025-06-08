@@ -1,5 +1,4 @@
 import db from "../database/db";
-import { updateChampionDTO } from "../DTOS/ChampionDTO";
 import { createChampionRoleDTO, updateChampionRoleDTO } from "../DTOS/ChampionRoleDTO";
 import { ThrowsError } from "../errors/ThrowsError";
 import { RepositoryInterface } from "../interfaces/repositoryInterface";
@@ -53,25 +52,6 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 		}
 	}
 
-	async findByName(name: string) {
-		try {
-			const role = await db(this.tableName)
-				.whereILike({ name })
-				.first();
-
-			if (!role) {
-				throw new ThrowsError("Role not found", 404);
-			}
-
-			return role;
-		} catch (error) {
-			if (error instanceof ThrowsError) {
-				throw error;
-			}
-			throw new ThrowsError("Internal server error", 500);
-		}
-	}
-
 	async create(role: createChampionRoleDTO): Promise<ChampionRole> {
 		try {
 			const createdRole = await db(this.tableName).insert(role).returning('*');
@@ -87,7 +67,7 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 		}
 	}
 
-	async update(championRole: updateChampionRoleDTO): Promise<updateChampionDTO> {
+	async update(championRole: updateChampionRoleDTO): Promise<updateChampionRoleDTO> {
 		try {
 			const updatedRole = await db(this.tableName).where({ id: championRole.id }).update(championRole).returning('*');
 			if (!updatedRole || updatedRole.length === 0) {

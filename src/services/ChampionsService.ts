@@ -1,12 +1,13 @@
 import { ChampionMapper } from './../utils/mapppers/championMapping';
 import { FilterChampion } from "../models/Filters";
 import { ChampionRole } from "../models/ChampionRole";
-import { championRepo, roleRepo, skillRepo, championInventoryRepo } from "../repositories/RepositoryManager";
+import { championRepo, roleRepo, skillRepo, championInventoryRepo, itemsRepo } from "../repositories/RepositoryManager";
 import { ServiceInterface } from "../interfaces/serviceInterface";
 import { ChampionDTO, createChampionDTO, updateChampionDTO, updatedChampionStatusDTO } from "../DTOS/ChampionDTO";
 import { Inventory } from '../models/Inventory';
 import { InventoryItens } from '../models/InventoryItens';
 import { ThrowsError } from '../errors/ThrowsError';
+import { ItemRarity } from '../models/enums/ItemRarity';
 
 export class ChampionService implements ServiceInterface<createChampionDTO, updateChampionDTO, ChampionDTO> {
 
@@ -191,6 +192,18 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 
 	async createInventoryItem(championId: number, userId: number, itemId: number, quantity: number, price: number, rarity: string): Promise<InventoryItens> {
 		try {
+
+			const item = await itemsRepo.getById(itemId);
+			if(!item) {
+				throw new ThrowsError("Item not found", 404);
+			}
+
+			const rarityValues = Object.values(ItemRarity);
+
+			if(!rarityValues.includes(rarity as ItemRarity)) {
+				throw new ThrowsError("Invalid rarity", 400);
+			}
+
 			const inventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId);
 
 			if(!inventory) {

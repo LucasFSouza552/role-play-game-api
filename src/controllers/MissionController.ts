@@ -5,7 +5,8 @@ import { MissionsService } from "../services/MissionsService";
 import { Request, Response } from "express";
 import { MissionMapper } from "../utils/mapppers/missionMapping";
 import { ThrowsError } from "../errors/ThrowsError";
-import { FilterDefault, FilterMission } from "../models/Filters";
+import { FilterMission } from "../models/Filters";
+import filterConfig from "../utils/FilterConfig";
 
 const missionsServices = new MissionsService();
 
@@ -13,7 +14,7 @@ export class MissionsController implements ControllerInterface {
 
     async getAll(req: Request, res: Response): Promise<void> {
         try {
-            const filter: FilterMission = {...FilterDefault, ...req.query};
+            const filter: FilterMission = filterConfig(req.query);
             const missions: Mission[] = await missionsServices.getAll(filter);
             if (!missions) {
                 throw new ThrowsError("Missions not found", 404);
@@ -133,7 +134,10 @@ export class MissionsController implements ControllerInterface {
             }
 
             const deletedMission = await missionsServices.delete(missionId);
-            res.status(200).json({ deletedMission });
+            if (!deletedMission) {
+                throw new ThrowsError("Mission not deleted", 404);
+            }
+            res.status(204).send();
         } catch (err: any) {
             if (err instanceof ThrowsError) {
                 res.status(err.statusCode).json({ error: err.message });
