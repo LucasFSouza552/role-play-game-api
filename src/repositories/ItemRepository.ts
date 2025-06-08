@@ -4,6 +4,7 @@ import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { FilterItem } from "../models/Filters";
 import { Item } from "../models/Item";
 import { ThrowsError } from "../errors/ThrowsError";
+import { ItemType } from "../models/enums/ItemType";
 
 
 export class ItemRepository implements RepositoryInterface<createItemDTO, updateItemDTO, Item> {
@@ -24,6 +25,9 @@ export class ItemRepository implements RepositoryInterface<createItemDTO, update
 					}
 					if (filter.maxPrice !== undefined) {
 						query.where("items.priceMax", "<=", filter.maxPrice);
+					}
+					if (filter.type) {
+						query.where("items.type", filter.type as ItemType);
 					}
 				}).orderBy(filter.orderBy, filter.order);
 
@@ -59,6 +63,11 @@ export class ItemRepository implements RepositoryInterface<createItemDTO, update
 	
 	async create(item: createItemDTO): Promise<Item> {
 		try {
+			const itemExists = await db(this.tableName).where({ name: item.name }).first();
+			if (itemExists) {
+				throw new ThrowsError("Item already exists", 400);
+			}
+
 			const newItem = await db(this.tableName).insert(item).returning("*");
 			if (!newItem || newItem.length === 0) {
 				throw new ThrowsError("Item not created", 404);

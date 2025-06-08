@@ -44,6 +44,7 @@ export interface FilterItem extends Filter {
     name?: string;
     minPrice?: number;
     maxPrice?: number;
+    type?: ItemType;
 }
 
 export interface FilterShop extends Filter {

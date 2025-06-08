@@ -43,6 +43,11 @@ export class ItemService implements ServiceInterface<createItemDTO, updateItemDT
     try {
       const newItem: createItemDTO = ItemMapper.mapCreateItemToDTO(item);
 
+      const validTypes = Object.values(ItemType) as string[];
+			if (!validTypes.includes(item.type)) {
+				throw new ThrowsError("Invalid item type.", 400);
+			}
+
       const createdItem = await itemsRepo.create(newItem);
       if (!createdItem) {
         throw new ThrowsError("Item not created", 404);
@@ -58,17 +63,10 @@ export class ItemService implements ServiceInterface<createItemDTO, updateItemDT
 
   async update(item: updateItemDTO): Promise<updateItemDTO> {
     try {      
-      if (item.type && !Object.values(ItemType).includes(item.type)) {
-        throw new ThrowsError("Invalid item type.", 400);
-      }
-
-      if (
-        item.priceMin != null &&
-        item.priceMax != null &&
-        item.priceMin > item.priceMax
-      ) {
-        throw new ThrowsError("The minimum price cannot be greater than the maximum price.", 400);
-      }
+      const validTypes = Object.values(ItemType) as string[];
+			if (item.type && !validTypes.includes(item.type as string)) {
+				throw new ThrowsError("Invalid item type.", 400);
+			}
 
       const existingItem = await itemsRepo.getById(item.id);
       if (!existingItem) {
@@ -79,6 +77,7 @@ export class ItemService implements ServiceInterface<createItemDTO, updateItemDT
       if (!updatedItem) {
         throw new ThrowsError("Item not updated", 404);
       }
+      
       return updatedItem;
     } catch (error) {
       if (error instanceof ThrowsError) {
@@ -90,6 +89,12 @@ export class ItemService implements ServiceInterface<createItemDTO, updateItemDT
 
   async delete(id: number): Promise<boolean> {
     try {
+
+      const itemExists = await itemsRepo.getById(id);
+      if (!itemExists) {
+        throw new ThrowsError("Item not found", 404);
+      }
+
       const deletedItem = await itemsRepo.delete(id);
       if (!deletedItem) {
         throw new ThrowsError("Item not deleted", 404);

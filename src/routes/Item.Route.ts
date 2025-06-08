@@ -10,10 +10,10 @@ const ItemRoute = Router();
  * @swagger
  * /api/items:
  *   get:
- *     summary: Listar todos os itens (Apenas Administradores)
- *     description: Retorna uma lista de todos os itens disponíveis no jogo, com opções de filtro. Acesso restrito a administradores.
+ *     summary: Listar todos os itens
+ *     description: Retorna uma lista de todos os itens disponíveis no jogo, com opções de filtro e paginação
  *     tags:
- *        - Itens (Items)
+ *       - Itens (Items)
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -31,14 +31,13 @@ const ItemRoute = Router();
  *         description: Filtrar por nome do item
  *         schema:
  *           type: string
- *           example: "Espada"
  *       - in: query
  *         name: minPrice
  *         required: false
  *         description: Preço mínimo do item
  *         schema:
  *           type: number
- *           example: 50
+ *           example: 0
  *       - in: query
  *         name: maxPrice
  *         required: false
@@ -85,7 +84,7 @@ const ItemRoute = Router();
  *           example: "asc"
  *     responses:
  *       200:
- *         description: Lista de itens
+ *         description: Lista de itens retornada com sucesso
  *         content:
  *           application/json:
  *             schema:
@@ -94,7 +93,7 @@ const ItemRoute = Router();
  *                 items:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/Item'
+ *                     $ref: "#/components/schemas/Item"
  *                 total:
  *                   type: integer
  *                   description: Número total de itens
@@ -130,12 +129,8 @@ const ItemRoute = Router();
  *                   priceMin: 30.00
  *                   priceMax: 100.00
  *               total: 100
- *               page: 1
- *               totalPages: 10
- *               hasNext: true
- *               hasPrevious: false
  *       401:
- *         description: Não autorizado
+ *         description: Token inválido
  *         content:
  *           application/json:
  *             schema:
@@ -143,8 +138,7 @@ const ItemRoute = Router();
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Mensagem de erro
- *                   example: "Invalid or expired token"
+ *                   example: "Invalid token. Use format Bearer <token>"
  *       403:
  *         description: Acesso proibido
  *         content:
@@ -154,8 +148,17 @@ const ItemRoute = Router();
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Mensagem de erro
  *                   example: "You do not have permission to access this resource"
+ *       404:
+ *         description: Itens não encontrados
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Items not found"
  *       500:
  *         description: Erro interno do servidor
  *         content:
@@ -165,7 +168,6 @@ const ItemRoute = Router();
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Mensagem de erro
  *                   example: "Internal server error"
  */
 ItemRoute.get("/", itemController.getAll);
@@ -174,28 +176,27 @@ ItemRoute.get("/", itemController.getAll);
  * @swagger
  * /api/items/{id}:
  *   get:
- *     summary: Obter item por ID (Apenas Administradores)
- *     description: Retorna os detalhes de um item específico pelo seu ID. Acesso restrito a administradores.
+ *     summary: Obter item por ID
+ *     description: Retorna os detalhes de um item específico pelo seu ID
  *     tags:
- *        - Itens (Items)
+ *       - Itens (Items)
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID do item
  *         schema:
  *           type: integer
  *           minimum: 1
- *           example: 1
+ *         description: ID do item
  *     responses:
  *       200:
- *         description: Detalhes do item
+ *         description: Item encontrado com sucesso
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Item'
+ *               $ref: "#/components/schemas/Item"
  *             example:
  *               id: 1
  *               name: "Espada Longa"
@@ -203,8 +204,8 @@ ItemRoute.get("/", itemController.getAll);
  *               type: "Weapons"
  *               priceMin: 50.00
  *               priceMax: 150.00
- *       401:
- *         description: Não autorizado
+ *       400:
+ *         description: ID inválido
  *         content:
  *           application/json:
  *             schema:
@@ -212,8 +213,17 @@ ItemRoute.get("/", itemController.getAll);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Mensagem de erro
- *                   example: "Invalid or expired token"
+ *                   example: "Invalid ID"
+ *       401:
+ *         description: Token inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid token. Use format Bearer <token>"
  *       404:
  *         description: Item não encontrado
  *         content:
@@ -223,7 +233,6 @@ ItemRoute.get("/", itemController.getAll);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Mensagem de erro
  *                   example: "Item not found"
  *       500:
  *         description: Erro interno do servidor
@@ -234,21 +243,18 @@ ItemRoute.get("/", itemController.getAll);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Mensagem de erro
  *                   example: "Internal server error"
  */
-ItemRoute.get("/:id", AuthMiddleware, itemController.getById);
+ItemRoute.get("/:id",itemController.getById);
 
 /**
  * @swagger
  * /api/items:
  *   post:
- *     summary: Criar novo item (Apenas Administradores)
- *     description: Cria um novo item no jogo. Acesso restrito a administradores.
+ *     summary: Criar novo item
+ *     description: Cria um novo item no sistema
  *     tags:
- *        - Itens (Items)
- *     security:
- *       - bearerAuth: []
+ *       - Itens (Items)
  *     requestBody:
  *       required: true
  *       content:
@@ -265,33 +271,41 @@ ItemRoute.get("/:id", AuthMiddleware, itemController.getById);
  *               name:
  *                 type: string
  *                 description: Nome do item
- *                 example: "Espada Longa"
  *               description:
  *                 type: string
- *                 description: Descrição do item
- *                 example: "Uma espada longa forjada em aço valiriano"
+ *                 description: Descrição detalhada do item
  *               type:
  *                 type: string
- *                 description: Tipo do item
  *                 enum: [Spells, Armour, Weapons, Potions]
- *                 example: "Weapons"
+ *                 description: Tipo do item
  *               priceMin:
  *                 type: number
- *                 description: Preço mínimo do item
  *                 minimum: 0
- *                 example: 50.00
+ *                 description: Preço mínimo do item
  *               priceMax:
  *                 type: number
- *                 description: Preço máximo do item
  *                 minimum: 0
- *                 example: 150.00
+ *                 description: Preço máximo do item
+ *             example:
+ *               name: "Espada Longa"
+ *               description: "Uma espada longa forjada em aço valiriano"
+ *               type: "Weapons"
+ *               priceMin: 50.00
+ *               priceMax: 150.00
  *     responses:
  *       201:
  *         description: Item criado com sucesso
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Item'
+ *               $ref: "#/components/schemas/Item"
+ *             example:
+ *               id: 1
+ *               name: "Espada Longa"
+ *               description: "Uma espada longa forjada em aço valiriano"
+ *               type: "Weapons"
+ *               priceMin: 50.00
+ *               priceMax: 150.00
  *       400:
  *         description: Dados inválidos
  *         content:
@@ -301,10 +315,9 @@ ItemRoute.get("/:id", AuthMiddleware, itemController.getById);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Mensagem de erro
- *                   example: "Invalid data provided"
- *       401:
- *         description: Não autorizado
+ *                   example: "All required fields must be filled"
+ *       404:
+ *         description: Erro ao criar item
  *         content:
  *           application/json:
  *             schema:
@@ -312,19 +325,7 @@ ItemRoute.get("/:id", AuthMiddleware, itemController.getById);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Mensagem de erro
- *                   example: "Invalid or expired token"
- *       403:
- *         description: Acesso negado
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Mensagem de erro
- *                   example: "Access denied: only administrators can create items"
+ *                   example: "Item not created"
  *       500:
  *         description: Erro interno do servidor
  *         content:
@@ -334,7 +335,6 @@ ItemRoute.get("/:id", AuthMiddleware, itemController.getById);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Mensagem de erro
  *                   example: "Internal server error"
  */
 ItemRoute.post("/", itemController.create);
@@ -343,21 +343,18 @@ ItemRoute.post("/", itemController.create);
  * @swagger
  * /api/items/{id}:
  *   patch:
- *     summary: Atualizar item (Apenas Administradores)
- *     description: Atualiza os dados de um item existente. Acesso restrito a administradores.
+ *     summary: Atualizar item
+ *     description: Atualiza um item existente no sistema
  *     tags:
  *       - Itens (Items)
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID do item
  *         schema:
  *           type: integer
  *           minimum: 1
- *           example: 1
+ *         description: ID do item a ser atualizado
  *     requestBody:
  *       required: true
  *       content:
@@ -368,33 +365,41 @@ ItemRoute.post("/", itemController.create);
  *               name:
  *                 type: string
  *                 description: Novo nome do item
- *                 example: "Espada Longa Melhorada"
  *               description:
  *                 type: string
  *                 description: Nova descrição do item
- *                 example: "Uma espada longa forjada em aço valiriano melhorada"
  *               type:
  *                 type: string
- *                 description: Novo tipo do item
  *                 enum: [Spells, Armour, Weapons, Potions]
- *                 example: "Weapons"
+ *                 description: Novo tipo do item
  *               priceMin:
  *                 type: number
- *                 description: Novo preço mínimo do item
  *                 minimum: 0
- *                 example: 75.00
+ *                 description: Novo preço mínimo do item
  *               priceMax:
  *                 type: number
- *                 description: Novo preço máximo do item
  *                 minimum: 0
- *                 example: 200.00
+ *                 description: Novo preço máximo do item
+ *             example:
+ *               name: "Espada Longa - Atualizada"
+ *               description: "Uma espada longa forjada em aço valiriano - Atualizada"
+ *               type: "Weapons"
+ *               priceMin: 75.00
+ *               priceMax: 200.00
  *     responses:
  *       200:
  *         description: Item atualizado com sucesso
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Item'
+ *               $ref: "#/components/schemas/Item"
+ *             example:
+ *               id: 1
+ *               name: "Espada Longa - Atualizada"
+ *               description: "Uma espada longa forjada em aço valiriano - Atualizada"
+ *               type: "Weapons"
+ *               priceMin: 75.00
+ *               priceMax: 200.00
  *       400:
  *         description: Dados inválidos
  *         content:
@@ -404,30 +409,7 @@ ItemRoute.post("/", itemController.create);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Mensagem de erro
- *                   example: "Invalid data provided"
- *       401:
- *         description: Não autorizado
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Mensagem de erro
- *                   example: "Invalid or expired token"
- *       403:
- *         description: Acesso negado
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Mensagem de erro
- *                   example: "Access denied: only administrators can update items"
+ *                   example: "The minimum price cannot be greater than the maximum price"
  *       404:
  *         description: Item não encontrado
  *         content:
@@ -437,7 +419,6 @@ ItemRoute.post("/", itemController.create);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Mensagem de erro
  *                   example: "Item not found"
  *       500:
  *         description: Erro interno do servidor
@@ -448,30 +429,26 @@ ItemRoute.post("/", itemController.create);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Mensagem de erro
  *                   example: "Internal server error"
  */
-ItemRoute.patch("/:id", AuthMiddleware, authorizationMiddleware(["admin"]), itemController.update);
+ItemRoute.patch("/:id", itemController.update);
 
 /**
  * @swagger
  * /api/items/{id}:
  *   delete:
- *     summary: Excluir item (Apenas Administradores)
- *     description: Remove um item do jogo. Acesso restrito a administradores.
+ *     summary: Excluir item
+ *     description: Remove um item do sistema
  *     tags:
- *        - Itens (Items)
- *     security:
- *       - bearerAuth: []
+ *       - Itens (Items)
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID do item
  *         schema:
  *           type: integer
  *           minimum: 1
- *           example: 1
+ *         description: ID do item a ser excluído
  *     responses:
  *       200:
  *         description: Item excluído com sucesso
@@ -480,12 +457,13 @@ ItemRoute.patch("/:id", AuthMiddleware, authorizationMiddleware(["admin"]), item
  *             schema:
  *               type: object
  *               properties:
- *                 message:
- *                   type: string
- *                   description: Mensagem de sucesso
- *                   example: "Item excluído com sucesso"
- *       401:
- *         description: Não autorizado
+ *                 deletedItem:
+ *                   type: boolean
+ *                   description: Indica se o item foi excluído com sucesso
+ *             example:
+ *               deletedItem: true
+ *       400:
+ *         description: ID inválido
  *         content:
  *           application/json:
  *             schema:
@@ -493,19 +471,7 @@ ItemRoute.patch("/:id", AuthMiddleware, authorizationMiddleware(["admin"]), item
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Mensagem de erro
- *                   example: "Invalid or expired token"
- *       403:
- *         description: Acesso negado
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Mensagem de erro
- *                   example: "Access denied: only administrators can delete items"
+ *                   example: "Invalid ID"
  *       404:
  *         description: Item não encontrado
  *         content:
@@ -515,7 +481,6 @@ ItemRoute.patch("/:id", AuthMiddleware, authorizationMiddleware(["admin"]), item
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Mensagem de erro
  *                   example: "Item not found"
  *       500:
  *         description: Erro interno do servidor
@@ -526,9 +491,8 @@ ItemRoute.patch("/:id", AuthMiddleware, authorizationMiddleware(["admin"]), item
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Mensagem de erro
  *                   example: "Internal server error"
  */
-ItemRoute.delete("/:id", AuthMiddleware, authorizationMiddleware(["admin"]), itemController.delete);
+ItemRoute.delete("/:id", itemController.delete);
 
 export default ItemRoute;

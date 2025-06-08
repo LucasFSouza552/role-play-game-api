@@ -334,7 +334,7 @@ const swaggerOptions = {
       },
       {
         name: "Itens (Items)",
-        description: "Operações de itens"
+        description: "Operações de itens (Apenas Administradores)"
       },
       {
         name: "Missões (Missions)",
