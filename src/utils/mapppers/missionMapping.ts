@@ -8,8 +8,8 @@ export class MissionMapper {
             title: mission.title,
             description: mission.description,
             difficulty: mission.difficulty,
-            XP: mission.XP,
-            SP: mission.SP,
+            xp: mission.xp,
+            sp: mission.sp,
             money: mission.money
         }
     }
@@ -20,8 +20,8 @@ export class MissionMapper {
             ...(mission.title && {title: mission.title}),
             ...(mission.description && {description: mission.description}),
             ...(mission.difficulty && {difficulty: mission.difficulty}),
-            ...(mission.XP && {XP: mission.XP}),
-            ...(mission.SP && {SP: mission.SP}),
+            ...(mission.xp && {xp: mission.xp}),
+            ...(mission.sp && {sp: mission.sp}),
             ...(mission.money && {money: mission.money})
         }
     }
@@ -31,9 +31,9 @@ export class MissionMapper {
             title: mission.title,
             description: mission.description,
             difficulty: mission.difficulty,
-            money: mission.money,
-            XP: mission.XP,
-            SP: mission.SP
+            money: mission.money!,
+            xp: mission.xp!,
+            sp: mission.sp!
         }
     }
 

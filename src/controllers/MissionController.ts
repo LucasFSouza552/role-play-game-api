@@ -5,6 +5,7 @@ import { MissionsService } from "../services/MissionsService";
 import { Request, Response } from "express";
 import { MissionMapper } from "../utils/mapppers/missionMapping";
 import { ThrowsError } from "../errors/ThrowsError";
+import { FilterDefault, FilterMission } from "../models/Filters";
 
 const missionsServices = new MissionsService();
 
@@ -12,7 +13,8 @@ export class MissionsController implements ControllerInterface {
 
     async getAll(req: Request, res: Response): Promise<void> {
         try {
-            const missions: Mission[] = await missionsServices.getAll();
+            const filter: FilterMission = {...FilterDefault, ...req.query};
+            const missions: Mission[] = await missionsServices.getAll(filter);
             if (!missions) {
                 throw new ThrowsError("Missions not found", 404);
             }
@@ -34,8 +36,7 @@ export class MissionsController implements ControllerInterface {
             const missionsId: number = parseInt(req.params.id);
 
             if (!missionsId) {
-                res.status(400).send({ error: "Invalid ID." });
-                return;
+                throw new ThrowsError("Invalid ID.", 400);
             }
             const mission = await missionsServices.getById(missionsId);
             if (!mission) {
@@ -55,19 +56,22 @@ export class MissionsController implements ControllerInterface {
         try {
             const mission: createMissionDTO = req.body;
 
-            if (!mission.title || !mission.difficulty || !mission.description) {
-                res.status(400).json({ error: 'Missing required information to create a mission' });
-                return;
+            if (!mission.title || !mission.difficulty) {
+                throw new ThrowsError('Missing required information to create a mission', 400);
             }
 
-            if(!mission.SP && !mission.XP && !mission.money) {
-                res.status(400).json({ error: 'The mission needs rewards' });
-                return;
+            if(!mission.sp && !mission.xp && !mission.money) {
+                throw new ThrowsError('The mission needs rewards', 400);
+            }
+
+            if(!mission.description) {
+                throw new ThrowsError('The mission needs a description', 400);
             }
             
             const missionData: createMissionDTO = MissionMapper.mapCreateMissionToDTO(mission)
 
             const newMission = await missionsServices.create(missionData);
+            console.log(newMission);
             res.status(201).json({ newMission });
         } catch (err: any) {
             if (err instanceof ThrowsError) {
@@ -81,19 +85,31 @@ export class MissionsController implements ControllerInterface {
     async update(req: Request, res: Response): Promise<void> {
         try {
             const missionId = parseInt(req.params.id);
-            const mission: updateMissionDTO = req.body;
+            if (isNaN(missionId) || missionId <= 0) {
+                throw new ThrowsError('Invalid mission ID', 400);
+            }
 
-            if (!missionId) {
-                res.status(400).json({ error: 'Invalid mission ID' });
+            const mission: updateMissionDTO = req.body;
+            if (!mission || typeof mission !== 'object') {
+                throw new ThrowsError('Invalid mission data', 400);
+            }
+
+            if (mission.money !== undefined && isNaN(mission.money)) {
+                throw new ThrowsError('Invalid type for money, expected a number', 400);
+            }
+            if (mission.sp !== undefined && isNaN(mission.sp)) {
+                throw new ThrowsError('Invalid type for sp, expected a number', 400);
+            }
+            if (mission.xp !== undefined && isNaN(mission.xp)) {
+                throw new ThrowsError('Invalid type for xp, expected a number', 400);
             }
 
             const missionExists: Mission = await missionsServices.getById(missionId);
-
             if (!missionExists) {
-                res.status(400).json({ error: 'Mission not found' });
-                return;
+                throw new ThrowsError('Mission not found', 404);
             }
-        
+
+            mission.id = missionId;
             const missionData: updateMissionDTO = MissionMapper.mapUpdateMissionToDTO(mission);
 
             const updatedMission = await missionsServices.update(missionData);
@@ -102,6 +118,7 @@ export class MissionsController implements ControllerInterface {
             if (err instanceof ThrowsError) {
                 res.status(err.statusCode).json({ error: err.message });
             } else {
+                console.error(err);
                 res.status(500).json({ error: "Internal server error" });
             }
         }
@@ -110,20 +127,13 @@ export class MissionsController implements ControllerInterface {
     async delete(req: Request, res: Response): Promise<void> {
         try {
             const missionId = parseInt(req.params.id);
-            const userId = req.userId as number;
-
-            if(!userId) {
-                res.status(400).json({ error: 'Invalid user.' });
-                return;
-            }
 
             if (!missionId) {
-                res.status(400).json({ error: 'Invalid mission ID.' });
-                return;
+                throw new ThrowsError('Invalid mission ID.', 400);
             }
 
-            const deletedMission = await missionsServices.delete(userId, missionId);
-            res.status(200).json({ deletedMission: !!deletedMission });
+            const deletedMission = await missionsServices.delete(missionId);
+            res.status(200).json({ deletedMission });
         } catch (err: any) {
             if (err instanceof ThrowsError) {
                 res.status(err.statusCode).json({ error: err.message });

@@ -4,16 +4,20 @@ import { MissionDifficult } from "../models/enums/MissionDifficult";
 import { ServiceInterface } from "../interfaces/serviceInterface";
 import { createMissionDTO, updateMissionDTO } from "../DTOS/MissionDTO";
 import { ThrowsError } from "../errors/ThrowsError";
+import { FilterMission } from "../models/Filters";
 
 export class MissionsService implements ServiceInterface<createMissionDTO, updateMissionDTO, Mission> {
-	async getAll(): Promise<Mission[]> {
+	async getAll(filter: FilterMission): Promise<Mission[]> {
 		try {
-			const missions = await missionRepo.getAll();
+			const missions = await missionRepo.getAll(filter);
 			if (!missions) {
 				throw new ThrowsError("Missions not found", 404);
 			}
 			return missions;
 		} catch (error) {
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
 			throw new ThrowsError('Internal server error', 500);
 		}
 	}
@@ -26,6 +30,9 @@ export class MissionsService implements ServiceInterface<createMissionDTO, updat
 			}
 			return mission;
 		} catch (error) {
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
 			throw new ThrowsError('Internal server error', 500);
 		}
 	}
@@ -37,18 +44,16 @@ export class MissionsService implements ServiceInterface<createMissionDTO, updat
 			function isValidMissionDifficult(value: string): boolean {
 				return missionDifficult.includes(value as MissionDifficult);
 			}
-
-			if (!mission.title || mission.title.trim() === '') {
-				throw new ThrowsError('Title not found!', 400);
-			}
 			if (!isValidMissionDifficult(mission.difficulty)) {
 				throw new ThrowsError('Invalid difficulty!', 400);
 			}
-			if (!mission.description || mission.description.trim() === '') {
-				throw new ThrowsError('Empty description!', 400);
-			}
+
 			return await missionRepo.create(mission);
 		} catch (error) {
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			console.error(error);
 			throw new ThrowsError('Internal server error', 500);
 		}
 	}
@@ -61,18 +66,24 @@ export class MissionsService implements ServiceInterface<createMissionDTO, updat
 			}
 			return updatedMission;
 		} catch (error) {
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
 			throw new ThrowsError('Internal server error', 500);
 		}
 	}
 
-	async delete(id: number, userId: number): Promise<boolean> {
+	async delete(id: number): Promise<boolean> {
 		try {
-			const deletedMission = await missionRepo.delete(id, userId);
+			const deletedMission = await missionRepo.delete(id);
 			if (!deletedMission) {
 				throw new ThrowsError("Mission not deleted", 404);
 			}
 			return deletedMission;
 		} catch (error) {
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
 			throw new ThrowsError('Internal server error', 500);
 		}
 	}

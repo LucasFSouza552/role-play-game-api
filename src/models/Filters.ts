@@ -1,4 +1,5 @@
 import { ItemType } from "./enums/ItemType";
+import { MissionDifficult } from "./enums/MissionDifficult";
 
 export interface Filter {
     page: number;
@@ -24,8 +25,8 @@ export interface FilterGuild extends Filter {
 }
 
 export interface FilterMission extends Filter {
-    name?: string;
-    difficulty?: number;
+    title?: string; 
+    difficulty?: MissionDifficult;
 }
 
 export interface FilterChampion extends Filter {

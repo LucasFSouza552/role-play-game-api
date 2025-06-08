@@ -5,7 +5,7 @@ export interface Mission {
     title: string;
     description: string;
     difficulty: MissionDifficult;
-    XP?: number;
-    SP?: number; 
-    money: number;
+    xp?: number;
+    sp?: number; 
+    money?: number;
 }

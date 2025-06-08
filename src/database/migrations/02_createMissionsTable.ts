@@ -11,9 +11,9 @@ export async function up(knex: Knex): Promise<void> {
         table.string('title').notNullable();
         table.text('description').notNullable();
         table.enu('difficulty', difficultyKeys).notNullable();
-        table.integer('xp');
-        table.integer('sp');
-        table.decimal('money');
+        table.integer('xp').defaultTo(0).notNullable();
+        table.integer('sp').defaultTo(0).notNullable();
+        table.decimal('money', 10, 2).defaultTo(0).notNullable();
     });
 }
 

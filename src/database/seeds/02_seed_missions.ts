@@ -5,7 +5,6 @@ import { MissionStatus } from "../../models/enums/MissionStatus";
 export async function seed(knex: Knex): Promise<void> {
   await knex('missions').insert([
     {
-      id: 1,
       title: "Defeat the Goblin King",
       description: "Eliminate the Goblin King in the Dark Forest.",
       difficulty: MissionDifficult.HARD,
@@ -14,7 +13,6 @@ export async function seed(knex: Knex): Promise<void> {
       sp: 6,
     },
     {
-      id: 2,
       title: "Gather Herbs",
       description: "Collect 10 healing herbs near the river.",
       difficulty: MissionDifficult.EASY,
@@ -23,7 +21,6 @@ export async function seed(knex: Knex): Promise<void> {
       sp: 1,
     },
     {
-      id: 3,
       title: "Rescue the Merchant",
       description: "Save the merchant captured by bandits.",
       difficulty: MissionDifficult.MEDIUM,
@@ -32,7 +29,6 @@ export async function seed(knex: Knex): Promise<void> {
       sp: 3,
     },
     {
-      id: 4,
       title: "Enter the God Realm",
       description: "Survive a challenge from the gods themselves.",
       difficulty: MissionDifficult.GOD,
