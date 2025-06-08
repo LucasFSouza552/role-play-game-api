@@ -65,8 +65,7 @@ export class ChampionRoleController implements ControllerInterface {
         try {
             const filters: FilterChampionRole = filterConfig(req.query);
             const roles: ChampionRole[] = await championRoleService.getAll(filters);
-
-            res.status(200).json({ roles: roles, length: roles.length });
+            res.status(200).json({ roles, length: roles.length });
         } catch (error: any) {
             if (error instanceof ThrowsError) {
                 res.status(error.statusCode).json({ error: error.message });
@@ -87,7 +86,6 @@ export class ChampionRoleController implements ControllerInterface {
             const role = await championRoleService.getById(roleId);
             if(!role) {
                 throw new ThrowsError("Role not found", 404);
-                return;
             }
             res.status(200).json(role);
         } catch (error: any) {

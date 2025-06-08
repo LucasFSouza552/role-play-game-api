@@ -19,7 +19,7 @@ export class UserMapper {
 
     public static mapCreateUserToDTO(user: user): createUserDTO {
         return {
-            name: user.name,
+            name: user.name.trim(),
             email: user.email,
             password: user.password
         };
@@ -28,8 +28,9 @@ export class UserMapper {
     public static mapUserToUpdateDTO(user: updateUserDTO): updateUserDTO {
         return {
             id: user.id!,
-            ...(user.name && { name: user.name }),
-            ...(user.password && { password: user.password })
+            ...(user.name && { name: user.name.trim() }),
+            ...(user.password && { password: user.password }),
+            ...(user.role && { role: user.role })
         };
     }
 }

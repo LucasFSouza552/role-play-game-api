@@ -4,7 +4,7 @@ import { ChampionSkill } from "../models/ChampionSkill";
 import { GuildService } from "../services/GuildService";
 import { FilterChampion } from "../models/Filters";
 import { ControllerInterface } from "../interfaces/controllerInterface";
-import {	
+import { 
 	ChampionDTO,
 	createChampionDTO,
 	updateChampionDTO,
@@ -26,14 +26,15 @@ export class ChampionController implements ControllerInterface {
 	async getAll(req: Request, res: Response): Promise<void> {
 		try {
 			const filters: FilterChampion = filterConfig({...req.query, userId: req.userId});
-			
+
 			const champions: ChampionDTO[] = await championService.getAll(filters);
-			if(!champions) {
-				throw new ThrowsError("Champions not found", 404);
+			res.status(200).json({ champions, length: champions.length });
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
 			}
-			res.status(200).json({ champions: champions, length: champions.length });
-		} catch (err: any) {
-			res.status(500).json({ error: err.message });
 		}
 	}
 
@@ -43,22 +44,22 @@ export class ChampionController implements ControllerInterface {
 			const userId: number = req.userId as number;
 
 			if (!championId) {
-				res.status(400).json({ error: "Invalid champion ID" });
-				return;
+				new ThrowsError("Invalid champion ID", 400);
 			}
 
 			const champion: ChampionDTO = await championService.getById(championId, userId);
 
 			if (!champion) {
-				res.status(404).json({ error: "Champion not found" });
-				return;
+				throw new ThrowsError("Champion not found", 404);
 			}
 
 			res.status(200).json(champion);
-			return;
-		} catch (err: any) {
-			res.status(500).json({ error: err.message || "Internal server error" });
-			return;
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 
@@ -67,22 +68,21 @@ export class ChampionController implements ControllerInterface {
 			const champion: createChampionDTO = req.body;
 			const userId: number = req.userId as number;
 
-			if (!champion.name || !champion.roleId) {
-				res
-					.status(400)
-					.json({ error: "Missing required information to create a champion" });
-				return;
+			if (!champion.name.trim() || isNaN(champion.roleId) || champion.roleId <= 0) {
+				throw new ThrowsError(
+					"Missing required information to create a champion",
+					400
+				);
 			}
 
 			if (!userId) {
-				res.status(400).json({ error: "Invalid User" });
-				return;
+				throw new ThrowsError("Invalid User", 400);
 			}
 
 			champion.userId = userId;
 
 			const championData: createChampionDTO = ChampionMapper.mapCreateChampionToDTO(champion);
-			
+
 			const newChampion: ChampionDTO = await championService.create(championData);
 
 			const inventoryData: createInventoryDTO = InventoryMapper.mapCreateInventoryToDTO({
@@ -93,13 +93,43 @@ export class ChampionController implements ControllerInterface {
 			await championInventoryService.create(inventoryData);
 
 			res.status(201).json(newChampion);
-		} catch (err: any) {
-			res.status(400).json({ error: err.message });
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 
 	async update(req: Request, res: Response): Promise<void> { // Atualiza o nome do campeão
-		throw new Error("Not implemented");
+		try {
+			const championID = parseInt(req.params.id);
+			const userId = req.userId as number;
+
+			if (!championID) {
+				throw new ThrowsError("Invalid champion ID", 400);
+			}
+
+			const { name } = req.body;
+
+			if (!name) {
+				throw new ThrowsError("Missing required information to update a champion", 400);
+			}
+
+			const updatedChampion: updateChampionDTO = ChampionMapper.mapChampionToUpdateDTO({id: championID, userId, name});
+
+			const champion: ChampionDTO = await championService.update(updatedChampion);
+
+			res.status(200).json(champion);
+
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
+		}
 	}
 
 	async updateStatus(req: Request, res: Response): Promise<void> {
@@ -109,13 +139,11 @@ export class ChampionController implements ControllerInterface {
 			const { strength, dexterity, intelligence, vitality } = req.body;
 
 			if (!userId) {
-				res.status(400).json({ error: "Invalid user" });
-				return;
+				throw new ThrowsError("Invalid user", 400);
 			}
 
 			if (!championId) {
-				res.status(400).json({ error: "Invalid champion ID" });
-				return;
+				throw new ThrowsError("Invalid champion ID", 400);
 			}
 
 			if (
@@ -124,35 +152,23 @@ export class ChampionController implements ControllerInterface {
 				intelligence == null &&
 				vitality == null
 			) {
-				res
-					.status(400)
-					.json({ error: "No attributes were sent to update" });
-				return;
+				throw new ThrowsError("No attributes were sent to update", 400);
 			}
 
 			const status = [strength, dexterity, intelligence, vitality];
 			if (status.some((stat) => stat < 0)) {
-				res
-					.status(400)
-					.json({ error: "The status value must be greater than zero" });
-				return;
+				throw new ThrowsError("The status value must be greater than zero", 400);
 			}
 
 			const championExists = await championService.getById(championId, userId);
 			if (!championExists) {
-				res.status(404).json({ error: "Champion not found" });
-				return;
+				throw new ThrowsError('Champion not found', 404);
 			}
 
 			const totalSP = status.reduce((acc, stat) => acc + (stat || 0), 0);
 
 			if (totalSP > championExists.sp) {
-				res
-					.status(400)
-					.json({
-						error: `The total of SP cannot be greater than ${championExists.sp} points`,
-					});
-				return;
+				new ThrowsError(`The total of SP cannot be greater than ${championExists.sp} points`, 400);
 			}
 
 			const championData: updatedChampionStatusDTO = ChampionMapper.mapChampionToUpdateStatusDTO({
@@ -167,8 +183,12 @@ export class ChampionController implements ControllerInterface {
 
 			const updatedChampion = await championService.updateChampionStatus(championData);
 			res.status(200).json(updatedChampion);
-		} catch (err: any) {
-			res.status(500).json({ error: err.message });
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 
@@ -178,25 +198,26 @@ export class ChampionController implements ControllerInterface {
 			const userId: number = req.userId as number;
 
 			if (!userId) {
-				res.status(400).json({ error: "Invalid User" });
-				return;
+				throw new ThrowsError("Invalid User", 400);
 			}
 
 			if (!championId) {
-				res.status(400).json({ error: "Invalid Champion ID" });
-				return;
+				throw new ThrowsError("Invalid Champion ID", 400);
 			}
 
 			const championExists = await championService.getById(championId, userId);
 			if (!championExists) {
-				res.status(404).json({ error: "Champion not found" });
-				return;
+				throw new ThrowsError("Champion not found", 404);
 			}
 
 			const deletedChampion = await championService.delete(championId,userId);
 			res.status(200).json({ deleted: deletedChampion});
-		} catch (err: any) {
-			res.status(500).json({ error: err.message });
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 
@@ -207,38 +228,37 @@ export class ChampionController implements ControllerInterface {
 			const userId: number = req.userId as number;
 
 			if (!championId) {
-				res.status(400).json({ error: "Invalid champion ID" });
-				return;
+				throw new ThrowsError("Invalid champion ID", 400);
 			}
 
 			if (!userId) {
-				res.status(400).json({ error: "Invalid user" });
-				return;
+				throw new ThrowsError("Invalid user", 400);
 			}
 
 			const championExists = await championService.getById(championId, userId);
 			if (!championExists) {
-				res.status(404).json({ error: "Champion not found" });
-				return;
+				throw new ThrowsError("Champion not found", 404);
 			}
 
 			if (!skillId) {
-				res.status(400).json({ error: "Invalid skill ID" });
-				return;
+				throw new ThrowsError("Invalid skill ID", 400);
 			}
 
 			const hasSkill = championExists.skills?.some(
 				(skill: ChampionSkill) => skill.id === skillId
 			);
 			if (hasSkill) {
-				res.status(400).json({ error: "A skill already exists" });
-				return;
+				throw new ThrowsError("A skill already exists", 400);
 			}
 
 			const addedSkill = await championService.addSkill(championId, skillId);
 			res.status(200).json(addedSkill);
-		} catch (err: any) {
-			res.status(400).json({ error: err.message });
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 
@@ -247,15 +267,17 @@ export class ChampionController implements ControllerInterface {
 			const championId = parseInt(req.params.id);
 
 			if (!championId) {
-				res.status(400).json({ error: "Invalid champion ID" });
-				return;
+				throw new ThrowsError("Invalid champion ID", 400);
 			}
 
 			const championSkills = await championService.getSkills(championId);
 			res.status(200).json(championSkills);
-		} catch (err: any) {
-			res.status(500).json({ error: err.message || "Internal server error" });
-			return;
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 
@@ -266,33 +288,26 @@ export class ChampionController implements ControllerInterface {
 			const userId: number = req.userId as number;
 
 			if (!championId || !guildId) {
-				res
-					.status(400)
-					.json({ error: "Missing required information to join the guild" });
-				return;
+				throw new ThrowsError("Missing required information to join the guild", 400);
 			}
 
 			if (!userId) {
-				res.status(400).json({ error: "Invalid user" });
-				return;
+				throw new ThrowsError("Invalid user", 400);
 			}
 
 			const guildExists = await guildService.getById(guildId);
 
 			if (!guildExists) {
-				res.status(404).json({ error: "Guild not found" });
-				return;
+				throw new ThrowsError("Guild not found", 404);
 			}
 
 			const championExists = await championService.getById(championId, userId);
 			if (!championExists) {
-				res.status(404).json({ error: "Champion not found" });
-				return;
+				throw new ThrowsError("Champion not found", 404);
 			}
 
 			if (championExists.guildId) {
-				res.status(400).json({ error: "The champion already belongs to a guild" });
-				return;
+				throw new ThrowsError("The champion already belongs to a guild", 400);
 			}
 
 			const joinedGuild = await championService.updateChampionGuild({
@@ -301,8 +316,12 @@ export class ChampionController implements ControllerInterface {
 				userId: userId,
 			});
 			res.status(200).json(joinedGuild);
-		} catch (err: any) {
-			res.status(400).json({ error: err.message });
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 
@@ -312,28 +331,21 @@ export class ChampionController implements ControllerInterface {
 			const userId: number = req.userId as number;
 
 			if (!championId) {
-				res.status(400).json({ error: "Invalid champion ID" });
-				return;
+				new ThrowsError("Invalid champion ID", 400);
 			}
 
 			if (!userId) {
-				res.status(400).json({ error: "Invalid user" });
-				return;
+				new ThrowsError("Invalid user", 400);
 			}
 
 			const championExists = await championService.getById(championId, userId);
 			if (!championExists) {
-				res.status(404).json({ error: "Champion not found" });
-				return;
+				new ThrowsError("Champion not found", 404);
 			}
 
 			if (!championExists.guildId) {
-				res
-					.status(400)
-					.json({ error: "The champion does not belong to any guild" });
-				return;
+				new ThrowsError("The champion does not belong to any guild", 400);
 			}
-
 
 			const updatedChampionData: updateChampionDTO = ChampionMapper.mapChampionToUpdateDTO({
 				id: championId,
@@ -343,8 +355,12 @@ export class ChampionController implements ControllerInterface {
 
 			const updatedChampion = await championService.updateChampionGuild(updatedChampionData);
 			res.status(200).json(updatedChampion);
-		} catch (err: any) {
-			res.status(400).json({ error: err.message });
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 
@@ -354,14 +370,17 @@ export class ChampionController implements ControllerInterface {
 			const userId = req.userId as number;
 
 			if (!championId) {
-				res.status(400).json({ error: "Invalid champion ID" });
-				return;
+				throw new ThrowsError("Invalid champion ID", 400);
 			}
 
 			const inventory = await championService.getInventory(championId, userId);
 			res.status(200).json(inventory);
-		} catch (err: any) {
-			res.status(400).json({ error: err.message });
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 
@@ -372,18 +391,15 @@ export class ChampionController implements ControllerInterface {
 			const { itemId, quantity, price, rarity } = req.body;
 
 			if (!championId) {
-				res.status(400).json({ error: "Invalid champion ID" });
-				return;
+				throw new ThrowsError("Invalid champion ID", 400);
 			}
 
 			if (!itemId) {
-				res.status(400).json({ error: "Invalid item ID" });
-				return;
+				throw new ThrowsError("Invalid item ID", 400);
 			}
 
 			if (!quantity || isNaN(quantity) || quantity <= 0 || quantity > 999) {
-				res.status(400).json({ error: "Invalid quantity" });
-				return;
+				throw new ThrowsError("Invalid quantity", 400);
 			}
 
 			const inventory = await championService.createInventoryItem(
@@ -395,8 +411,12 @@ export class ChampionController implements ControllerInterface {
 				rarity || "Common"
 			);
 			res.status(200).json(inventory);
-		} catch (err: any) {
-			res.status(400).json({ error: err.message });
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 
@@ -407,23 +427,19 @@ export class ChampionController implements ControllerInterface {
 			const { itemId, quantity, price } = req.body;
 
 			if (!championId) {
-				res.status(400).json({ error: "Invalid champion ID" });
-				return;
+				new ThrowsError("Invalid champion ID", 400);
 			}
 
 			if (!itemId) {
-				res.status(400).json({ error: "Invalid item ID" });
-				return;
+				new ThrowsError("Invalid item ID", 400);
 			}
 
 			if (price === undefined || price < 0) {
-				res.status(400).json({ error: "Invalid price" });
-				return;
+				new ThrowsError("Invalid price", 400);
 			}
 
 			if (!quantity || isNaN(quantity) || quantity < 0) {
-				res.status(400).json({ error: "Invalid quantity" });
-				return;
+				new ThrowsError("Invalid quantity", 400);
 			}
 
 			const inventory = await championService.updateInventoryItem(
@@ -433,10 +449,14 @@ export class ChampionController implements ControllerInterface {
 				quantity,
 				price
 			);
-			
+
 			res.status(200).json(inventory);
-		} catch (err: any) {
-			res.status(400).json({ error: err.message });
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 }

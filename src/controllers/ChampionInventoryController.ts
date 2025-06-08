@@ -15,22 +15,34 @@ export class ChampionInventoryController implements ControllerInterface {
 			const inventories = inventoryService.getAll(filter);
 			res.status(200).json(inventories);
 		} catch (error: any) {
-			throw new Error("Error fetching inventories");
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 	async getById(req: Request, res: Response): Promise<void> {
+		try {
 		const inventoryId = parseInt(req.params.id);
 
-		if (!inventoryId) {
-			res.status(400).json({ error: "Invalid ID" });
-			return;
-		}
+			if (!inventoryId) {
+				throw new ThrowsError("Invalid ID", 400);
+			}
 
-		try {
 			const inventory = await inventoryService.getById(inventoryId);
+
+			if (!inventory) {
+				throw new ThrowsError("Inventory not found", 404);
+			}
+
 			res.status(200).json(inventory);
-		} catch (err: any) {
-			res.status(404).json({ error: err.message });
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 	async create(req: Request, res: Response): Promise<void> {
@@ -38,14 +50,17 @@ export class ChampionInventoryController implements ControllerInterface {
 			const inventoryData: createInventoryDTO = req.body;
 
 			if (!inventoryData.ownerId) {
-				res.status(400).json({ error: "Missing required fields" });
-				return;
+				throw new ThrowsError("Missing required fields", 400);
 			}
 
 			const inventory = await inventoryService.create(inventoryData);
 			res.status(201).json(inventory);
-		} catch (err: any) {
-			res.status(400).json({ error: err.message });
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 	async update(req: Request, res: Response): Promise<void> {
@@ -53,21 +68,22 @@ export class ChampionInventoryController implements ControllerInterface {
 			const id = parseInt(req.params.id);
 
 			if (!id) {
-				res.status(400).json({ error: "Invalid ID" });
-				return;
+				throw new ThrowsError("Invalid ID", 400);
 			}
-			//TODO: Fazer Mapper
 			const inventoryData: updateInventoryDTO = req.body;
 
 			if (!inventoryData.capacity) {
-				res.status(400).json({ error: "Missing required fields" });
-				return;
+				throw new ThrowsError("Missing required fields", 400);
 			}
 
 			const inventory = await inventoryService.update(inventoryData);
 			res.status(200).json(inventory);
-		} catch (err: any) {
-			res.status(400).json({ error: err.message });
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 	async delete(req: Request, res: Response): Promise<void> {
@@ -104,49 +120,50 @@ export class ChampionInventoryController implements ControllerInterface {
 			const { itemId , quantity, itemPrice, rarity } = req.body;
 
 			if (!itemId || isNaN(itemId)) {
-				res.status(400).json({ error: "Invalid item" });
-				return;
+				throw new ThrowsError("Invalid item", 400);
 			}
 
 			if (itemPrice === undefined) {
-				res.status(400).json({ error: "Invalid item price" });
-				return;
+				throw new ThrowsError("Invalid item price", 400);
 			}
 
 			if (!quantity || isNaN(quantity) || quantity <= 0) {
-				res.status(400).json({ error: "Invalid quantity" });
-				return;
+				throw new ThrowsError("Invalid quantity", 400);
 			}
 
 			const inventory = await inventoryService.createItemInventory(inventoryId, itemId, quantity, itemPrice, rarity);
 			res.status(200).json(inventory);
-		} catch (err: any) {
-			res.status(400).json({ error: err.message });
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 	}
 
 	async removeItemInventory(req: Request, res: Response): Promise<void> {
 		try {
-			const userId: number = req.userId as number;
 			const inventoryId = parseInt(req.params.id);
 			const item = parseInt(req.body.item);
-
 			if (!item || isNaN(item)) {
-				res.status(400).json({ error: "Invalid item or quantity" });
-				return;
+				throw new ThrowsError("Invalid item or quantity", 400);
 			}
 
 			const inventoryExists = await inventoryService.getById(inventoryId);
 			if (!inventoryExists) {
-				res.status(404).json({ error: "Inventory not found" });
-				return;
+				throw new ThrowsError("Inventory not found", 404);
 			}
 
 			const updatedInventory = await inventoryService.removeItemInventory(inventoryId, item);
 			res.status(200).json(updatedInventory);
 
-		} catch (err: any) {
-			res.status(400).json({ error: err?.message || "Unexpected error occurred" });
+		}catch (error: any) {
+			if (error instanceof ThrowsError) {
+				res.status(error.statusCode).json({ error: error.message });
+			} else {
+				res.status(500).json({ error: 'Internal server error' });
+			}
 		}
 
 	}

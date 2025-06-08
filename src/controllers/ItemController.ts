@@ -14,9 +14,6 @@ export class ItemController implements ControllerInterface {
 		try {
 			const filter: FilterItem = filterConfig(req.query);
 			const items = await itemService.getAll(filter);
-			if (!items) {
-				throw new ThrowsError("Items not found", 404);
-			}
 			res.status(200).json({items, total: items.length});
 		} catch (error) {
 			if (error instanceof ThrowsError) {

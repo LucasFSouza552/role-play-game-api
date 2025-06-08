@@ -34,6 +34,8 @@ const ItemRoute = Router();
  *       - in: query
  *         name: minPrice
  *         required: false
+ *         minimum: 0
+ *         maximum: 999
  *         description: Preço mínimo do item
  *         schema:
  *           type: number
@@ -41,6 +43,8 @@ const ItemRoute = Router();
  *       - in: query
  *         name: maxPrice
  *         required: false
+ *         minimum: 0
+ *         maximum: 999
  *         description: Preço máximo do item
  *         schema:
  *           type: number

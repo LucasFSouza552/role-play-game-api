@@ -30,7 +30,7 @@ export class ChampionMapper {
 
 	public static mapCreateChampionToDTO(champion: Champion | createChampionDTO): createChampionDTO {
 		return {
-			name: champion.name,
+			name: champion.name.trim(),
 			roleId: champion.roleId,
 			userId: champion.userId,
 			hp: champion.hp,

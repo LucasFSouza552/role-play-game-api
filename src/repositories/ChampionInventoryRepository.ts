@@ -136,14 +136,14 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 		}
 	}
 
-	async getItemById(inventoryId:number, itemId:number): Promise<InventoryItens> {
+	async getItemById(inventoryId:number, itemId:number): Promise<InventoryItens | null> {
 		try {
 			const itens = await db("champion_items")
 				.join('items', 'champion_items.itemId', '=', 'items.id')
 				.select("items.id", "items.name", "items.description","champion_items.quantity", "items.type", "rarity", "champion_items.price")
 				.where({ inventoryId, itemId }).first();
 			if (!itens) {
-				throw new ThrowsError("Item not found", 404);
+				return null;
 			}
 			return itens;
 		} catch (error: any) {

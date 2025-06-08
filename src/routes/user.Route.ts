@@ -253,7 +253,7 @@ userRoute.get("/profile", AuthMiddleware, userController.getById);
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Missing information to create a user"
+ *                   example: "Missing information to create a user or Invalid email"
  *       409:
  *         description: Conflito - Usuário já existe
  *         content:
@@ -369,7 +369,7 @@ userRoute.post("/login", userController.authenticateUser);
 
 /**
  * @swagger
- * /api/user/update:
+ * /api/user:
  *   patch:
  *     summary: Atualizar dados do usuário
  *     description: Atualiza os dados do usuário. Apenas administradores podem alterar o campo 'role' de outros usuários.
@@ -470,88 +470,6 @@ userRoute.post("/login", userController.authenticateUser);
  *                   type: string
  *                   example: "Internal server error"
  */
-userRoute.patch("/update", AuthMiddleware, validateAllowedFields, userController.update);
-
-/**
- * @swagger
- * /api/user:
- *   patch:
- *     summary: Atualizar usuário
- *     description: Atualiza os dados do usuário autenticado.
- *     tags:
- *       - Usuários (Users)
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 description: Nome do usuário
- *               email:
- *                 type: string
- *                 format: email
- *                 description: Email do usuário
- *               password:
- *                 type: string
- *                 format: password
- *                 description: Nova senha do usuário
- *     responses:
- *       200:
- *         description: Usuário atualizado com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *                   description: Novo token JWT de autenticação
- *       400:
- *         description: Dados inválidos
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Missing information to update a user"
- *       401:
- *         description: Não autorizado
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Invalid token. Use format Bearer <token>"
- *       404:
- *         description: Usuário não encontrado
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "User not found"
- *       500:
- *         description: Erro interno do servidor
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Internal server error"
- */
-userRoute.patch("/", AuthMiddleware, userController.update);
+userRoute.patch("/", AuthMiddleware, validateAllowedFields, userController.update);
 
 export default userRoute;

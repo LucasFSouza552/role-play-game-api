@@ -135,6 +135,8 @@ ChampionRoute.get("/", championController.getAll);
  *         schema:
  *           type: integer
  *           minimum: 1
+ *           maximum: 2147483647
+ *           example: 1
  *     responses:
  *       200:
  *         description: Detalhes do campeão

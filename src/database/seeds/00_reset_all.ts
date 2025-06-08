@@ -2,6 +2,8 @@ import { Knex } from 'knex';
 
 export async function seed(knex: Knex): Promise<void> {
     // Busca todas as tabelas do schema 'public'
+
+
     const tablesResult = await knex
         .select('tablename')
         .from('pg_tables')

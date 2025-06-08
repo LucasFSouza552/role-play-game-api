@@ -4,7 +4,7 @@ import { user } from "./../models/User";
 export type createUserDTO = Omit<user, 'id' | 'role'>;
 
 // Atualizar o usuário sem o cargo (role)
-export type updateUserDTO = Required<Pick<user, 'id'>> & Partial<Pick<user, 'name' | 'password'>>;
+export type updateUserDTO = Required<Pick<user, 'id'>> & Partial<Pick<user, 'name' | 'password' | 'role'>>;
 
 // Retonar o usuário sem a senha
 export type userDTO = Omit<user, 'password'>;

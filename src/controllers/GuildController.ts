@@ -15,9 +15,6 @@ export class GuildController implements ControllerInterface {
 			const filter: FilterGuild = filterConfig(req.query); 
 
 			const guilds = await guildService.getAll(filter);
-			if (!guilds) {
-				throw new ThrowsError("Guilds not found", 404);
-			}
 			res.json({ guilds, total: guilds.length });
 		} catch (error: any) {
 			if (error instanceof ThrowsError) {

@@ -33,9 +33,6 @@ export class ShopController implements ControllerInterface {
 		try {
 			const filter: FilterShop = filterConfig(req.query);
 			const shops = await shopService.getAll(filter);
-			if(!shops) {
-				throw new ThrowsError("Shops not found", 404);
-			}
 			res.status(200).json({shops, total: shops.length});
 		} catch (error) {
 			if (error instanceof ThrowsError) {

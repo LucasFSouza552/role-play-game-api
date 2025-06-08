@@ -367,10 +367,6 @@ const swaggerOptions = {
         description: "Operações de classes"
       },
       {
-        name: "Habilidades (Skills)",
-        description: "Operações de habilidades"
-      },
-      {
         name: "Guildas (Guilds)",
         description: "Operações de guildas"
       },

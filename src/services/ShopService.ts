@@ -156,6 +156,7 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 				item.quantity -= quantity;
 	
 				const itemExists = await championInventoryRepo.getItemById(championInventory.id, itemId);
+				console.log(itemExists);
 				const updatedChampionMoney = parseFloat((parseFloat(champion.money.toString()) - item.price * quantity).toFixed(2));
 				await championRepo.updateMoney(championId, updatedChampionMoney);
 	
@@ -188,7 +189,7 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 				const championInventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId);
 				if (!championInventory) throw new ThrowsError('Champion inventory not found', 404);
 
-				const item: InventoryItens = await championInventoryRepo.getItemById(championInventory.id, itemId);
+				const item: InventoryItens | null = await championInventoryRepo.getItemById(championInventory.id, itemId);
 				if (!item) throw new ThrowsError("Item not found in champion inventory", 404);
 				if (item.quantity < quantity) throw new ThrowsError("Not enough items in champion inventory", 400);
 

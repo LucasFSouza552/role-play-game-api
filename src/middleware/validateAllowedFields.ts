@@ -32,11 +32,11 @@ export async function validateAllowedFields(req: Request, res: Response, next: N
 			});
 			return;
 		}
-
+		
 		if (fields.includes('role') || fields.includes('id')) {
 			const targetUserId = req.body.id;
 			if (user.role !== 'admin') {
-				throw new ThrowsError("You do not have permission to change the 'role' field.", 403);
+				throw new ThrowsError("You do not have permission to change the 'role' or 'id' field.", 403);
 			}
 			if (targetUserId === userId) {
 				throw new ThrowsError("You cannot change your own 'role'.", 403);

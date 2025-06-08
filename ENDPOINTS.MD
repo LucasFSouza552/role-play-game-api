@@ -3,59 +3,75 @@
 /api
 ```
 
-
-### Usuário (User)
-```bash 
-GET /user # Exibe dados sobre o usuário
-POST /user/register # Cria um novo usuário
-POST /user/login # Autenticar usuário
-PATCH /user/update #Atualiza dados do usuário
+### Usuário (user)
+```bash
+GET /api/user # Listar todos os usuários
+PATCH /api/user # Atualizar dados do usuário
+GET /api/user/profile # Obter dados do usuário logado
+POST /api/user/register # Criar um novo usuário
+POST /api/user/login # Autenticar usuário
 ```
 
-### Aventureiro (Champion)
+### Campeões (champions)
 ```bash
-GET /champions # Exibe todos os aventureiros
-GET /champions/:id # Exibe um aventureiro específico
-GET /champions/:id/skills # Retorna todas as habilidades de um aventureiro
-POST /champions #Cria um Aventureiro
-POST /champions/:id/items # Adiciona um item no inventário do aventureiro
-POST /champions/:id/skill # Adicionar uma habilidade ao aventureiro
-POST /champions/:id/guilds/join # Aventureiro entrar na guilda
-PATCH /champions # Atualiza um aventureiro
-```
-    
-### Guilda (Guilds)
-```bash
-GET /guilds # Retorna todas as guildas
-GET /guilds/:id # Retorna uma guilda específica
-POST /guilds # Cria uma guilda
-PATCH /guilds # Atualiza o nome da guilda
+GET /api/champions # Listar todos os campeões do usuário
+POST /api/champions # Criar um novo campeão
+GET /api/champions/{id} # Recuperar um campeão específico do usuário
+DELETE /api/champions/{id} # Excluir um campeão
+PATCH /api/champions/{id} # Atualizar o nome de um campeão
+POST /api/champions/{id}/skills # Adicionar habilidade ao campeão
+PATCH /api/champions/{id}/status # Atualizar o status de um campeão
+PATCH /api/champions/{id}/guild/join # Entrar na guilda
+PATCH /api/champions/{id}/guild/leave # Sair da guilda
+GET /api/champions/{id}/inventory # Obter inventário do campeão
+POST /api/champions/{id}/inventory # Atualizar inventário do campeão (Administradores)
+PATCH /api/champions/{id}/inventory # Atualizar quantidade de itens no inventário (Administradores)
 ```
 
-### Missões (Missions)
+### Itens (items)
 ```bash
-GET /missions # Retorna todas as missões
-GET /missions/:id # Retorna uma guilda específica
-POST /missions # Cria uma missão
-PATCH /missions # Atualiza uma missão
-POST /missions/:id/accept # Aceita uma missão específica
+GET /api/items # Listar todos os itens
+POST /api/items # Criar novo item
+GET /api/items/{id} # Obter item por ID
+PATCH /api/items/{id} # Atualizar item
+DELETE /api/items/{id} # Excluir item
 ```
 
-### Lojas (Shop)
+### Missões (missions)
 ```bash
-GET /shop # Retorna todas as lojas
-GET /shop/:id # Retorna uma loja específica
-GET /shop/:id/stock # Retorna os itens de uma loja específica
-POST /shop/:id/stock/buy # Compra um item da loja
-POST /shop/:id/stock/sell # Vende um item da loja
-POST /shop # Cria uma loja
+GET /api/missions # Listar todas as missões
+POST /api/missions # Criar nova missão
+GET /api/missions/{id} # Obter missão por ID
+PATCH /api/missions/{id} # Atualizar missão
+DELETE /api/missions/{id} # Excluir missão
 ```
 
-### Itens (Itens)
+### Classes (roles)
 ```bash
-GET /itens # Retornar todos os itens
-GET /itens/:id # Retorna um item em específico
-POST /itens # Cria um novo item
-POST /itens # Atualiza um item
-DELETE /itens # Apaga um item
+GET /api/roles # Listar classes disponíveis
+POST /api/roles # Criar nova classe
+PATCH /api/roles # Atualizar classe
+GET /api/roles/{id} # Recuperar uma classe específica
+DELETE /api/roles/{id} # Excluir classe
+```
+
+### Guildas (guilds)
+```bash
+GET /api/guilds # Listar guildas
+POST /api/guilds # Criar nova guilda
+GET /api/guilds/{id} # Obter guilda por ID
+PATCH /api/guilds/{id} # Atualizar guilda
+DELETE /api/guilds/{id} # Excluir guilda
+```
+
+### Lojas (shop)
+```bash
+GET /api/shop # Listar todas as lojas
+POST /api/shop # Criar nova loja
+GET /api/shop/{id} # Buscar loja por ID
+PATCH /api/shop/{id} # Atualizar loja
+DELETE /api/shop/{id} # Excluir loja
+GET /api/shop/{id}/inventory # Obter inventário da loja
+POST /api/shop/{id}/purchase # Realizar compra
+POST /api/shop/{id}/sell # Realizar venda
 ```

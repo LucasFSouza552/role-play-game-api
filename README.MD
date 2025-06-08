@@ -10,15 +10,13 @@ Este projeto é uma API desenvolvida para gerenciar elementos de um jogo de RPG,
 ---
 
 ## 🚀 Funcionalidades
-Aventureiros: Cadastro e gerenciamento de personagens, incluindo nome, progressão, status, classe, inventário, guilda, missões e habilidades.
 
-Missões: Criação e atribuição de missões com título, descrição, dificuldade, prazo e recompensas.
-
-Guildas: Gerenciamento de guildas com nome, nível (baseado nos membros), membros e conquistas.
-
-Lojas: Controle de inventário e rotacionamento diário de itens.
-
-Itens: Cadastro de itens com nome, descrição, raridade, nível e preços.
+- **Usuários**: Registro, login, atualização de dados e acesso ao perfil do usuário logado.
+- **Aventureiros**: Cadastro e gerenciamento de personagens, incluindo nome, progressão, status, classe, inventário, guilda, missões e habilidades.
+- **Missões**: Criação e atribuição de missões com título, descrição, dificuldade, prazo e recompensas.
+- **Guildas**: Gerenciamento de guildas com nome, nível (baseado nos membros), membros e conquistas.
+- **Lojas**: Controle de inventário e rotacionamento diário de itens.
+- **Itens**: Cadastro de itens com nome, descrição, raridade, nível e preços.
 
 ---
 
@@ -51,5 +49,6 @@ Itens: Cadastro de itens com nome, descrição, raridade, nível e preços.
 ---
 
 ## 📌 Como Usar
-Consulte o arquivo ENDPOINTS.MD para obter detalhes sobre os endpoints disponíveis, incluindo métodos, parâmetros e exemplos de requisições.
+
+Consulte o arquivo [`ENDPOINTS.MD`](./ENDPOINTS.MD) para obter detalhes sobre todos os endpoints disponíveis, incluindo métodos, caminhos e descrições das funcionalidades.
 

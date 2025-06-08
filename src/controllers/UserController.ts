@@ -7,6 +7,7 @@ import { ControllerInterface } from "../interfaces/controllerInterface";
 import { createUserDTO, updateUserDTO } from "../DTOS/UserDTO";
 import { FilterDefault, FilterUser } from "../models/Filters";
 import { ThrowsError } from "../errors/ThrowsError";
+import isValidEmail from "../utils/emailValidator";
 
 const userService = new UserService();
 
@@ -16,9 +17,13 @@ export class UserController implements ControllerInterface {
 		try {
 			const user = req.body;
 
-			if (!user || !user.name || !user.email || !user.password) {
+			if (!user || !user.name.trim() || !user.email || !user.password) {
 				throw new ThrowsError('Missing information to create a user', 400);
 			}
+
+			if(!isValidEmail(user.email)) {
+				throw new ThrowsError('Invalid email', 400);
+			}	
 
 			const userExists = await userService.getByEmail(user.email);
 
@@ -41,7 +46,6 @@ export class UserController implements ControllerInterface {
 			if (error instanceof ThrowsError) {
 				res.status(error.statusCode).json({ error: error.message });
 			} else {
-				console.error(error);
 				res.status(500).json({ error: 'Internal server error' });
 			}
 		}
@@ -62,7 +66,6 @@ export class UserController implements ControllerInterface {
 			if (error instanceof ThrowsError) {
 				res.status(error.statusCode).json({ error: error.message });
 			} else {
-				console.error(error);
 				res.status(500).json({ error: 'Internal server error' });
 			}
 		}
