@@ -4,7 +4,7 @@ const tablename = 'guilds';
 export async function up(knex: Knex): Promise<void> {
     await knex.schema.createTable(tablename, (table) => {
         table.increments('id').primary();
-        table.string('name').primary();
+        table.string('name').unique().notNullable();
         table.integer('level').notNullable().defaultTo(1);
         table.timestamp('created_at').defaultTo(knex.fn.now());
     });

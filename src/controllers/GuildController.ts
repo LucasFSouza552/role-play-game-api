@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { GuildService } from '../services/GuildService';
 import { ControllerInterface } from '../interfaces/controllerInterface';
-import { updateGuildDTO } from '../DTOS/GuildDTO';
+import { createGuildDTO, updateGuildDTO } from '../DTOS/GuildDTO';
 import { FilterGuild } from '../models/Filters';
 import { ThrowsError } from '../errors/ThrowsError';
 import { GuildMapper } from '../utils/mapppers/guildMapping';
@@ -55,7 +55,9 @@ export class GuildController implements ControllerInterface {
 				throw new ThrowsError("Missing information to create guild", 400);
 			}
 
-			const newGuild = await guildService.create(guild);
+			const guildData: createGuildDTO = GuildMapper.mapCreateGuildToDTO(guild);
+
+			const newGuild = await guildService.create(guildData);
 
 			res.status(201).json(newGuild);
 		} catch (error: any) {
@@ -77,7 +79,7 @@ export class GuildController implements ControllerInterface {
 
 			const guild = {...req.body, id: guildId};
 
-			if (!guild.name && !guild.level) {
+			if (!guild.name.trim() && !guild.level) {
 				throw new ThrowsError("Missing information to update guild", 400);
 			}
 

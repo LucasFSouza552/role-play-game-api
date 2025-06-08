@@ -145,11 +145,19 @@ ChampionRoleRoute.get("/", championRoleController.getAll);
  *           minimum: 1
  *     responses:
  *       200:
- *         description: Detalhes da classe
+ *         description: Detalhes atualizados da classe
  *         content:
  *           application/json:
  *             schema:
- *               type: object
+ *               $ref: '#/components/schemas/Role'
+ *             example:
+ *               id: 2
+ *               name: "Guerreiro Elite"
+ *               description: "master of magic and arcane arts"
+ *               hp: 80
+ *               mp: 100
+ *               ep: 50
+ * 
  *       400:
  *         description: ID inválido
  *         content:
@@ -254,7 +262,7 @@ ChampionRoleRoute.get("/:id", championRoleController.getById);
  *             schema:
  *               $ref: '#/components/schemas/Role'
  *       400:
- *         description: Dados inválidos fornecidos
+ *         description: Dados inválidos fornecidos ou nome da classe já existe
  *         content:
  *           application/json:
  *             schema:
@@ -262,7 +270,7 @@ ChampionRoleRoute.get("/:id", championRoleController.getById);
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Missing required fields"
+ *                   example: "Missing information to update role or role with this name already exists"
  *       401:
  *         description: Token não fornecido ou inválido
  *         content:
@@ -298,7 +306,7 @@ ChampionRoleRoute.post("/", championRoleController.create);
 
 /**
  * @swagger
- * /api/roles:
+ * /api/roles/{id}:
  *   patch:
  *     summary: Atualizar classe
  *     description: Atualiza uma classe existente
@@ -306,19 +314,21 @@ ChampionRoleRoute.post("/", championRoleController.create);
  *       - Classes (Roles)
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Identificador único da classe
+ *         schema:
+ *           type: integer
+ *           minimum: 1
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - id
  *             properties:
- *               id:
- *                 type: integer
- *                 description: ID da classe a ser atualizada
- *                 example: 1
  *               name:
  *                 type: string
  *                 description: Novo nome da classe
@@ -397,7 +407,7 @@ ChampionRoleRoute.post("/", championRoleController.create);
  *                   type: string
  *                   example: "Internal server error"
  */
-ChampionRoleRoute.patch("/", championRoleController.update);
+ChampionRoleRoute.patch("/:id", championRoleController.update);
 
 /**
  * @swagger

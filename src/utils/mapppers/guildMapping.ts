@@ -18,14 +18,14 @@ export class GuildMapper {
 
   public static mapCreateGuildToDTO(guild: Guild): createGuildDTO {
     return {
-      name: guild.name
+      name: guild.name.trim()
     };
   }
 
   public static mapGuildToUpdateDTO(guild: Guild): updateGuildDTO {
     return {
       id: guild.id,
-      ...(guild.name && { name: guild.name }),
+      ...(guild.name.trim() && { name: guild.name.trim() }),
       ...(guild.level && { level: guild.level })
     };
   }

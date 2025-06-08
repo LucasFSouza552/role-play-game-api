@@ -5,19 +5,19 @@ export async function seed(knex: Knex): Promise<void> {
 	await knex('shop').insert([
 		{
 		  name: 'Arcanaeum Mystica',
-		  itemType: ItemType.SPELLS,
+		  type: ItemType.SPELLS,
 		},
 		{
 		  name: 'Forja do Titã',
-		  itemType: ItemType.ARMOUR,
+		  type: ItemType.ARMOUR,
 		},
 		{
 		  name: 'Lâmina e Glória',
-		  itemType: ItemType.WEAPONS,
+		  type: ItemType.WEAPONS,
 		},
 		{
 		  name: 'O Caldeirão Fumegante',
-		  itemType: ItemType.POTIONS,
+		  type: ItemType.POTIONS,
 		},
 	  ]);
 }

@@ -83,7 +83,7 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 			if(!shopToUpdate) {
 				throw new ThrowsError("Shop not found", 404);
 			}
-			
+
 			if(shopToUpdate.type !== shop.type) {
 				throw new ThrowsError("You cannot change the type of a shop", 400);
 			}
@@ -94,7 +94,7 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 			if(shop.type) {
 				shopToUpdate.type = shop.type;
 			}
-			
+
 			const updatedShop = await shopRepo.update(shopToUpdate);
 			if (!updatedShop) {
 				throw new ThrowsError("Error updating shop", 404);
@@ -127,44 +127,43 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 		try {
 			return await db.transaction(async trx => {
 				const champion: ChampionDTO = await championRepo.getById(championId, userId);
-	
+
 				if(!champion) {
 					throw new ThrowsError('Champion not found', 404);
 				}
-	
+
 				const inventory: Inventory = await shopInventoryRepo.getInventoryByShopId(shopId);
 				const championInventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId); 
-	
+
 				if(!inventory || !championInventory) {
 					throw new ThrowsError('Inventory not found', 404);
 				}
-	
-				const item: InventoryItens = await shopInventoryRepo.getItemById(inventory.id, itemId);
-	
+
+				const item: InventoryItens | null = await shopInventoryRepo.getItemById(inventory.id, itemId);
+
 				if(!item || item.quantity - quantity < 0) {
 					throw new ThrowsError("Item not found in shop inventory", 404);
 				}
-	
+
 				if(item.price * quantity > champion.money) {
 					throw new ThrowsError("Not enough money", 400);
 				}
-	
+
 				const updatedShop = await shopInventoryRepo.updateInventoryItem(inventory.id, itemId, -quantity);
 				if(!updatedShop) {
 					throw new ThrowsError("Error updating shop inventory", 404);
 				}
 				item.quantity -= quantity;
-	
-				const itemExists = await championInventoryRepo.getItemById(championInventory.id, itemId);
-				console.log(itemExists);
+
+				const itemExists: InventoryItens | null = await championInventoryRepo.getItemById(championInventory.id, itemId);
 				const updatedChampionMoney = parseFloat((parseFloat(champion.money.toString()) - item.price * quantity).toFixed(2));
 				await championRepo.updateMoney(championId, updatedChampionMoney);
-	
-				if(!itemExists) {
+
+				if(!itemExists || itemExists.rarity !== item.rarity) {
 					await championInventoryRepo.createInventoryItem(championInventory.id, item.id, quantity, item.price, item.rarity);
 					return true;
 				}
-	
+
 				const updatedChampion = await championInventoryRepo.updateInventoryItem(championInventory.id, item.id, quantity);
 				if(updatedChampion) {
 					return true;
@@ -175,6 +174,7 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
+			console.error(error);
 			throw new ThrowsError("Internal server error", 500);
 		}
 	}
@@ -189,18 +189,34 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 				const championInventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId);
 				if (!championInventory) throw new ThrowsError('Champion inventory not found', 404);
 
+				// Verificar se o item existe no inventário do champion
 				const item: InventoryItens | null = await championInventoryRepo.getItemById(championInventory.id, itemId);
-				if (!item) throw new ThrowsError("Item not found in champion inventory", 404);
-				if (item.quantity < quantity) throw new ThrowsError("Not enough items in champion inventory", 400);
+				if (!item) {
+					throw new ThrowsError("Item not found in champion inventory", 404);
+				}
 
-				await championInventoryRepo.updateInventoryItem(championInventory.id, item.id, -quantity);
+				// Verificar se a quantidade solicitada é válida
+				if (item.quantity < quantity) {
+					throw new ThrowsError("Not enough items in champion inventory", 400);
+				}
 
+				// Se não há mais itens no inventário, remover o item
 				if (item.quantity - quantity <= 0) {
 					await championInventoryRepo.removeInventoryItem(championInventory.id, item.id);
+				} else {
+					await championInventoryRepo.updateInventoryItem(championInventory.id, item.id, -quantity);
 				}
 
 				const shopInventory: Inventory = await shopInventoryRepo.getInventoryByShopId(shopId);
-				if (!shopInventory) throw new ThrowsError('Shop inventory not found', 404);
+				if (!shopInventory) {
+					throw new ThrowsError('Shop inventory not found', 404);
+				}
+
+				const itemExists = await shopInventoryRepo.getItemById(shopInventory.id, itemId);
+				if (!itemExists || itemExists.rarity !== item.rarity) {
+					await shopInventoryRepo.createInventoryItem(shopInventory.id, item.id, quantity, item.price, item.rarity);
+					return true;
+				}
 
 				await shopInventoryRepo.updateInventoryItem(shopInventory.id, item.id, quantity);
 

@@ -20,8 +20,9 @@ export async function up(knex: Knex): Promise<void> {
             .references('id')
             .inTable('items')
             .onDelete('CASCADE');
+        table.enu('rarity', rarityKeys).notNullable();
 
-        table.primary(['inventoryId', 'itemId']);
+        table.primary(['inventoryId', 'itemId', 'rarity']);
 
         table.integer('quantity')
             .notNullable()
@@ -29,7 +30,6 @@ export async function up(knex: Knex): Promise<void> {
             
         table.integer('price').notNullable().defaultTo(0);
 
-        table.enu('rarity', rarityKeys).notNullable();
 
     });
 }

@@ -1,8 +1,9 @@
 import { Knex } from "knex";
+import { Item } from "../../models/Item";
 
 export async function seed(knex: Knex): Promise<void> {
-  const shops = await knex('shop').select('id');
-  const items = await knex('items').select('id', 'name', 'priceMin', 'priceMax');
+  const shops = await knex('shop').select('id', 'type');
+  const items = await knex('items').select('id', 'name', 'priceMin', 'priceMax', 'type');
 
   const rarityMultipliers: Record<string, number> = {
     Common: 1,
@@ -12,10 +13,12 @@ export async function seed(knex: Knex): Promise<void> {
     Legendary: 3,
   };
 
-  const rarityOptions = Object.keys(rarityMultipliers); // ['common', 'uncommon', 'rare', 'epic', 'legendary']
+  const rarityOptions = Object.keys(rarityMultipliers);
 
   for (const shop of shops) {
-    const randomItems = items.sort(() => 0.5 - Math.random()).slice(0, 3);
+    const randomItems = items
+      .filter((item: Item) => item.type === shop.type)
+      .sort(() => Math.random() - 0.5);
 
     for (const item of randomItems) {
       // Escolhe um rarity válido da lista

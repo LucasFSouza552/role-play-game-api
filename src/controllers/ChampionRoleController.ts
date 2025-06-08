@@ -13,21 +13,21 @@ export class ChampionRoleController implements ControllerInterface {
 
     async update(req: Request, res: Response): Promise<void> {
         try {
-            const roleId = req.params.id && !isNaN(Number(req.params.id)) ? parseInt(req.params.id) : null;
+            const roleId = parseInt(req.params.id);
 
-            if (!roleId) {
+            if (isNaN(roleId) || roleId <= 0) {
                 throw new ThrowsError("Invalid ID", 400);
             }
 
             const role = req.body;
-            const requiredFields = ['name', 'description', 'hp', 'mp', 'ep'];
-            const missingFields = requiredFields.filter(field => !role[field]);
-
-            if (missingFields.length > 0) {
-                throw new ThrowsError("Missing required fields: " + missingFields.join(", "), 400);
+            
+            if(!role.name && !role.description && !role.hp && !role.mp && !role.ep) {
+                throw new ThrowsError("Missing information to update role", 400);
             }
 
-            const updatedRole = await championRoleService.update(role);
+            role.id = roleId;
+            const roleData = ChampionRoleMapper.mapUpdateRoleToDTO(role);
+            const updatedRole = await championRoleService.update(roleData);
             res.status(200).json(updatedRole);
         } catch (error: any) {
             if (error instanceof ThrowsError) {
@@ -39,9 +39,9 @@ export class ChampionRoleController implements ControllerInterface {
     }
     async delete(req: Request, res: Response): Promise<void> {
         try {
-            const roleId = req.params.id && !isNaN(Number(req.params.id)) ? parseInt(req.params.id) : null;
+            const roleId = parseInt(req.params.id);
 
-            if (!roleId) {
+            if (isNaN(roleId)  || roleId <= 0) {
                 throw new ThrowsError("Invalid ID", 400);
             }
 
@@ -51,7 +51,7 @@ export class ChampionRoleController implements ControllerInterface {
                 throw new ThrowsError("Role not found", 404);
             }
 
-            res.status(200).json({ message: "Role deleted successfully" });
+            res.status(204).send();
         } catch (error: any) {
             if (error instanceof ThrowsError) {
                 res.status(error.statusCode).json({ error: error.message });
@@ -92,6 +92,7 @@ export class ChampionRoleController implements ControllerInterface {
             if (error instanceof ThrowsError) {
                 res.status(error.statusCode).json({ error: error.message });
             } else {
+                console.error(error);
                 res.status(500).json({ error: "Internal server error" });
             }
         }
@@ -101,7 +102,7 @@ export class ChampionRoleController implements ControllerInterface {
         try {
             const role = req.body;
             const requiredFields = ['name', 'description', 'hp', 'mp', 'ep'];
-            const missingFields = requiredFields.filter(field => !role[field]);
+            const missingFields = requiredFields.filter(field => !role[field].toString().trim());
 
             if (missingFields.length > 0) {
                 throw new ThrowsError("Missing required fields: " + missingFields.join(", "), 400);

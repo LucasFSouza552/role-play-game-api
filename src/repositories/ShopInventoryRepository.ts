@@ -5,6 +5,7 @@ import { Filter } from "../models/Filters";
 import { createInventoryDTO, updateInventoryDTO } from "../DTOS/InventoryDTO";
 import { InventoryItens } from "../models/InventoryItens";
 import { ThrowsError } from "../errors/ThrowsError";
+import { ItemType } from "../models/enums/ItemType";
 
 export class ShopInventoryRepository implements RepositoryInterface<createInventoryDTO, updateInventoryDTO, Inventory> {
 	private tableName = "shop_inventory";
@@ -106,14 +107,14 @@ export class ShopInventoryRepository implements RepositoryInterface<createInvent
 		}
 	}
 
-	async getItemById(inventoryId:number, itemId:number): Promise<InventoryItens> {
+	async getItemById(inventoryId:number, itemId:number): Promise<InventoryItens | null> {
 		try {
 			const itens = await db("shop_items")
 				.join('items', 'shop_items.itemId', '=', 'items.id')
 				.select("items.id", "items.name", "items.description","shop_items.quantity", "items.type", "shop_items.rarity", "shop_items.price")
 				.where({ inventoryId, itemId }).first();
 			if (!itens) {
-				throw new ThrowsError("Item not found", 404);
+				return null
 			}
 			return itens;
 		} catch (error: any) { 
@@ -164,9 +165,9 @@ export class ShopInventoryRepository implements RepositoryInterface<createInvent
 		}
 	}
 
-	async createInventoryItem(inventoryId: number, itemId: number, quantity: number, price: number): Promise<InventoryItens> {
+	async createInventoryItem(inventoryId: number, itemId: number, quantity: number, price: number, rarity: string): Promise<InventoryItens> {
 		try {
-			const newItem = await db("shop_items").insert({ inventoryId, itemId, quantity, price }).returning("*");
+			const newItem = await db("shop_items").insert({ inventoryId, itemId, quantity, price, rarity }).returning("*");
 			if (!newItem || newItem.length === 0) {
 				throw new ThrowsError("Item not added to inventory", 404);
 			}

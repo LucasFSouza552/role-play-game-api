@@ -16,7 +16,7 @@ export class ChampionRoleMapper {
     public static mapUpdateRoleToDTO(role: ChampionRole): updateChampionRoleDTO {
         return {
             id: role.id,
-            ...(role.name && { name: role.name }),
+            ...(role.name.trim() && { name: role.name.trim() }),
             ...(role.description && { description: role.description }),
             ...(role.hp !== undefined && { hp: role.hp }),
             ...(role.mp !== undefined && { mp: role.mp }),

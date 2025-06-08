@@ -13,7 +13,10 @@ export class ChampionRoleService implements ServiceInterface<createChampionRoleD
 				throw new ThrowsError("Roles not found", 404);
 			}
 			return roles;
-		} catch (error) {
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
 			throw new ThrowsError("Internal server error", 500);
 		}
 	}
@@ -25,7 +28,10 @@ export class ChampionRoleService implements ServiceInterface<createChampionRoleD
 				throw new ThrowsError("Role not found", 404);
 			}
 			return role;
-		} catch (error) {
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
 			throw new ThrowsError("Internal server error", 500);
 		}
 	}
@@ -37,19 +43,40 @@ export class ChampionRoleService implements ServiceInterface<createChampionRoleD
 				throw new ThrowsError("Role not created", 404);
 			}
 			return newRole;
-		} catch (error) {
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
 			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
 	async update(role: updateChampionRoleDTO): Promise<updateChampionRoleDTO> {
 		try {
+
+			const roleExists = await roleRepo.getById(role.id);	
+			if (!roleExists) {
+				throw new ThrowsError("Role not found", 404);
+			}
+
+			if(role.name) {
+				const roleNameExits: ChampionRole[] = await roleRepo.getByName(role.name);
+				const hasRoleWithSameName = roleNameExits.length > 0 && roleNameExits.find(role => role.id !== roleExists.id);
+				if(hasRoleWithSameName) {
+					throw new ThrowsError("Role name already exists", 400);
+				}
+			}
+			
+
 			const updatedRole = await roleRepo.update(role);
 			if (!updatedRole) {
 				throw new ThrowsError("Role not updated", 404);
 			}
 			return updatedRole;
-		} catch (error) {
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
 			throw new ThrowsError("Internal server error", 500);
 		}
 	}
@@ -67,7 +94,10 @@ export class ChampionRoleService implements ServiceInterface<createChampionRoleD
 				throw new ThrowsError("Role not deleted", 404);
 			}
 			return deletedRole;
-		} catch (error) {
+		} catch (error: any) {
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
 			throw new ThrowsError("Internal server error", 500);
 		}
 	}

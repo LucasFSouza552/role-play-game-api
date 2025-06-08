@@ -64,14 +64,16 @@ export class ShopController implements ControllerInterface {
 	async create(req: Request, res: Response): Promise<void> {
 		try {
 			const { name, type } = req.body;
-			if(!name || !type) {
+			const nameTrim = name.trim();
+			const typeTrim = type.trim();
+			if(!nameTrim || !typeTrim) {
 				throw new ThrowsError("Missing required fields", 400);
 			}
-			if(!Object.values(ItemType).includes(type as ItemType)) {
+			if(!Object.values(ItemType).includes(nameTrim as ItemType)) {
 				throw new ThrowsError("Invalid type", 400);
 			}
 
-			const shop = await shopService.create({ name, type });
+			const shop = await shopService.create({ name: nameTrim, type: typeTrim });
 			if(!shop) {
 				throw new ThrowsError("Error creating shop", 404);
 			}
@@ -86,7 +88,11 @@ export class ShopController implements ControllerInterface {
 	}
 	async update(req: Request, res: Response): Promise<void> {
 		try {
-			const { id, name, type } = req.body;
+			const id = parseInt(req.params.id);
+			if (!id) {
+				throw new ThrowsError("Invalid ID", 400);
+			}
+			const { name, type } = req.body;
 			if(!id || !name || !type) {
 				throw new ThrowsError("Missing required fields", 400);
 			}

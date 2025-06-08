@@ -7,9 +7,8 @@ export async function up(knex: Knex): Promise<void> {
 		table.integer('userId').notNullable().references('id').inTable('users').onDelete('CASCADE');
 		table.string('name').notNullable();
 		table.decimal('money', 10, 2).defaultTo(0);
-		table.integer('guildId').nullable();
-		//.references('id').inTable('guilds'); // Manter enquanto a guild não existe
-		table.integer('roleId').references('id').inTable('champion_roles');
+		table.integer('guildId').references('id').inTable('guilds').onDelete('SET NULL');
+		table.integer('roleId').references('id').inTable('champion_roles').onDelete('CASCADE');
 
 		// Status
 		table.integer('strength').defaultTo(0);

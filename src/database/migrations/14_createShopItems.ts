@@ -24,7 +24,7 @@ export async function up(knex: Knex): Promise<void> {
 
 		table.enu('rarity', rarityKeys).notNullable();
 
-		table.primary(['inventoryId', 'itemId']);
+		table.primary(['inventoryId', 'itemId', 'rarity']);
 		
 		table.integer('quantity')
 			.notNullable()

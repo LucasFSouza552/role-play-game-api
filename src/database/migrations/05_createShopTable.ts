@@ -8,7 +8,7 @@ export async function up(knex: Knex) {
     await knex.schema.createTable(tablename, (table) => {
         table.increments('id').primary();
         table.string('name').notNullable();
-        table.enu('itemType', itemType).notNullable();
+        table.enu('type', itemType).notNullable();
     })
 }
 

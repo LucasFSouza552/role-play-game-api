@@ -32,10 +32,8 @@ export default function AuthMiddleware(req: Request, res: Response, next: NextFu
 	} catch (error) {
         if (error instanceof ThrowsError) {
             res.status(error.statusCode).json({ error: error.message });
-            return;
         } else {
             res.status(500).json({ error: 'Internal server error' });
-            return;
         }
 	}
 

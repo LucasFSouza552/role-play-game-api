@@ -6,6 +6,7 @@ import { ChampionRole } from "../models/ChampionRole";
 import { FilterChampionRole } from "../models/Filters";
 
 export class ChampionRoleRepository implements RepositoryInterface<createChampionRoleDTO, updateChampionRoleDTO, ChampionRole> {
+	
 	private tableName = 'champion_roles';
 
 	async getAll(filter: FilterChampionRole): Promise<ChampionRole[]> {
@@ -36,8 +37,9 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 	async getById(id: number): Promise<ChampionRole> {
 		try {
 			const role = await db(this.tableName)
+				.select('*')	
 				.where({ id })
-				.select('*').first();
+				.first();
 
 			if (!role) {
 				throw new ThrowsError("Role not found", 404);
@@ -70,6 +72,7 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 	async update(championRole: updateChampionRoleDTO): Promise<updateChampionRoleDTO> {
 		try {
 			const updatedRole = await db(this.tableName).where({ id: championRole.id }).update(championRole).returning('*');
+
 			if (!updatedRole || updatedRole.length === 0) {
 				throw new ThrowsError("Role not updated", 404);
 			}
@@ -85,11 +88,31 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 	async delete(id: number): Promise<boolean> {
 		try {
 			const deletedRole = await db(this.tableName).where({ id }).del();
+
 			if (!deletedRole) {
 				throw new ThrowsError("Role not deleted", 404);
 			}
 			return deletedRole == 1;
 		} catch (error) {
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
+		}
+	}
+
+	async getByName(name: string): Promise<ChampionRole[]> {
+		try {
+			const role = await db(this.tableName)
+				.select('*')	
+				.where({ name });
+
+			if (!role) {
+				throw new ThrowsError("Role not found", 404);
+			}
+
+			return role;
+		}  catch (error) {
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
