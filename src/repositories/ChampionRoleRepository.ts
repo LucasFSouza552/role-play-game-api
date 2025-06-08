@@ -30,7 +30,7 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while fetching roles", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -49,7 +49,7 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while searching for role by id", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -68,7 +68,7 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while searching for role by name", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -83,7 +83,7 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while creating role", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -98,7 +98,7 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while updating role", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -113,7 +113,7 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while deleting role", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 }

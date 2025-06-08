@@ -21,7 +21,7 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error creating inventory", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 	async delete(id: number, ownerId: number): Promise<boolean> {
@@ -35,7 +35,7 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error deleting inventory", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 	async getAll(filter: Filter): Promise<Inventory[]> {
@@ -53,7 +53,7 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error fetching inventories", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 	async getItemsById(inventoryId: number): Promise<InventoryItens[]> {
@@ -70,7 +70,7 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError(`Error fetching champion items inventory: ${error.message}`, 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -89,7 +89,7 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error fetching champion inventory", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 	async update(inventory: updateInventoryDTO): Promise<updateInventoryDTO> {
@@ -103,7 +103,7 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error updating inventory", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -132,7 +132,7 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError(`Error fetching champion inventory: ${error.message}`, 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -150,7 +150,7 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError(`Error fetching champion inventory: ${error.message}`, 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -165,7 +165,7 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError(`Error adding item to inventory: ${error.message}`, 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -180,7 +180,7 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error adding item to champion inventory", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -195,7 +195,7 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error adding item to champion inventory", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 }

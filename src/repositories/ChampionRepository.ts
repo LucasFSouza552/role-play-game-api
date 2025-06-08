@@ -48,7 +48,7 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while searching for champion", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -63,7 +63,7 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while creating champion", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -80,7 +80,7 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while updating champion", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -95,7 +95,7 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while deleting champion", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -110,7 +110,7 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while adding skill to champion", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -129,7 +129,7 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while searching for champion skills", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -146,7 +146,7 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while updating champion guild", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -169,7 +169,7 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while updating champion status", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -186,7 +186,7 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while updating champion money", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 }

@@ -18,7 +18,7 @@ export class MissionRepository implements RepositoryInterface<createMissionDTO, 
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while fetching all missions", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -33,7 +33,7 @@ export class MissionRepository implements RepositoryInterface<createMissionDTO, 
             if (error instanceof ThrowsError) {
                 throw error;
             }
-            throw new ThrowsError("Error while fetching mission by id", 500);
+            throw new ThrowsError("Internal server error", 500);
         }
 	}
 
@@ -52,7 +52,7 @@ export class MissionRepository implements RepositoryInterface<createMissionDTO, 
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while creating mission", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -72,7 +72,7 @@ export class MissionRepository implements RepositoryInterface<createMissionDTO, 
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while updating mission", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -87,7 +87,7 @@ export class MissionRepository implements RepositoryInterface<createMissionDTO, 
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while deleting mission", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 }

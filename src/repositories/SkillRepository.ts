@@ -19,7 +19,7 @@ export class SkillRepository implements RepositoryInterface<createSkillDTO, upda
             if (error instanceof ThrowsError) {
                 throw error;
             }
-            throw new ThrowsError("Error while fetching all skills", 500);
+            throw new ThrowsError("Internal server error", 500);
         }
     }
 
@@ -34,7 +34,7 @@ export class SkillRepository implements RepositoryInterface<createSkillDTO, upda
             if (error instanceof ThrowsError) {
                 throw error;
             }
-            throw new ThrowsError("Error while fetching skill by id", 500);
+            throw new ThrowsError("Internal server error", 500);
         }
     }
 
@@ -49,7 +49,7 @@ export class SkillRepository implements RepositoryInterface<createSkillDTO, upda
             if (error instanceof ThrowsError) {
                 throw error;
             }
-            throw new ThrowsError("Error while creating skill", 500);
+            throw new ThrowsError("Internal server error", 500);
         }
     }
 
@@ -67,7 +67,7 @@ export class SkillRepository implements RepositoryInterface<createSkillDTO, upda
             if (error instanceof ThrowsError) {
                 throw error;
             }
-            throw new ThrowsError("Error while updating skill", 500);
+            throw new ThrowsError("Internal server error", 500);
         }
     }
 
@@ -82,7 +82,7 @@ export class SkillRepository implements RepositoryInterface<createSkillDTO, upda
             if (error instanceof ThrowsError) {
                 throw error;
             }
-            throw new ThrowsError("Error while deleting skill", 500);
+            throw new ThrowsError("Internal server error", 500);
         }
     }
 }

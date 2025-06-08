@@ -25,7 +25,7 @@ export class ShopRepository implements RepositoryInterface<createShopDTO, update
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error getting all shops", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -40,7 +40,7 @@ export class ShopRepository implements RepositoryInterface<createShopDTO, update
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error getting shop by id", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -55,7 +55,7 @@ export class ShopRepository implements RepositoryInterface<createShopDTO, update
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error creating shop", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -70,7 +70,7 @@ export class ShopRepository implements RepositoryInterface<createShopDTO, update
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error updating shop", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -85,7 +85,7 @@ export class ShopRepository implements RepositoryInterface<createShopDTO, update
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error deleting shop", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 }

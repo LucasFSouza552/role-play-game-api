@@ -20,7 +20,7 @@ export class UserService implements ServiceInterface<createUserDTO, updateUserDT
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Internal server error while fetching users", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -35,7 +35,7 @@ export class UserService implements ServiceInterface<createUserDTO, updateUserDT
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Internal server error while fetching user", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -53,7 +53,7 @@ export class UserService implements ServiceInterface<createUserDTO, updateUserDT
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Internal server error while creating user", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -72,7 +72,7 @@ export class UserService implements ServiceInterface<createUserDTO, updateUserDT
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Internal server error while updating user", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -87,7 +87,7 @@ export class UserService implements ServiceInterface<createUserDTO, updateUserDT
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Internal server error while fetching user by email", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -102,7 +102,7 @@ export class UserService implements ServiceInterface<createUserDTO, updateUserDT
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Internal server error while deleting user", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 }

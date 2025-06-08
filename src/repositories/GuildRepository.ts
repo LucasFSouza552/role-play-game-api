@@ -20,7 +20,7 @@ export class GuildRepository implements RepositoryInterface<createGuildDTO, upda
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while fetching all guilds", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 	async getById(id: number): Promise<Guild> {
@@ -36,7 +36,7 @@ export class GuildRepository implements RepositoryInterface<createGuildDTO, upda
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while fetching guild by id", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -53,7 +53,7 @@ export class GuildRepository implements RepositoryInterface<createGuildDTO, upda
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while creating guild", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -73,7 +73,7 @@ export class GuildRepository implements RepositoryInterface<createGuildDTO, upda
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while updating guild", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -90,7 +90,7 @@ export class GuildRepository implements RepositoryInterface<createGuildDTO, upda
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while deleting guild", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -107,7 +107,7 @@ export class GuildRepository implements RepositoryInterface<createGuildDTO, upda
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while fetching guild by name", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 

@@ -36,7 +36,7 @@ export class ItemRepository implements RepositoryInterface<createItemDTO, update
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while fetching items", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -52,7 +52,7 @@ export class ItemRepository implements RepositoryInterface<createItemDTO, update
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while fetching item", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -68,7 +68,7 @@ export class ItemRepository implements RepositoryInterface<createItemDTO, update
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while creating item", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -86,7 +86,7 @@ export class ItemRepository implements RepositoryInterface<createItemDTO, update
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while updating item", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -103,7 +103,7 @@ export class ItemRepository implements RepositoryInterface<createItemDTO, update
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error while deleting item", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 }

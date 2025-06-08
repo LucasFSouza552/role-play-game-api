@@ -13,7 +13,7 @@ export function generateJwtToken(userId: number): string {
         if (error instanceof ThrowsError) {
             throw error;
         }
-        throw new ThrowsError('Error generating token', 500);
+        throw new ThrowsError('Internal server error', 500);
     }
 }
 

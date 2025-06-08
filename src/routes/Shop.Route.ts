@@ -92,7 +92,7 @@ const shopController = new ShopController();
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Error fetching shops"
+ *                   example: "Internal server error"
  */
 shopRoute.get('/', shopController.getAll);
 
@@ -159,7 +159,7 @@ shopRoute.get('/', shopController.getAll);
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Error fetching shop"
+ *                   example: "Internal server error"
  */
 shopRoute.get('/:id', shopController.getById);
 
@@ -485,7 +485,7 @@ shopRoute.delete('/:id', AuthMiddleware, authorizationMiddleware(["admin"]), sho
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Error fetching shop inventory"
+ *                   example: "Internal server error"
  */
 shopRoute.get('/:id/inventory', shopController.getInventory);
 

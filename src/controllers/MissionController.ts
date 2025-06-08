@@ -4,6 +4,7 @@ import { Mission } from "../models/Mission";
 import { MissionsService } from "../services/MissionsService";
 import { Request, Response } from "express";
 import { MissionMapper } from "../utils/mapppers/missionMapping";
+import { ThrowsError } from "../errors/ThrowsError";
 
 const missionsServices = new MissionsService();
 
@@ -12,12 +13,19 @@ export class MissionsController implements ControllerInterface {
     async getAll(req: Request, res: Response): Promise<void> {
         try {
             const missions: Mission[] = await missionsServices.getAll();
+            if (!missions) {
+                throw new ThrowsError("Missions not found", 404);
+            }
             res.status(200).json({
                 missions: missions,
                 length: missions.length
             });
         } catch (err: any) {
-            res.status(500).json({ error: err.message });
+            if (err instanceof ThrowsError) {
+                res.status(err.statusCode).json({ error: err.message });
+            } else {
+                res.status(500).json({ error: "Internal server error" });
+            }   
         }
     }
 
@@ -32,7 +40,11 @@ export class MissionsController implements ControllerInterface {
             const mission = await missionsServices.getById(missionsId);
             res.status(200).json(mission);
         } catch (err: any) {
-            res.status(500).json({ err: err.message });
+            if (err instanceof ThrowsError) {
+                res.status(err.statusCode).json({ error: err.message });
+            } else {
+                res.status(500).json({ error: "Internal server error" });
+            }
         }
     }
 
@@ -55,7 +67,11 @@ export class MissionsController implements ControllerInterface {
             const newMission = await missionsServices.create(missionData);
             res.status(201).json({ newMission });
         } catch (err: any) {
-            res.status(400).json({ error: err.message });
+            if (err instanceof ThrowsError) {
+                res.status(err.statusCode).json({ error: err.message });
+            } else {
+                res.status(500).json({ error: "Internal server error" });
+            }
         }
     }
 
@@ -80,7 +96,11 @@ export class MissionsController implements ControllerInterface {
             const updatedMission = await missionsServices.update(missionData);
             res.status(200).json(updatedMission);
         } catch (err: any) {
-            res.status(500).json({ error: err.message });
+            if (err instanceof ThrowsError) {
+                res.status(err.statusCode).json({ error: err.message });
+            } else {
+                res.status(500).json({ error: "Internal server error" });
+            }
         }
     }
 
@@ -102,7 +122,11 @@ export class MissionsController implements ControllerInterface {
             const deletedMission = await missionsServices.delete(userId, missionId);
             res.status(200).json({ deletedMission: !!deletedMission });
         } catch (err: any) {
-            res.status(500).json({ error: err.message });
+            if (err instanceof ThrowsError) {
+                res.status(err.statusCode).json({ error: err.message });
+            } else {
+                res.status(500).json({ error: "Internal server error" });
+            }
         }
     }
 

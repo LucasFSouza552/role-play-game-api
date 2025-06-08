@@ -20,7 +20,7 @@ export class ShopInventoryRepository implements RepositoryInterface<createInvent
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error creating inventory", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 	
@@ -35,7 +35,7 @@ export class ShopInventoryRepository implements RepositoryInterface<createInvent
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error deleting inventory", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -54,7 +54,7 @@ export class ShopInventoryRepository implements RepositoryInterface<createInvent
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error fetching inventories", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -69,7 +69,7 @@ export class ShopInventoryRepository implements RepositoryInterface<createInvent
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError(`Error fetching inventory: ${error.message}`, 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -84,7 +84,7 @@ export class ShopInventoryRepository implements RepositoryInterface<createInvent
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error updating inventory", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -102,7 +102,7 @@ export class ShopInventoryRepository implements RepositoryInterface<createInvent
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError(`Error fetching items inventory: ${error.message}`, 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -120,7 +120,7 @@ export class ShopInventoryRepository implements RepositoryInterface<createInvent
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError(`Error fetching item inventory: ${error.message}`, 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -141,7 +141,7 @@ export class ShopInventoryRepository implements RepositoryInterface<createInvent
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError(`Error fetching inventory and items: ${error.message}`, 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 
 	}
@@ -160,7 +160,7 @@ export class ShopInventoryRepository implements RepositoryInterface<createInvent
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError(`Error returning shop inventory: ${error.message}`, 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -175,7 +175,7 @@ export class ShopInventoryRepository implements RepositoryInterface<createInvent
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error adding item to inventory", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -190,7 +190,7 @@ export class ShopInventoryRepository implements RepositoryInterface<createInvent
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError(`Error adding item to shop inventory: ${error.message}`, 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	} 
 
@@ -205,7 +205,7 @@ export class ShopInventoryRepository implements RepositoryInterface<createInvent
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			throw new ThrowsError("Error removing item to shop inventory", 500);
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
