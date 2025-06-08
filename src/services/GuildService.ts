@@ -88,7 +88,6 @@ export class GuildService implements ServiceInterface<createGuildDTO, updateGuil
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			console.error(error);
 			throw new ThrowsError("Internal server error", 500);
 		}
 	}

@@ -174,7 +174,6 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			console.error(error);
 			throw new ThrowsError("Internal server error", 500);
 		}
 	}

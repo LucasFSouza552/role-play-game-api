@@ -82,7 +82,6 @@ export class GuildRepository implements RepositoryInterface<createGuildDTO, upda
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			console.error(error);
 			throw new ThrowsError("Internal server error", 500);
 		}
 	}

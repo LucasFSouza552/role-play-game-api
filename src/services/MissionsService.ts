@@ -53,7 +53,6 @@ export class MissionsService implements ServiceInterface<createMissionDTO, updat
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			console.error(error);
 			throw new ThrowsError('Internal server error', 500);
 		}
 	}

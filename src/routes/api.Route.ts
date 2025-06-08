@@ -26,9 +26,9 @@ apiRoute.use("/champions", AuthMiddleware, ChampionRoute);
 apiRoute.use("/roles", ChampionRoleRoute);
 apiRoute.use("/missions", MissionsRoute);
 apiRoute.use("/shop", ShopRoute);
+apiRoute.use("/guilds", AuthMiddleware, GuildRoute);
 
 // Rotas que requerem autenticação e autorização de admin
-apiRoute.use("/guilds", AuthMiddleware, authorizationMiddleware(["admin"]), GuildRoute);
 apiRoute.use("/items", AuthMiddleware, authorizationMiddleware(["admin"]), ItemRoute);
 
 // Rota desabilitada

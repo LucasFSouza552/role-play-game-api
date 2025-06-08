@@ -1,0 +1,24 @@
+.character-card {
+transition: all 0.3s ease;
+}
+.character-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.5s;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.health-bar {
+    height: 20px;
+    border-radius: 10px;
+    transition: width 0.5s;
+}
+

@@ -27,7 +27,6 @@ export class MissionRepository implements RepositoryInterface<createMissionDTO, 
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			console.error(error);
 			throw new ThrowsError("Internal server error", 500);
 		}
 	}
@@ -62,7 +61,6 @@ export class MissionRepository implements RepositoryInterface<createMissionDTO, 
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			console.error(error);
 			throw new ThrowsError("Internal server error", 500);
 		}
 	}

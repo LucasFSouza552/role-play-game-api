@@ -168,7 +168,7 @@ export class ChampionController implements ControllerInterface {
 			const totalSP = status.reduce((acc, stat) => acc + (stat || 0), 0);
 
 			if (totalSP > championExists.sp) {
-				new ThrowsError(`The total of SP cannot be greater than ${championExists.sp} points`, 400);
+				throw new ThrowsError(`The total of SP cannot be greater than ${championExists.sp} points`, 400);
 			}
 
 			const championData: updatedChampionStatusDTO = ChampionMapper.mapChampionToUpdateStatusDTO({

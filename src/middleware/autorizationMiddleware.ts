@@ -25,7 +25,7 @@ export default function authorizationMiddleware(allowedRoles: string[]) {
             if (error instanceof ThrowsError) {
                 res.status(error.statusCode).json({ error: error.message });
             } else {
-                console.error(error);
+                
                 res.status(500).json({ error: 'Internal server error' });
             }
         }

@@ -125,7 +125,6 @@ export class ChampionRepository implements RepositoryInterface<createChampionDTO
 			}
 			return championSkills;
 		} catch (error) {
-			console.error(error);
 			if (error instanceof ThrowsError) {
 				throw error;
 			}

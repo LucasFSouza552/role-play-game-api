@@ -22,7 +22,6 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
-			console.error(error);
 			throw new ThrowsError("Internal server error", 500);
 		}
 	}
@@ -142,8 +141,10 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 			const skill = await skillRepo.getById(skillId);
 			return skill;
 		} catch (error) {
-			console.error(error);
-			throw new Error('Error adding skill to champion');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG API Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-8 text-center">
+            <h1
+                class="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent text-4xl-font-bold">
+                RPG API Dashboard</h1>
+            <p class="text-gray-400">Interact with the Role Play Game API</p>
+            <div class="mt-4">
+                <a href="https://github.com/LucasFSouza552/role-play-game-api" target="_blank"
+                    class="inline-flex items-center px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition">
+                    <i class="fab fa-github mr-2"></i> View API on GitHub
+                </a>
+            </div>
+        </header>
+
+        <!-- Token Input -->
+        <div class="mb-8">
+            <label class="block mb-2" for="token">API Token</label>
+            <div class="relative">
+                <input type="password" id="token" class="w-full px-4 py-2 bg-gray-700 rounded-lg"
+                    placeholder="Insert your API token here">
+                <button type="button" class="absolute right-2 top-2 text-gray-400 hover:text-gray-200"
+                    id="toggle-token-visibility">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            <div class="mt-2 bg-gray-800 p-2 rounded-lg">
+                <p id="user-name" class="text-center"></p>
+                <p id="user-role" class="text-center"></p>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="flex flex-wrap justify-center mb-8 border-b border-gray-700">
+            <button class="tab-btn px-6 py-3 font-medium rounded-t-lg hover:bg-cyan-500 transition-colors group"
+                data-tab="characters">
+                <i class="fas fa-user mr-2 text-cyan-500 group-hover:text-white transition-colors"></i>Campeões
+            </button>
+            <button id="tab-items-btn" class="tab-btn px-6 py-3 font-medium rounded-t-lg hover:bg-yellow-500 transition-colors group"
+                data-tab="items">
+                <i class="fas fa-shopping-bag mr-2 text-yellow-500 group-hover:text-white transition-colors"></i>Items
+            </button>
+            <button class="tab-btn px-6 py-3 font-medium rounded-t-lg hover:bg-purple-500 transition-colors group"
+                data-tab="guilds">
+                <i class="fas fa-users mr-2 text-purple-500 group-hover:text-white transition-colors"></i>Guildas
+            </button>
+            <button class="tab-btn px-6 py-3 font-medium rounded-t-lg hover:bg-green-500 transition-colors group"
+                data-tab="shops">
+                <i class="fas fa-store mr-2 text-green-500 group-hover:text-white transition-colors"></i>Lojas
+            </button>
+            <a href="/docs" class="tab-btn px-6 py-3 font-medium rounded-t-lg hover:bg-red-500 transition-colors group">
+                <i class="fas fa-book mr-2 group-hover:text-white transition-colors"></i>API Docs
+            </a>
+
+        </div>
+
+        <!-- Tab Contents -->
+        <div class="tab-contents">
+            <!-- Characters Tab -->
+            <div id="characters" class="tab-content active">
+                <div class="mb-6 flex flex-wrap justify-between items-center">
+                    <h2 class="text-2xl font-bold">Campeões</h2>
+                    <button id="create-character-btn"
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition">
+                        <i class="fas fa-plus mr-2"></i>Criar Campeão
+                    </button>
+                </div>
+
+                <!-- Character Creation Form (Hidden by default) -->
+                <div id="character-form" class="hidden mb-8 p-6 bg-gray-800 rounded-lg">
+                    <h3 class="text-xl font-semibold mb-4">Criar novo Campeão</h3>
+                    <form id="new-character-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block mb-2">Nome</label>
+                            <input type="text" id="character-name" class="w-full px-4 py-2 bg-gray-700 rounded-lg"
+                                required>
+                        </div>
+                        <div>
+                            <label class="block mb-2">Classe</label>
+                            <select id="character-class" class="w-full px-4 py-2 bg-gray-700 rounded-lg" required>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2 flex justify-end space-x-4">
+                            <button type="button" id="cancel-character"
+                                class="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg transition">
+                                Cancelar
+                            </button>
+                            <button type="submit"
+                                class="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg transition">
+                                Criar Campeão
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Characters List -->
+                <div id="characters-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Characters will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Items Tab -->
+            <div id="items" class="tab-content">
+                <div class="mb-6 flex flex-wrap justify-between items-center">
+                    <h2 class="text-2xl font-bold">Itens</h2>
+                    <button id="create-item-btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition">
+                        <i class="fas fa-plus mr-2"></i>Criar item
+                    </button>
+                </div>
+
+                <!-- Item Creation Form (Hidden by default) -->
+                <div id="item-form" class="hidden mb-8 p-6 bg-gray-800 rounded-lg">
+                    <h3 class="text-xl font-semibold mb-4">Criar novo item</h3>
+                    <form id="new-item-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block mb-2">nome</label>
+                            <input type="text" id="item-name" class="w-full px-4 py-2 bg-gray-700 rounded-lg" required>
+                        </div>
+                        <div>
+                            <label class="block mb-2">Type</label>
+                            <select id="item-type" class="w-full px-4 py-2 bg-gray-700 rounded-lg" required>
+                                <option value="Armour">Armour</option>
+                                <option value="Potions">Potions</option>
+                                <option value="Spells">Spells</option>
+                                <option value="Weapons">Weapons</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block mb-2">Valor Mínimo</label>
+                            <input type="number" id="item-value-min" class="w-full px-4 py-2 bg-gray-700 rounded-lg"
+                                min="1" value="10">
+                        </div>
+                        <div>
+                            <label class="block mb-2">Valor Máximo</label>
+                            <input type="number" id="item-value-max" class="w-full px-4 py-2 bg-gray-700 rounded-lg"
+                                min="1" value="100">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block mb-2">Descrição</label>
+                            <textarea id="item-description" class="w-full px-4 py-2 bg-gray-700 rounded-lg"
+                                rows="3"></textarea>
+                        </div>
+                        <div class="md:col-span-2 flex justify-end space-x-4">
+                            <button type="button" id="cancel-item"
+                                class="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg transition">
+                                Cancelar
+                            </button>
+                            <button type="submit"
+                                class="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg transition">
+                                Criar Item
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Items List -->
+                <div id="items-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Items will be loaded here -->
+                </div>
+            </div>
+
+            <div id="guilds" class="tab-content">
+                <div class="mb-6 flex flex-wrap justify-between items-center">
+                    <h2 class="text-2xl font-bold">Guildas</h2>
+
+                </div>
+                <div id="guilds-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Guilds will be loaded here -->
+                </div>
+            </div>
+
+            <div id="shops" class="tab-content">
+                <div class="mb-6 flex flex-wrap justify-between items-center">
+                    <h2 class="text-2xl font-bold">Lojas</h2>
+
+                </div>
+                <div id="shops-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Shops will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
+    <script type="module" src="/js/utils.js"></script>
+    <script type="module" src="/js/api.js"></script>
+    <script type="module" src="/js/script.js"></script>
+
+</body>
+
+</html>

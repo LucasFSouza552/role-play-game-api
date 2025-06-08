@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { GuildController } from "../controllers/GuildController";
+import authorizationMiddleware from "../middleware/autorizationMiddleware";
 
 const guildController = new GuildController(); 
 const GuildRouter = Router();
@@ -274,7 +275,7 @@ GuildRouter.get("/:id", guildController.getById);
  *                   type: string
  *                   example: "Internal server error"
  */
-GuildRouter.post("/", guildController.create);
+GuildRouter.post("/", authorizationMiddleware(['admin']),guildController.create);
 
 /**
  * @swagger
@@ -362,7 +363,7 @@ GuildRouter.post("/", guildController.create);
  *                   type: string
  *                   example: "Internal server error"
  */
-GuildRouter.patch("/:id", guildController.update);
+GuildRouter.patch("/:id", authorizationMiddleware(['admin']),guildController.update);
 
 /**
  * @swagger
@@ -435,7 +436,7 @@ GuildRouter.patch("/:id", guildController.update);
  *                 error:
  *                   type: string
  */
-GuildRouter.delete("/:id", guildController.delete);
+GuildRouter.delete("/:id", authorizationMiddleware(['admin']),guildController.delete);
 
 export default GuildRouter;
 
