@@ -454,18 +454,8 @@ ItemRoute.patch("/:id", itemController.update);
  *           minimum: 1
  *         description: ID do item a ser excluído
  *     responses:
- *       200:
+ *       204:
  *         description: Item excluído com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 deletedItem:
- *                   type: boolean
- *                   description: Indica se o item foi excluído com sucesso
- *             example:
- *               deletedItem: true
  *       400:
  *         description: ID inválido
  *         content:

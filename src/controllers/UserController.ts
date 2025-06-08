@@ -189,7 +189,7 @@ export class UserController implements ControllerInterface {
 				throw new ThrowsError("Error deleting the user", 400);
 			}
 
-			res.status(200).json({ message: "User deleted successfully" });
+			res.status(204).send();
 			return;
 		} catch (error: any) {
 			if (error instanceof ThrowsError) {

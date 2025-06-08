@@ -116,6 +116,7 @@ shopRoute.get('/', shopController.getAll);
  *       - in: path
  *         name: id
  *         required: true
+ *         minimum: 1
  *         schema:
  *           type: integer
  *         description: ID da loja
@@ -283,10 +284,6 @@ shopRoute.post('/', AuthMiddleware, authorizationMiddleware(["admin"]), shopCont
  *               name:
  *                 type: string
  *                 description: Novo nome da loja
- *               type:
- *                 type: string
- *                 enum: [Spells, Armour, Weapons, Potions]
- *                 description: Tipo da loja (não pode ser alterado)
  *     responses:
  *       200:
  *         description: Loja atualizada com sucesso
@@ -365,16 +362,8 @@ shopRoute.patch('/:id', AuthMiddleware, authorizationMiddleware(["admin"]), shop
  *           type: integer
  *         description: ID da loja a ser excluída
  *     responses:
- *       200:
+ *       204:
  *         description: Loja excluída com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
  *       400:
  *         description: ID inválido
  *         content:
@@ -535,16 +524,8 @@ shopRoute.get('/:id/inventory', shopController.getInventory);
  *                 maximum: 999
  *                 description: Quantidade do item a ser comprado (1-999)
  *     responses:
- *       200:
+ *       204:
  *         description: Compra realizada com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
  *       400:
  *         description: Dados inválidos
  *         content:
@@ -628,16 +609,8 @@ shopRoute.post('/:id/purchase', AuthMiddleware, shopController.purchase);
  *                 maximum: 999
  *                 description: Quantidade do item a ser vendido (1-999)
  *     responses:
- *       200:
+ *       204:
  *         description: Venda realizada com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
  *       400:
  *         description: Dados inválidos
  *         content:

@@ -69,7 +69,7 @@ export class ShopController implements ControllerInterface {
 			if(!nameTrim || !typeTrim) {
 				throw new ThrowsError("Missing required fields", 400);
 			}
-			if(!Object.values(ItemType).includes(nameTrim as ItemType)) {
+			if(!Object.values(ItemType).includes(typeTrim as ItemType)) {
 				throw new ThrowsError("Invalid type", 400);
 			}
 
@@ -122,7 +122,7 @@ export class ShopController implements ControllerInterface {
 			if(!shop) {
 				throw new ThrowsError("Error deleting shop", 404);
 			}
-			res.status(200).json(shop);
+			res.status(204).json();
 		} catch (error: any) {
 			if (error instanceof ThrowsError) {
 				res.status(error.statusCode).json({ error: error.message });
@@ -160,7 +160,11 @@ export class ShopController implements ControllerInterface {
 				quantity
 			);
 
-			res.status(200).json(updatedShop);
+			if (!updatedShop) {
+				throw new ThrowsError("Error selling item", 404);
+			}
+
+			res.status(204).send();
 		} catch (error: any) {
 			if (error instanceof ThrowsError) {
 				res.status(error.statusCode).json({ error: error.message });
@@ -196,7 +200,11 @@ export class ShopController implements ControllerInterface {
 				quantity
 			);
 
-			res.status(200).json(updatedShop);
+			if(!updatedShop) {
+				throw new ThrowsError("Error purchasing item", 404);
+			}
+
+			res.status(204).send();
 
 		} catch (error: any) {
 			if (error instanceof ThrowsError) {

@@ -211,7 +211,10 @@ export class ChampionController implements ControllerInterface {
 			}
 
 			const deletedChampion = await championService.delete(championId,userId);
-			res.status(200).json({ deleted: deletedChampion});
+			if(!deletedChampion) {
+				throw new ThrowsError("Champion not deleted", 404);
+			}
+			res.status(204).send();
 		} catch (error: any) {
 			if (error instanceof ThrowsError) {
 				res.status(error.statusCode).json({ error: error.message });

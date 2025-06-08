@@ -417,18 +417,8 @@ missionsRoute.patch("/:id", AuthMiddleware, authorizationMiddleware(["admin"]), 
  *           type: integer
  *         description: ID da missão a ser excluída
  *     responses:
- *       200:
+ *       204:
  *         description: Missão excluída com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 deletedMission:
- *                   type: boolean
- *                   description: Indica se a missão foi excluída com sucesso
- *             example:
- *               deletedMission: true
  *       400:
  *         description: Dados inválidos
  *         content:
