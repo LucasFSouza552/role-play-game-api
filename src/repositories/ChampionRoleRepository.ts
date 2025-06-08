@@ -65,6 +65,7 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 			if (error instanceof ThrowsError) {
 				throw error;
 			}
+			console.log(error)
 			throw new ThrowsError("Internal server error", 500);
 		}
 	}

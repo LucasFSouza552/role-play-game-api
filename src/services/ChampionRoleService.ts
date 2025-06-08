@@ -38,6 +38,14 @@ export class ChampionRoleService implements ServiceInterface<createChampionRoleD
 
 	async create(role: createChampionRoleDTO): Promise<ChampionRole> {
 		try {
+
+			const roleNameExits: ChampionRole[] = await roleRepo.getByName(role.name);
+			if (roleNameExits.length > 0) {
+				const hasRoleWithSameId = roleNameExits.find(role => role.id === role.id);
+				if (hasRoleWithSameId) {
+					throw new ThrowsError("Role name already exists", 400);
+				}
+			}
 			const newRole = await roleRepo.create(role);
 			if (!newRole) {
 				throw new ThrowsError("Role not created", 404);
@@ -54,19 +62,19 @@ export class ChampionRoleService implements ServiceInterface<createChampionRoleD
 	async update(role: updateChampionRoleDTO): Promise<updateChampionRoleDTO> {
 		try {
 
-			const roleExists = await roleRepo.getById(role.id);	
+			const roleExists = await roleRepo.getById(role.id);
 			if (!roleExists) {
 				throw new ThrowsError("Role not found", 404);
 			}
 
-			if(role.name) {
+			if (role.name) {
 				const roleNameExits: ChampionRole[] = await roleRepo.getByName(role.name);
 				const hasRoleWithSameName = roleNameExits.length > 0 && roleNameExits.find(role => role.id !== roleExists.id);
-				if(hasRoleWithSameName) {
+				if (hasRoleWithSameName) {
 					throw new ThrowsError("Role name already exists", 400);
 				}
 			}
-			
+
 
 			const updatedRole = await roleRepo.update(role);
 			if (!updatedRole) {
