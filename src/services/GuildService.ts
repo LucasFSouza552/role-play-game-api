@@ -92,7 +92,7 @@ export class GuildService implements ServiceInterface<createGuildDTO, updateGuil
 			throw new ThrowsError("Internal server error", 500);
 		}
 	}
-	
+
 	async delete(id: number): Promise<boolean> {
 		try {
 

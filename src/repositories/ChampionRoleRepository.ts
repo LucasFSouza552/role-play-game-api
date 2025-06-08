@@ -5,8 +5,10 @@ import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { ChampionRole } from "../models/ChampionRole";
 import { FilterChampionRole } from "../models/Filters";
 
+
+// Rota desabilitada
 export class ChampionRoleRepository implements RepositoryInterface<createChampionRoleDTO, updateChampionRoleDTO, ChampionRole> {
-	
+
 	private tableName = 'champion_roles';
 
 	async getAll(filter: FilterChampionRole): Promise<ChampionRole[]> {
@@ -37,7 +39,7 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 	async getById(id: number): Promise<ChampionRole> {
 		try {
 			const role = await db(this.tableName)
-				.select('*')	
+				.select('*') 
 				.where({ id })
 				.first();
 
@@ -105,7 +107,7 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 	async getByName(name: string): Promise<ChampionRole[]> {
 		try {
 			const role = await db(this.tableName)
-				.select('*')	
+				.select('*') 
 				.where({ name });
 
 			if (!role) {
@@ -113,7 +115,7 @@ export class ChampionRoleRepository implements RepositoryInterface<createChampio
 			}
 
 			return role;
-		}  catch (error) {
+		} catch (error) {
 			if (error instanceof ThrowsError) {
 				throw error;
 			}

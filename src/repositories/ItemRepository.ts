@@ -9,7 +9,7 @@ import { ItemType } from "../models/enums/ItemType";
 
 export class ItemRepository implements RepositoryInterface<createItemDTO, updateItemDTO, Item> {
 	private tableName = "items";
-	
+
 	async getAll(filter: FilterItem): Promise<Item[]> {
 		try {
 			const allItems = await db(this.tableName)
@@ -44,7 +44,7 @@ export class ItemRepository implements RepositoryInterface<createItemDTO, update
 		}
 	}
 
-	
+
 	async getById(id: number): Promise<Item> {
 		try {
 			const item = await db(this.tableName).where({ id }).first();
@@ -60,7 +60,7 @@ export class ItemRepository implements RepositoryInterface<createItemDTO, update
 		}
 	}
 
-	
+
 	async create(item: createItemDTO): Promise<Item> {
 		try {
 			const itemExists = await db(this.tableName).where({ name: item.name }).first();

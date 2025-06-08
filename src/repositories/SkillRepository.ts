@@ -14,8 +14,8 @@ export class SkillRepository implements RepositoryInterface<createSkillDTO, upda
             const skills = await db(this.tableName)
                 .select('*')
                 .limit(filter.limit)
-				.offset((filter.page - 1) * filter.limit)
-				.orderBy(filter.orderBy, filter.order);;
+                .offset((filter.page - 1) * filter.limit)
+                .orderBy(filter.orderBy, filter.order);;
             if (!skills) {
                 throw new ThrowsError("Skills not found", 404);
             }

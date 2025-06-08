@@ -171,7 +171,7 @@ export class ChampionInventoryRepository implements RepositoryInterface<createIn
 
 	async updateInventoryItem(inventoryId: number, itemId: number, quantity?: number, price?: number): Promise<InventoryItens> {
 		try {
-			const updatedItem = await db("champion_items").where({ inventoryId, itemId }).update({ quantity: db.raw(`quantity + ${quantity || 0}`), price:  db.raw(` ${price || "price"}`)  }).returning("*");
+			const updatedItem = await db("champion_items").where({ inventoryId, itemId }).update({ quantity: db.raw(`quantity + ${quantity || 0}`), price: db.raw(` ${price || "price"}`) }).returning("*");
 			if (!updatedItem || updatedItem.length === 0) {
 				throw new ThrowsError("Item not updated in inventory", 404);
 			}

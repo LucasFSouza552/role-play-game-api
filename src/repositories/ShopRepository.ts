@@ -17,9 +17,10 @@ export class ShopRepository implements RepositoryInterface<createShopDTO, update
 					if (filter.name) query.whereILike('name', `%${filter.name}%`);
 					if (filter.type) query.where('type', filter.type);
 				}).orderBy(filter.orderBy, filter.order);
-			if (!shops){
+
+			if (!shops) {
 				throw new ThrowsError("Shops not found", 404);
-				}
+			}
 			return shops;
 		} catch (error) {
 			if (error instanceof ThrowsError) {

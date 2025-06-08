@@ -24,7 +24,7 @@ export class ShopInventoryRepository implements RepositoryInterface<createInvent
 			throw new ThrowsError("Internal server error", 500);
 		}
 	}
-	
+
 	async delete(id: number): Promise<boolean> {
 		try {
 			const deletedInventory = await db(this.tableName).where({ id }).del();
@@ -127,7 +127,7 @@ export class ShopInventoryRepository implements RepositoryInterface<createInvent
 
 	async getInventoryAndItemsById(inventoryId: number): Promise<Inventory> {
 		try {
-			const inventory = await this.getById(inventoryId);	
+			const inventory = await this.getById(inventoryId); 
 			if (!inventory) {
 				throw new ThrowsError("Inventory not found", 404);
 			}

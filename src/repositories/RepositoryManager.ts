@@ -21,14 +21,14 @@ const shopRepo = new ShopRepository();
 const shopInventoryRepo = new ShopInventoryRepository();
 
 export {
-  championRepo,
-  roleRepo,
-  skillRepo,
-  userRepo,
-  missionRepo,
-  itemsRepo,
-  guildRepo,
-  championInventoryRepo,
-  shopRepo,
-  shopInventoryRepo
+	championRepo,
+	roleRepo,
+	skillRepo,
+	userRepo,
+	missionRepo,
+	itemsRepo,
+	guildRepo,
+	championInventoryRepo,
+	shopRepo,
+	shopInventoryRepo
 };

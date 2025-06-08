@@ -10,7 +10,7 @@ export class UserRepository implements RepositoryInterface<createUserDTO, update
 
 	async getAll(filter: FilterUser): Promise<user[]> {
 		try {
-			const users =  await db(this.tableName).select('*')
+			const users = await db(this.tableName).select('*')
 			.limit(filter.limit)
 			.offset((filter.page - 1) * filter.limit)
 			.modify((query) => {
