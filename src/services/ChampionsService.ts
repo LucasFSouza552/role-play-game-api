@@ -6,23 +6,37 @@ import { ServiceInterface } from "../interfaces/serviceInterface";
 import { ChampionDTO, createChampionDTO, updateChampionDTO, updatedChampionStatusDTO } from "../DTOS/ChampionDTO";
 import { Inventory } from '../models/Inventory';
 import { InventoryItens } from '../models/InventoryItens';
+import { ThrowsError } from '../errors/ThrowsError';
 
 export class ChampionService implements ServiceInterface<createChampionDTO, updateChampionDTO, ChampionDTO> {
 
 	async getAll(filter: FilterChampion): Promise<ChampionDTO[]> {
 		try {
-			return await championRepo.getAll(filter);
+			const champions = await championRepo.getAll(filter);
+			if (!champions) {
+				throw new ThrowsError("Champions not found", 404);
+			}
+			return champions;
 		} catch (error) {
-			throw new Error('Error fetching champions: ' + error);
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
 	async getById(id: number, userId: number): Promise<ChampionDTO> {
 		try {
 			const champion: ChampionDTO = await championRepo.getById(id, userId);
+			if (!champion) {
+				throw new ThrowsError("Champion not found", 404);
+			}
 			return champion;
 		} catch (error) {
-			throw new Error('Champion not found');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -33,7 +47,7 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 			const roleExists: ChampionRole = await roleRepo.getById(roleId);
 
 			if (!roleExists) {
-				throw new Error('Role not found');
+				throw new ThrowsError("Role not found", 404);
 			}
 
 			const newChampion: createChampionDTO = ChampionMapper.mapCreateChampionToDTO({
@@ -48,34 +62,75 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 			const createdChampion: ChampionDTO = await championRepo.create(newChampion);
 
 			const RetrievedChampion: ChampionDTO = await championRepo.getById(createdChampion.id, champion.userId);
+			if (!RetrievedChampion) {
+				throw new ThrowsError("Champion not found", 404);
+			}
 			return RetrievedChampion;
 		} catch (error) {
-			throw new Error('Champion not created');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
 	async update(champion: updateChampionDTO): Promise<ChampionDTO> {
 		try {
-			return await championRepo.update(champion);
+			const updatedChampion = await championRepo.update(champion);
+			if (!updatedChampion) {
+				throw new ThrowsError("Champion not updated", 404);
+			}
+			return updatedChampion;
 		} catch (error) {
-			throw new Error('Champion not updated');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
 	async updateChampionStatus(champion: updatedChampionStatusDTO) {
-		return await championRepo.updateStatus(champion);
+		try {
+			const updatedChampion = await championRepo.updateStatus(champion);
+			if (!updatedChampion) {
+				throw new ThrowsError("Champion not updated", 404);
+			}
+			return updatedChampion;
+		} catch (error) {
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
+		}
 	}
 
 	async updateChampionGuild(champion: updateChampionDTO) {
-		return await championRepo.updateGuild(champion);
+		try {
+			const updatedChampion = await championRepo.updateGuild(champion);
+			if (!updatedChampion) {
+				throw new ThrowsError("Champion not updated", 404);
+			}
+			return updatedChampion; 
+		} catch (error) {
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
+		}
 	}
 
 	async delete(championId: number, userId: number): Promise<boolean> {
 		try {
 			const deletedChampion = await championRepo.delete(championId, userId);
+			if (!deletedChampion) {
+				throw new ThrowsError("Champion not deleted", 404);
+			}
 			return deletedChampion;
 		} catch (error) {
-			throw new Error('Error deleting champion'); 
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -92,26 +147,45 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 
 	async getSkills(ChampionId: number) {
 		try {
-			return await championRepo.getSkills(ChampionId);
+			const skills = await championRepo.getSkills(ChampionId);
+			if (!skills) {
+				throw new ThrowsError("Skills not found", 404);
+			}
+			return skills;
 		} catch (error) {
-			throw new Error('Error getting champion skills');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
 	async getSkillById(skillId: number) {
 		try {
-			return await skillRepo.getById(skillId);
+			const skill = await skillRepo.getById(skillId);
+			if (!skill) {
+				throw new ThrowsError("Skill not found", 404);
+			}
+			return skill;
 		} catch (error) {
-			throw new Error('Error getting skill by id');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
 		}
 	}
 
 	async getInventory(championId: number, userId: number) {
 		try {
 			const inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId);
+			if (!inventory) {
+				throw new ThrowsError("Inventory not found", 404);
+			}
 			return inventory;
 		} catch (error) {
-			throw new Error('Error getting inventory');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -120,13 +194,16 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 			const inventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId);
 
 			if(!inventory) {
-				throw new Error('Inventory not found');
+				throw new ThrowsError("Inventory not found", 404);
 			}
 
 			const newItem: InventoryItens = await championInventoryRepo.createInventoryItem(inventory.id, itemId, quantity, price, rarity);
 			return newItem;
 		} catch (error) {
-			throw new Error('Error creating inventory item');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -135,13 +212,19 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 			const inventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId);
 
 			if(!inventory) {
-				throw new Error('Inventory not found');
+				throw new ThrowsError("Inventory not found", 404);
 			}
 
 			const item: InventoryItens = await championInventoryRepo.updateInventoryItem(inventory.id, itemId, quantity, price);
+			if (!item) {
+				throw new ThrowsError("Item not updated", 404);
+			}
 			return item;
 		} catch (error) {
-			throw new Error('Error updating inventory item');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 
@@ -151,12 +234,19 @@ export class ChampionService implements ServiceInterface<createChampionDTO, upda
 			const inventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId);
 
 			if(!inventory) {
-				throw new Error('Inventory not found');
+				throw new ThrowsError("Inventory not found", 404);
 			}
 
-			return await championInventoryRepo.removeInventoryItem(inventory.id, itemId);
+			const removedItem = await championInventoryRepo.removeInventoryItem(inventory.id, itemId);
+			if (!removedItem) {
+				throw new ThrowsError("Item not removed", 404);
+			}
+			return removedItem;
 		} catch (error) {
-			throw new Error('Error removing item from inventory');
+			if (error instanceof ThrowsError) {
+				throw error;
+			}
+			throw new ThrowsError("Internal server error", 500);
 		}
 	}
 

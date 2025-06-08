@@ -3,13 +3,21 @@ import db from "../database/db";
 import { Guild } from "../models/Guild";
 import { createGuildDTO, updateGuildDTO } from '../DTOS/GuildDTO';
 import { ThrowsError } from '../errors/ThrowsError';
+import { FilterGuild } from '../models/Filters';
 
 export class GuildRepository implements RepositoryInterface<createGuildDTO, updateGuildDTO, Guild> {
 	private tablename = 'guilds';
 
-	async getAll(): Promise<Guild[]> {
+	async getAll(filter: FilterGuild): Promise<Guild[]> {
 		try {
-			const guilds = await db(this.tablename).select('*');
+			const guilds = await db(this.tablename)
+			.select('*')
+			.modify((query) => {
+				if (filter.name) query.whereILike('name', `%${filter.name}%`);
+			})
+			.orderBy(filter.orderBy, filter.order)
+			.limit(filter.limit)
+			.offset((filter.page - 1) * filter.limit);
 
 			if (!guilds) {
 				throw new ThrowsError("Guilds not found", 404);
@@ -25,7 +33,7 @@ export class GuildRepository implements RepositoryInterface<createGuildDTO, upda
 	}
 	async getById(id: number): Promise<Guild> {
 		try {
-			const guild =  await db(this.tablename).where({ id }).first();
+			const guild = await db(this.tablename).where({ id }).first();
 
 			if (!guild) {
 				throw new ThrowsError("Guild not found", 404);

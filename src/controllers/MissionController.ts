@@ -38,6 +38,9 @@ export class MissionsController implements ControllerInterface {
                 return;
             }
             const mission = await missionsServices.getById(missionsId);
+            if (!mission) {
+                throw new ThrowsError("Mission not found", 404);
+            }
             res.status(200).json(mission);
         } catch (err: any) {
             if (err instanceof ThrowsError) {

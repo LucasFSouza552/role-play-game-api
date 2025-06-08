@@ -124,51 +124,58 @@ export class ShopService implements ServiceInterface<createShopDTO, updateShopDT
 	}
 
 	async purchase(shopId: number, userId: number, championId: number, itemId: number, quantity: number): Promise<boolean> {
-		return await db.transaction(async trx => {
-			const champion: ChampionDTO = await championRepo.getById(championId, userId);
-
-			if(!champion) {
-				throw new ThrowsError('Champion not found', 404);
+		try {
+			return await db.transaction(async trx => {
+				const champion: ChampionDTO = await championRepo.getById(championId, userId);
+	
+				if(!champion) {
+					throw new ThrowsError('Champion not found', 404);
+				}
+	
+				const inventory: Inventory = await shopInventoryRepo.getInventoryByShopId(shopId);
+				const championInventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId); 
+	
+				if(!inventory || !championInventory) {
+					throw new ThrowsError('Inventory not found', 404);
+				}
+	
+				const item: InventoryItens = await shopInventoryRepo.getItemById(inventory.id, itemId);
+	
+				if(!item || item.quantity - quantity < 0) {
+					throw new ThrowsError("Item not found in shop inventory", 404);
+				}
+	
+				if(item.price * quantity > champion.money) {
+					throw new ThrowsError("Not enough money", 400);
+				}
+	
+				const updatedShop = await shopInventoryRepo.updateInventoryItem(inventory.id, itemId, -quantity);
+				if(!updatedShop) {
+					throw new ThrowsError("Error updating shop inventory", 404);
+				}
+				item.quantity -= quantity;
+	
+				const itemExists = await championInventoryRepo.getItemById(championInventory.id, itemId);
+				const updatedChampionMoney = parseFloat((parseFloat(champion.money.toString()) - item.price * quantity).toFixed(2));
+				await championRepo.updateMoney(championId, updatedChampionMoney);
+	
+				if(!itemExists) {
+					await championInventoryRepo.createInventoryItem(championInventory.id, item.id, quantity, item.price, item.rarity);
+					return true;
+				}
+	
+				const updatedChampion = await championInventoryRepo.updateInventoryItem(championInventory.id, item.id, quantity);
+				if(updatedChampion) {
+					return true;
+				}
+				return false;
+			});
+		} catch (error) {
+			if (error instanceof ThrowsError) {
+				throw error;
 			}
-
-			const inventory: Inventory = await shopInventoryRepo.getInventoryByShopId(shopId);
-			const championInventory: Inventory = await championInventoryRepo.getInventoryByOwnerAndChampionId(championId, userId); 
-
-			if(!inventory || !championInventory) {
-				throw new ThrowsError('Inventory not found', 404);
-			}
-
-			const item: InventoryItens = await shopInventoryRepo.getItemById(inventory.id, itemId);
-
-			if(!item || item.quantity - quantity < 0) {
-				throw new ThrowsError("Item not found in shop inventory", 404);
-			}
-
-			if(item.price * quantity > champion.money) {
-				throw new ThrowsError("Not enough money", 400);
-			}
-
-			const updatedShop = await shopInventoryRepo.updateInventoryItem(inventory.id, itemId, -quantity);
-			if(!updatedShop) {
-				throw new ThrowsError("Error updating shop inventory", 404);
-			}
-			item.quantity -= quantity;
-
-			const itemExists = await championInventoryRepo.getItemById(championInventory.id, itemId);
-			const updatedChampionMoney = parseFloat((parseFloat(champion.money.toString()) - item.price * quantity).toFixed(2));
-			await championRepo.updateMoney(championId, updatedChampionMoney);
-
-			if(!itemExists) {
-				await championInventoryRepo.createInventoryItem(championInventory.id, item.id, quantity, item.price, item.rarity);
-				return true;
-			}
-
-			const updatedChampion = await championInventoryRepo.updateInventoryItem(championInventory.id, item.id, quantity);
-			if(updatedChampion) {
-				return true;
-			}
-			return false;
-		});
+			throw new ThrowsError("Internal server error", 500);
+		}
 	}
 
 	async sell(shopId: number,userId: number,championId: number, itemId: number, quantity: number): Promise<boolean> {

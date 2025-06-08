@@ -1,4 +1,5 @@
 import { createSkillDTO, updateSkillDTO } from "../DTOS/SkillDTO";
+import { ThrowsError } from "../errors/ThrowsError";
 import { RepositoryInterface } from "../interfaces/repositoryInterface";
 import { ChampionSkill } from "../models/ChampionSkill";
 import { skillRepo } from "../repositories/RepositoryManager";
@@ -7,40 +8,72 @@ export class SkillsService implements RepositoryInterface<createSkillDTO, update
     async create(skill: createSkillDTO): Promise<ChampionSkill> {
         try {
             const newSkill = await skillRepo.create(skill);
+            if (!newSkill) {
+                throw new ThrowsError("Skill not created", 404);
+            }
             return newSkill;
         } catch (error) {
-            throw new Error('Erro ao criar habilidade');
+            if (error instanceof ThrowsError) {
+                throw error;
+            }
+            throw new ThrowsError("Internal server error", 500);
         }
     }
     async update(element: updateSkillDTO): Promise<updateSkillDTO> {
         try {
             const updatedSkill = await skillRepo.update(element);
+            if (!updatedSkill) {
+                throw new ThrowsError("Skill not updated", 404);
+            }
             return updatedSkill;
         } catch (error) {
-            throw new Error('Erro ao atualizar habilidade');
+            if (error instanceof ThrowsError) {
+                throw error;
+            }
+            throw new ThrowsError("Internal server error", 500);
         }
     }
     async delete(id: number): Promise<boolean> {
         try {
-            const deletedSkill = skillRepo.delete(id);
+            const deletedSkill = await skillRepo.delete(id);
+            if (!deletedSkill) {
+                throw new ThrowsError("Skill not deleted", 404);
+            }
             return deletedSkill;
         } catch (error) {
-            throw new Error('Erro ao deletar habilidade');
+            if (error instanceof ThrowsError) {
+                throw error;
+            }
+            throw new ThrowsError("Internal server error", 500);
         }
     }
-    async getAll() {
+    async getAll(): Promise<ChampionSkill[]> {
         try {
-            return await skillRepo.getAll();
+            const skills = await skillRepo.getAll();
+            if (!skills) {
+                throw new ThrowsError("Skills not found", 404);
+            }
+            return skills;
         } catch (error) {
-            throw new Error('Erro ao buscar todas as habilidades');
+            if (error instanceof ThrowsError) {
+                throw error;
+            }
+            throw new ThrowsError("Internal server error", 500);
         }
     }
 
-    async getById(id: number) {
+    async getById(id: number): Promise<ChampionSkill> {
         try {
-            return await skillRepo.getById(id);
+            const skill = await skillRepo.getById(id);
+            if (!skill) {
+                throw new ThrowsError("Skill not found", 404);
+            }
+            return skill;
         } catch (error) {
-            throw new Error('Erro ao buscar habilidade pelo ID');
+            if (error instanceof ThrowsError) {
+                throw error;
+            }
+            throw new ThrowsError("Internal server error", 500);
         }
     }
 }

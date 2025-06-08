@@ -41,7 +41,7 @@ const missionsRoute = Router();
  *                   status: "Available"
  *               length: 1
  *       401:
- *         description: Não autorizado
+ *         description: Token inválido
  *         content:
  *           application/json:
  *             schema:
@@ -49,8 +49,17 @@ const missionsRoute = Router();
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Mensagem de erro
- *                   example: "Invalid or expired token"
+ *                   example: "Invalid token. Use format Bearer <token>"
+ *       404:
+ *         description: Missões não encontradas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Missions not found"
  *       500:
  *         description: Erro interno do servidor
  *         content:
@@ -60,7 +69,6 @@ const missionsRoute = Router();
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Mensagem de erro
  *                   example: "Internal server error"
  */
 missionsRoute.get("/", AuthMiddleware, missionsController.getAll);
