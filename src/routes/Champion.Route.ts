@@ -83,9 +83,9 @@ const ChampionRoute = Router();
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Invalid parameters"
+ *                   example: "Limit must be between 0 and 100"
  *       401:
- *         description: Não autorizado
+ *         description: Token não fornecido ou inválido
  *         content:
  *           application/json:
  *             schema:
@@ -93,7 +93,17 @@ const ChampionRoute = Router();
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Invalid or expired token"
+ *                   example: "Token not found. Use format Bearer <token>"
+ *       403:
+ *         description: Sem permissão para acessar o recurso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "You do not have permission to access this resource"
  *       500:
  *         description: Erro interno do servidor
  *         content:
@@ -112,7 +122,7 @@ ChampionRoute.get("/", championController.getAll);
  * /api/champions/{id}:
  *   get:
  *     summary: Recuperar um campeão específico do usuário
- *     description: Retorna um campeão do usuário baseado no ID fornecido.
+ *     description: Retorna um campeão do usuário baseado no ID fornecido
  *     tags:
  *       - Campeões (Champions)
  *     security:
@@ -124,7 +134,7 @@ ChampionRoute.get("/", championController.getAll);
  *         description: Identificador único do campeão
  *         schema:
  *           type: integer
- *           example: 1
+ *           minimum: 1
  *     responses:
  *       200:
  *         description: Detalhes do campeão
@@ -151,7 +161,7 @@ ChampionRoute.get("/", championController.getAll);
  *               xp: 0
  *               xp_max: 150
  *       400:
- *         description: Parâmetros inválidos
+ *         description: ID inválido
  *         content:
  *           application/json:
  *             schema:
@@ -159,12 +169,33 @@ ChampionRoute.get("/", championController.getAll);
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Invalid champion ID"
+ *                   example: "Invalid ID"
+ *       401:
+ *         description: Token não fornecido ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Token not found. Use format Bearer <token>"
+ *       403:
+ *         description: Sem permissão para acessar o recurso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "You do not have permission to access this resource"
  *       404:
  *         description: Campeão não encontrado
  *         content:
  *           application/json:
  *             schema:
+ *               type: object
  *               properties:
  *                 error:
  *                   type: string
@@ -187,7 +218,7 @@ ChampionRoute.get("/:id", championController.getById);
  * /api/champions/{id}/skills:
  *   post:
  *     summary: Adicionar habilidade ao campeão
- *     description: Adiciona uma nova habilidade ao campeão especificado pelo ID. O usuário só pode adicionar habilidades aos seus próprios campeões.
+ *     description: Adiciona uma nova habilidade ao campeão especificado pelo ID. O usuário só pode adicionar habilidades aos seus próprios campeões
  *     tags:
  *       - Campeões (Champions)
  *     security:
@@ -199,26 +230,48 @@ ChampionRoute.get("/:id", championController.getById);
  *         description: Identificador único do campeão
  *         schema:
  *           type: integer
+ *           minimum: 1
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - skillId
  *             properties:
  *               skillId:
  *                 type: integer
- *                 description: Identificador da habilidade a ser adicionada.
- *                 example: 5
+ *                 description: Identificador da habilidade a ser adicionada
+ *                 minimum: 1
  *     responses:
  *       200:
- *         description: Habilidade adicionada com sucesso.
+ *         description: Habilidade adicionada com sucesso
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Skill'
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   description: ID da habilidade
+ *                 name:
+ *                   type: string
+ *                   description: Nome da habilidade
+ *                 description:
+ *                   type: string
+ *                   description: Descrição da habilidade
+ *                 damage:
+ *                   type: integer
+ *                   description: Dano da habilidade
+ *                 mp_cost:
+ *                   type: integer
+ *                   description: Custo de mana
+ *                 ep_cost:
+ *                   type: integer
+ *                   description: Custo de energia
  *       400:
- *         description: Erro na requisição.
+ *         description: Dados inválidos
  *         content:
  *           application/json:
  *             schema:
@@ -227,8 +280,18 @@ ChampionRoute.get("/:id", championController.getById);
  *                 error:
  *                   type: string
  *                   example: "A skill already exists"
+ *       401:
+ *         description: Token não fornecido ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Token not found. Use format Bearer <token>"
  *       403:
- *         description: Acesso proibido
+ *         description: Sem permissão para acessar o recurso
  *         content:
  *           application/json:
  *             schema:
@@ -238,7 +301,7 @@ ChampionRoute.get("/:id", championController.getById);
  *                   type: string
  *                   example: "You do not have permission to access this resource"
  *       404:
- *         description: Campeão não encontrado.
+ *         description: Campeão ou habilidade não encontrados
  *         content:
  *           application/json:
  *             schema:
@@ -246,9 +309,9 @@ ChampionRoute.get("/:id", championController.getById);
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Champion not found"
+ *                   example: "Champion or skill not found"
  *       500:
- *         description: Erro interno do servidor.
+ *         description: Erro interno do servidor
  *         content:
  *           application/json:
  *             schema:
@@ -265,7 +328,7 @@ ChampionRoute.post("/:id/skills", championController.addSkill);
  * /api/champions:
  *   post:
  *     summary: Criar um novo campeão
- *     description: Cria um novo campeão com as informações fornecidas. O usuário autenticado será automaticamente associado ao campeão criado.
+ *     description: Cria um novo campeão com as informações fornecidas. O usuário autenticado será automaticamente associado ao campeão criado
  *     tags:
  *       - Campeões (Champions)
  *     security:
@@ -282,15 +345,16 @@ ChampionRoute.post("/:id/skills", championController.addSkill);
  *             properties:
  *               name:
  *                 type: string
- *                 description: Nome do campeão.
- *                 example: Thorgar
+ *                 description: Nome do campeão
+ *                 example: "Thorgar"
  *               roleId:
  *                 type: integer
- *                 description: ID da classe do campeão (role).
+ *                 description: ID da classe do campeão (role)
+ *                 minimum: 1
  *                 example: 1
  *     responses:
  *       201:
- *         description: Campeão criado com sucesso.
+ *         description: Campeão criado com sucesso
  *         content:
  *           application/json:
  *             schema:
@@ -314,7 +378,7 @@ ChampionRoute.post("/:id/skills", championController.addSkill);
  *               roleId: 1
  *               guildId: null
  *       400:
- *         description: Erro na requisição (campos obrigatórios ausentes ou inválidos).
+ *         description: Dados inválidos
  *         content:
  *           application/json:
  *             schema:
@@ -324,7 +388,7 @@ ChampionRoute.post("/:id/skills", championController.addSkill);
  *                   type: string
  *                   example: "Falta informação necessária para criar um campeão"
  *       401:
- *         description: Usuário não autenticado.
+ *         description: Token não fornecido ou inválido
  *         content:
  *           application/json:
  *             schema:
@@ -332,9 +396,9 @@ ChampionRoute.post("/:id/skills", championController.addSkill);
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Invalid User"
+ *                   example: "Token not found. Use format Bearer <token>"
  *       500:
- *         description: Erro interno do servidor.
+ *         description: Erro interno do servidor
  *         content:
  *           application/json:
  *             schema:
@@ -351,81 +415,7 @@ ChampionRoute.post("/", championController.create);
  * /api/champions/{id}/status:
  *   patch:
  *     summary: Atualizar o status de um campeão
- *     description: Atualiza o status de um campeão baseado no ID fornecido.
- *     tags:
- *       - Campeões (Champions)
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: Identificador único do campeão
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               strength:
- *                 type: integer
- *                 description: Valor a ser adicionado ao atributo de força física do campeão
- *               dexterity:
- *                 type: integer
- *                 description: Valor a ser adicionado ao atributo de agilidade e precisão do campeão
- *               intelligence:
- *                 type: integer
- *                 description: Valor a ser adicionado ao atributo de inteligência e magia do campeão
- *               vitality:
- *                 type: integer
- *                 description: Valor a ser adicionado ao atributo de resistência e vida máxima do campeão
- *     responses:
- *       200:
- *         description: Status do campeão atualizado com sucesso.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   description: Identificador único do campeão
- *                 strength:
- *                   type: integer
- *                   description: Novo valor de força física do campeão
- *                 dexterity:
- *                   type: integer
- *                   description: Novo valor de agilidade e precisão do campeão
- *                 intelligence:
- *                   type: integer
- *                   description: Novo valor de inteligência e magia do campeão
- *                 vitality:
- *                   type: integer
- *                   description: Novo valor de resistência e vida máxima do campeão
- *       400:
- *         description: Erro na requisição.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Descrição do erro.
- *       404:
- *         description: Campeão não encontrado.
- *       500:
- *         description: Erro interno do servidor.
- */
-ChampionRoute.patch("/:id/status", championController.updateStatus);
-
-/**
- * @swagger
- * /api/champions/{id}:
- *   delete:
- *     summary: Excluir um campeão
- *     description: Remove um campeão do usuário autenticado baseado no ID fornecido.
+ *     description: Atualiza o status de um campeão baseado no ID fornecido
  *     tags:
  *       - Campeões (Champions)
  *     security:
@@ -437,20 +427,55 @@ ChampionRoute.patch("/:id/status", championController.updateStatus);
  *         description: Identificador único do campeão
  *         schema:
  *           type: integer
- *           example: 1
+ *           minimum: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               strength:
+ *                 type: integer
+ *                 description: Valor a ser adicionado ao atributo de força física do campeão
+ *                 minimum: 0
+ *               dexterity:
+ *                 type: integer
+ *                 description: Valor a ser adicionado ao atributo de agilidade e precisão do campeão
+ *                 minimum: 0
+ *               intelligence:
+ *                 type: integer
+ *                 description: Valor a ser adicionado ao atributo de inteligência e magia do campeão
+ *                 minimum: 0
+ *               vitality:
+ *                 type: integer
+ *                 description: Valor a ser adicionado ao atributo de resistência e vida máxima do campeão
+ *                 minimum: 0
  *     responses:
  *       200:
- *         description: Campeão excluído com sucesso.
+ *         description: Status do campeão atualizado com sucesso
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 deleted:
- *                   type: boolean
- *                   example: true
+ *                 id:
+ *                   type: integer
+ *                   description: ID do campeão
+ *                 strength:
+ *                   type: integer
+ *                   description: Novo valor de força física
+ *                 dexterity:
+ *                   type: integer
+ *                   description: Novo valor de agilidade e precisão
+ *                 intelligence:
+ *                   type: integer
+ *                   description: Novo valor de inteligência e magia
+ *                 vitality:
+ *                   type: integer
+ *                   description: Novo valor de resistência e vida máxima
  *       400:
- *         description: Requisição inválida (usuário ou ID do campeão inválido).
+ *         description: Dados inválidos
  *         content:
  *           application/json:
  *             schema:
@@ -458,9 +483,9 @@ ChampionRoute.patch("/:id/status", championController.updateStatus);
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Invalid User"
+ *                   example: "Invalid status values"
  *       401:
- *         description: Usuário não autenticado.
+ *         description: Token não fornecido ou inválido
  *         content:
  *           application/json:
  *             schema:
@@ -468,9 +493,103 @@ ChampionRoute.patch("/:id/status", championController.updateStatus);
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Invalid User"
+ *                   example: "Token not found. Use format Bearer <token>"
+ *       403:
+ *         description: Sem permissão para acessar o recurso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "You do not have permission to access this resource"
+ *       404:
+ *         description: Campeão não encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Champion not found"
  *       500:
- *         description: Erro interno do servidor.
+ *         description: Erro interno do servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+ChampionRoute.patch("/:id/status", championController.updateStatus);
+
+/**
+ * @swagger
+ * /api/champions/{id}:
+ *   delete:
+ *     summary: Excluir um campeão
+ *     description: Remove um campeão do usuário autenticado baseado no ID fornecido
+ *     tags:
+ *       - Campeões (Champions)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Identificador único do campeão
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *     responses:
+ *       204:
+ *         description: Campeão excluído com sucesso
+ *       400:
+ *         description: ID inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid ID"
+ *       401:
+ *         description: Token não fornecido ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Token not found. Use format Bearer <token>"
+ *       403:
+ *         description: Sem permissão para acessar o recurso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "You do not have permission to access this resource"
+ *       404:
+ *         description: Campeão não encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Champion not found"
+ *       500:
+ *         description: Erro interno do servidor
  *         content:
  *           application/json:
  *             schema:
@@ -486,10 +605,10 @@ ChampionRoute.delete("/:id", championController.delete);
  * @swagger
  * /api/champions/{id}/guild/join:
  *   patch:
+ *     summary: Entrar na guilda
+ *     description: Atualiza o campeão adicionando-o à guilda especificada pelo ID
  *     tags:
  *       - Campeões (Champions)
- *     summary: Entrar na guilda
- *     description: Atualiza o campeão adicionando-o à guilda especificada pelo ID.
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -499,6 +618,7 @@ ChampionRoute.delete("/:id", championController.delete);
  *         description: Identificador único do campeão
  *         schema:
  *           type: integer
+ *           minimum: 1
  *     requestBody:
  *       required: true
  *       content:
@@ -510,17 +630,17 @@ ChampionRoute.delete("/:id", championController.delete);
  *             properties:
  *               guildId:
  *                 type: integer
- *                 description: Identificador da guilda a se juntar.
- *                 example: 1
+ *                 description: Identificador da guilda a se juntar
+ *                 minimum: 1
  *     responses:
  *       200:
- *         description: Campeão entrou na guilda com sucesso.
+ *         description: Campeão entrou na guilda com sucesso
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Champion'
  *       400:
- *         description: Erro na requisição.
+ *         description: Dados inválidos
  *         content:
  *           application/json:
  *             schema:
@@ -528,10 +648,9 @@ ChampionRoute.delete("/:id", championController.delete);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Descrição do erro.
  *                   example: "Invalid guild ID"
- *       403:
- *         description: Acesso proibido
+ *       401:
+ *         description: Token não fornecido ou inválido
  *         content:
  *           application/json:
  *             schema:
@@ -539,10 +658,19 @@ ChampionRoute.delete("/:id", championController.delete);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Descrição do erro
+ *                   example: "Token not found. Use format Bearer <token>"
+ *       403:
+ *         description: Sem permissão para acessar o recurso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
  *                   example: "You do not have permission to access this resource"
  *       404:
- *         description: Campeão ou guilda não encontrados.
+ *         description: Campeão ou guilda não encontrados
  *         content:
  *           application/json:
  *             schema:
@@ -550,10 +678,9 @@ ChampionRoute.delete("/:id", championController.delete);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Descrição do erro
  *                   example: "Champion or guild not found"
  *       500:
- *         description: Erro interno do servidor.
+ *         description: Erro interno do servidor
  *         content:
  *           application/json:
  *             schema:
@@ -561,7 +688,6 @@ ChampionRoute.delete("/:id", championController.delete);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Descrição do erro
  *                   example: "Internal server error"
  */
 ChampionRoute.patch("/:id/guild/join", championController.joinGuild);
@@ -570,10 +696,10 @@ ChampionRoute.patch("/:id/guild/join", championController.joinGuild);
  * @swagger
  * /api/champions/{id}/guild/leave:
  *   patch:
+ *     summary: Sair da guilda
+ *     description: Atualiza o status do campeão removendo-o da guilda atual
  *     tags:
  *       - Campeões (Champions)
- *     summary: Sair da guilda
- *     description: Atualiza o status do campeão removendo-o da guilda atual.
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -583,15 +709,24 @@ ChampionRoute.patch("/:id/guild/join", championController.joinGuild);
  *         description: Identificador único do campeão
  *         schema:
  *           type: integer
+ *           minimum: 1
  *     responses:
  *       200:
  *         description: Campeão saiu da guilda com sucesso
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Champion'
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   description: ID do campeão
+ *                 guildId:
+ *                   type: integer
+ *                   nullable: true
+ *                   description: ID da guilda (null após sair)
  *       400:
- *         description: Erro na requisição
+ *         description: Dados inválidos
  *         content:
  *           application/json:
  *             schema:
@@ -599,10 +734,9 @@ ChampionRoute.patch("/:id/guild/join", championController.joinGuild);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Descrição do erro
  *                   example: "Champion is not in a guild"
- *       403:
- *         description: Acesso proibido
+ *       401:
+ *         description: Token não fornecido ou inválido
  *         content:
  *           application/json:
  *             schema:
@@ -610,7 +744,16 @@ ChampionRoute.patch("/:id/guild/join", championController.joinGuild);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Descrição do erro
+ *                   example: "Token not found. Use format Bearer <token>"
+ *       403:
+ *         description: Sem permissão para acessar o recurso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
  *                   example: "You do not have permission to access this resource"
  *       404:
  *         description: Campeão não encontrado
@@ -621,7 +764,6 @@ ChampionRoute.patch("/:id/guild/join", championController.joinGuild);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Descrição do erro
  *                   example: "Champion not found"
  *       500:
  *         description: Erro interno do servidor
@@ -632,7 +774,6 @@ ChampionRoute.patch("/:id/guild/join", championController.joinGuild);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Descrição do erro
  *                   example: "Internal server error"
  */
 ChampionRoute.patch("/:id/guild/leave", championController.leaveGuild);
@@ -642,7 +783,7 @@ ChampionRoute.patch("/:id/guild/leave", championController.leaveGuild);
  * /api/champions/{id}/inventory:
  *   get:
  *     summary: Obter inventário do campeão
- *     description: Retorna todos os itens no inventário do campeão especificado pelo ID. O usuário só pode ver o inventário dos seus próprios campeões.
+ *     description: Retorna todos os itens no inventário do campeão especificado pelo ID. O usuário só pode ver o inventário dos seus próprios campeões
  *     tags:
  *       - Campeões (Champions)
  *     security:
@@ -654,6 +795,7 @@ ChampionRoute.patch("/:id/guild/leave", championController.leaveGuild);
  *         description: Identificador único do campeão
  *         schema:
  *           type: integer
+ *           minimum: 1
  *     responses:
  *       200:
  *         description: Inventário do campeão
@@ -662,9 +804,37 @@ ChampionRoute.patch("/:id/guild/leave", championController.leaveGuild);
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/InventoryItem'
- *       403:
- *         description: Acesso proibido
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: ID do item no inventário
+ *                   championId:
+ *                     type: integer
+ *                     description: ID do campeão dono do item
+ *                   itemId:
+ *                     type: integer
+ *                     description: ID do item
+ *                   quantity:
+ *                     type: integer
+ *                     description: Quantidade do item
+ *                   item:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         description: ID do item
+ *                       name:
+ *                         type: string
+ *                         description: Nome do item
+ *                       description:
+ *                         type: string
+ *                         description: Descrição do item
+ *                       price:
+ *                         type: string
+ *                         description: Preço do item
+ *       401:
+ *         description: Token não fornecido ou inválido
  *         content:
  *           application/json:
  *             schema:
@@ -672,12 +842,37 @@ ChampionRoute.patch("/:id/guild/leave", championController.leaveGuild);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Descrição do erro
+ *                   example: "Token not found. Use format Bearer <token>"
+ *       403:
+ *         description: Sem permissão para acessar o recurso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
  *                   example: "You do not have permission to access this resource"
  *       404:
  *         description: Campeão não encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Champion not found"
  *       500:
  *         description: Erro interno do servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
  */
 ChampionRoute.get("/:id/inventory", championController.getInventory);
 
@@ -686,7 +881,7 @@ ChampionRoute.get("/:id/inventory", championController.getInventory);
  * /api/champions/{id}/inventory:
  *   post:
  *     summary: Atualizar inventário do campeão (Administradores)
- *     description: Atualiza o inventário do campeão adicionando novos itens. Esta operação é restrita a administradores.
+ *     description: Atualiza o inventário do campeão adicionando novos itens. Esta operação é restrita a administradores
  *     tags:
  *       - Campeões (Champions)
  *     security:
@@ -698,6 +893,7 @@ ChampionRoute.get("/:id/inventory", championController.getInventory);
  *         description: Identificador único do campeão
  *         schema:
  *           type: integer
+ *           minimum: 1
  *     requestBody:
  *       required: true
  *       content:
@@ -712,6 +908,7 @@ ChampionRoute.get("/:id/inventory", championController.getInventory);
  *                 type: integer
  *                 description: ID do item a ser adicionado
  *                 example: 1
+ *                 minimum: 1
  *               quantity:
  *                 type: integer
  *                 description: Quantidade do item
@@ -727,7 +924,7 @@ ChampionRoute.get("/:id/inventory", championController.getInventory);
  *               items:
  *                 $ref: '#/components/schemas/InventoryItem'
  *       400:
- *         description: Erro na requisição
+ *         description: Dados inválidos
  *         content:
  *           application/json:
  *             schema:
@@ -735,12 +932,47 @@ ChampionRoute.get("/:id/inventory", championController.getInventory);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Descrição do erro
  *                   example: "Invalid quantity"
+ *       401:
+ *         description: Token não fornecido ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Token not found. Use format Bearer <token>"
+ *       403:
+ *         description: Sem permissão para acessar o recurso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "You do not have permission to access this resource"
  *       404:
- *         description: Campeão não encontrado
+ *         description: Campeão ou item não encontrados
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Champion or item not found"
  *       500:
  *         description: Erro interno do servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
  */
 ChampionRoute.post("/:id/inventory", championController.createInventoryItem);
 
@@ -749,7 +981,7 @@ ChampionRoute.post("/:id/inventory", championController.createInventoryItem);
  * /api/champions/{id}/inventory:
  *   patch:
  *     summary: Atualizar quantidade de itens no inventário (Administradores)
- *     description: Atualiza a quantidade de itens específicos no inventário do campeão. Esta operação é restrita a administradores.
+ *     description: Atualiza a quantidade de itens específicos no inventário do campeão. Esta operação é restrita a administradores
  *     tags:
  *       - Campeões (Champions)
  *     security:
@@ -761,6 +993,7 @@ ChampionRoute.post("/:id/inventory", championController.createInventoryItem);
  *         description: Identificador único do campeão
  *         schema:
  *           type: integer
+ *           minimum: 1
  *     requestBody:
  *       required: true
  *       content:
@@ -774,11 +1007,11 @@ ChampionRoute.post("/:id/inventory", championController.createInventoryItem);
  *               itemId:
  *                 type: integer
  *                 description: ID do item a ser atualizado
- *                 example: 1
+ *                 minimum: 1
  *               quantity:
  *                 type: integer
  *                 description: Nova quantidade do item
- *                 minimum: 0
+ *                 minimum: 1
  *                 example: 10
  *     responses:
  *       200:
@@ -790,7 +1023,7 @@ ChampionRoute.post("/:id/inventory", championController.createInventoryItem);
  *               items:
  *                 $ref: '#/components/schemas/InventoryItem'
  *       400:
- *         description: Erro na requisição
+ *         description: Dados inválidos
  *         content:
  *           application/json:
  *             schema:
@@ -798,12 +1031,47 @@ ChampionRoute.post("/:id/inventory", championController.createInventoryItem);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Descrição do erro
  *                   example: "Invalid quantity"
+ *       401:
+ *         description: Token não fornecido ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Token not found. Use format Bearer <token>"
+ *       403:
+ *         description: Sem permissão para acessar o recurso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "You do not have permission to access this resource"
  *       404:
- *         description: Campeão não encontrado
+ *         description: Campeão ou item não encontrados
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Champion or item not found"
  *       500:
  *         description: Erro interno do servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
  */
 ChampionRoute.patch("/:id/inventory", championController.updateInventoryItem);
 
@@ -812,9 +1080,11 @@ ChampionRoute.patch("/:id/inventory", championController.updateInventoryItem);
  * /api/champions/{id}:
  *   patch:
  *     summary: Atualizar o nome de um campeão
- *     description: Atualiza o nome de um campeão específico.
+ *     description: Atualiza o nome de um campeão específico
  *     tags:
  *       - Campeões (Champions)
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -822,6 +1092,7 @@ ChampionRoute.patch("/:id/inventory", championController.updateInventoryItem);
  *         description: Identificador único do campeão
  *         schema:
  *           type: integer
+ *           minimum: 1
  *     requestBody:
  *       required: true
  *       content:
@@ -841,9 +1112,16 @@ ChampionRoute.patch("/:id/inventory", championController.updateInventoryItem);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Champion'
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   description: ID do campeão
+ *                 name:
+ *                   type: string
+ *                   description: Novo nome do campeão
  *       400:
- *         description: Erro na requisição
+ *         description: Dados inválidos
  *         content:
  *           application/json:
  *             schema:
@@ -851,12 +1129,47 @@ ChampionRoute.patch("/:id/inventory", championController.updateInventoryItem);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Descrição do erro
  *                   example: "Invalid name"
+ *       401:
+ *         description: Token não fornecido ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Token not found. Use format Bearer <token>"
+ *       403:
+ *         description: Sem permissão para acessar o recurso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "You do not have permission to access this resource"
  *       404:
  *         description: Campeão não encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Champion not found"
  *       500:
  *         description: Erro interno do servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
  */
 ChampionRoute.patch("/:id", championController.update);
 

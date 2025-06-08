@@ -134,6 +134,8 @@ GuildRouter.get("/", guildController.getAll);
  *     description: Retorna os detalhes de uma guilda específica pelo seu ID
  *     tags:
  *       - Guildas (Guilds)
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -205,6 +207,8 @@ GuildRouter.get("/:id", guildController.getById);
  *     description: Cria uma nova guilda no sistema
  *     tags:
  *       - Guildas (Guilds)
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -280,6 +284,8 @@ GuildRouter.post("/", guildController.create);
  *     description: Atualiza uma guilda existente no sistema
  *     tags:
  *       - Guildas (Guilds)
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -422,17 +428,14 @@ GuildRouter.patch("/:id", guildController.update);
  *       500:
  *         description: Erro interno do servidor
  *         content:
- *           application/json:             
+ *           application/json:
  *             schema:
  *               type: object
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Internal server error"
  */
 GuildRouter.delete("/:id", guildController.delete);
-
-
 
 export default GuildRouter;
 

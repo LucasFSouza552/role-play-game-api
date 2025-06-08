@@ -80,7 +80,7 @@ export class GuildController implements ControllerInterface {
 
 			const guild = {...req.body, id: guildId};
 
-			if (!guild.name) {
+			if (!guild.name && !guild.level) {
 				throw new ThrowsError("Missing information to update guild", 400);
 			}
 

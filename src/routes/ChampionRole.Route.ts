@@ -13,6 +13,8 @@ const championRoleController = new ChampionRoleController();
  *     description: Retorna uma lista das classes
  *     tags:
  *       - Classes (Roles)
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: name
@@ -61,13 +63,65 @@ const championRoleController = new ChampionRoleController();
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Role'
+ *               type: object
+ *               properties:
+ *                 roles:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Role'
+ *                 length:
+ *                   type: integer
+ *                   description: Total de classes encontradas
  *       400:
- *         description: Invalid ID
+ *         description: Parâmetros de filtro inválidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Limit must be between 0 and 100"
+ *       401:
+ *         description: Token não fornecido ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Token not found. Use format Bearer <token>"
+ *       403:
+ *         description: Sem permissão para acessar o recurso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "You do not have permission to access this resource"
+ *       404:
+ *         description: Nenhuma classe encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Roles not found"
  *       500:
- *         description: Internal server error
+ *         description: Erro interno do servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
  */
 ChampionRoleRoute.get("/", championRoleController.getAll);
 
@@ -76,16 +130,19 @@ ChampionRoleRoute.get("/", championRoleController.getAll);
  * /api/roles/{id}:
  *   get:
  *     summary: Recuperar uma classe específica
- *     description: Retorna uma classe baseada no ID fornecido.
+ *     description: Retorna uma classe baseada no ID fornecido
  *     tags:
  *       - Classes (Roles)
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         description: Identificador único da classe
  *         schema:
- *           type: string
+ *           type: integer
+ *           minimum: 1
  *     responses:
  *       200:
  *         description: Detalhes da classe
@@ -93,9 +150,38 @@ ChampionRoleRoute.get("/", championRoleController.getAll);
  *           application/json:
  *             schema:
  *               type: object
- *               $ref: '#/components/schemas/Role'
+ *       400:
+ *         description: ID inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Invalid ID"
+ *       401:
+ *         description: Token não fornecido ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Token not found. Use format Bearer <token>"
+ *       403:
+ *         description: Sem permissão para acessar o recurso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "You do not have permission to access this resource"
  *       404:
- *         description: Class not found
+ *         description: Classe não encontrada
  *         content:
  *           application/json:
  *             schema:
@@ -103,10 +189,9 @@ ChampionRoleRoute.get("/", championRoleController.getAll);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Error message
- *                   example: "Class not found"
+ *                   example: "Role not found"
  *       500:
- *         description: Internal server error
+ *         description: Erro interno do servidor
  *         content:
  *           application/json:
  *             schema:
@@ -114,7 +199,6 @@ ChampionRoleRoute.get("/", championRoleController.getAll);
  *               properties:
  *                 error:
  *                   type: string
- *                   description: Error message
  *                   example: "Internal server error"
  */
 ChampionRoleRoute.get("/:id", championRoleController.getById);
@@ -124,7 +208,7 @@ ChampionRoleRoute.get("/:id", championRoleController.getById);
  * /api/roles:
  *   post:
  *     summary: Criar nova classe
- *     description: Cria uma nova classe para campeões.
+ *     description: Cria uma nova classe para campeões
  *     tags:
  *       - Classes (Roles)
  *     security:
@@ -178,18 +262,37 @@ ChampionRoleRoute.get("/:id", championRoleController.getById);
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Campos obrigatórios faltando"
- *                 missingFields:
- *                   type: array
- *                   items:
- *                     type: string
- *                   example: ["hp", "mp"]
+ *                   example: "Missing required fields"
  *       401:
- *         description: Não autorizado
+ *         description: Token não fornecido ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Token not found. Use format Bearer <token>"
  *       403:
- *         description: Acesso proibido
+ *         description: Sem permissão para acessar o recurso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "You do not have permission to access this resource"
  *       500:
  *         description: Erro interno do servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
  */
 ChampionRoleRoute.post("/", championRoleController.create);
 
@@ -198,7 +301,7 @@ ChampionRoleRoute.post("/", championRoleController.create);
  * /api/roles:
  *   patch:
  *     summary: Atualizar classe
- *     description: Atualiza uma classe existente.
+ *     description: Atualiza uma classe existente
  *     tags:
  *       - Classes (Roles)
  *     security:
@@ -224,6 +327,18 @@ ChampionRoleRoute.post("/", championRoleController.create);
  *                 type: string
  *                 description: Nova descrição da classe
  *                 example: "Guerreiro especializado em combate avançado"
+ *               hp:
+ *                 type: integer
+ *                 description: Novos pontos de vida base da classe
+ *                 example: 120
+ *               mp:
+ *                 type: integer
+ *                 description: Novos pontos de mana base da classe
+ *                 example: 60
+ *               ep:
+ *                 type: integer
+ *                 description: Novos pontos de energia base da classe
+ *                 example: 90
  *     responses:
  *       200:
  *         description: Classe atualizada com sucesso
@@ -233,14 +348,54 @@ ChampionRoleRoute.post("/", championRoleController.create);
  *               $ref: '#/components/schemas/Role'
  *       400:
  *         description: Dados inválidos fornecidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Missing required fields"
  *       401:
- *         description: Não autorizado
+ *         description: Token não fornecido ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Token not found. Use format Bearer <token>"
  *       403:
- *         description: Acesso proibido
+ *         description: Sem permissão para acessar o recurso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "You do not have permission to access this resource"
  *       404:
  *         description: Classe não encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Role not found"
  *       500:
  *         description: Erro interno do servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
  */
 ChampionRoleRoute.patch("/", championRoleController.update);
 
@@ -249,7 +404,7 @@ ChampionRoleRoute.patch("/", championRoleController.update);
  * /api/roles/{id}:
  *   delete:
  *     summary: Excluir classe
- *     description: Remove uma classe existente pelo ID.
+ *     description: Remove uma classe existente pelo ID
  *     tags:
  *       - Classes (Roles)
  *     security:
@@ -258,23 +413,15 @@ ChampionRoleRoute.patch("/", championRoleController.update);
  *       - in: path
  *         name: id
  *         required: true
+ *         description: ID da classe a ser excluída
  *         schema:
  *           type: integer
- *         description: ID da classe a ser excluída
- *         example: 1
+ *           minimum: 1
  *     responses:
- *       200:
+ *       204:
  *         description: Classe excluída com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Role deleted successfully
  *       400:
- *         description: Dados inválidos fornecidos
+ *         description: ID inválido
  *         content:
  *           application/json:
  *             schema:
@@ -282,11 +429,27 @@ ChampionRoleRoute.patch("/", championRoleController.update);
  *               properties:
  *                 error:
  *                   type: string
- *                   example: Invalid ID
+ *                   example: "Invalid ID"
  *       401:
- *         description: Não autorizado
+ *         description: Token não fornecido ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Token not found. Use format Bearer <token>"
  *       403:
- *         description: Acesso proibido
+ *         description: Sem permissão para acessar o recurso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "You do not have permission to access this resource"
  *       404:
  *         description: Classe não encontrada
  *         content:
@@ -296,9 +459,17 @@ ChampionRoleRoute.patch("/", championRoleController.update);
  *               properties:
  *                 error:
  *                   type: string
- *                   example: Role not found
+ *                   example: "Role not found"
  *       500:
  *         description: Erro interno do servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error"
  */
 ChampionRoleRoute.delete("/:id", championRoleController.delete);
 
