@@ -44,7 +44,7 @@ export class ChampionController implements ControllerInterface {
 			const userId: number = req.userId as number;
 
 			if (!championId) {
-				new ThrowsError("Invalid champion ID", 400);
+				throw new ThrowsError("Invalid champion ID", 400);
 			}
 
 			const champion: ChampionDTO = await championService.getById(championId, userId);
@@ -334,20 +334,20 @@ export class ChampionController implements ControllerInterface {
 			const userId: number = req.userId as number;
 
 			if (!championId) {
-				new ThrowsError("Invalid champion ID", 400);
+				throw new ThrowsError("Invalid champion ID", 400);
 			}
 
 			if (!userId) {
-				new ThrowsError("Invalid user", 400);
+				throw new ThrowsError("Invalid user", 400);
 			}
 
 			const championExists = await championService.getById(championId, userId);
 			if (!championExists) {
-				new ThrowsError("Champion not found", 404);
+				throw new ThrowsError("Champion not found", 404);
 			}
 
 			if (!championExists.guildId) {
-				new ThrowsError("The champion does not belong to any guild", 400);
+				throw new ThrowsError("The champion does not belong to any guild", 400);
 			}
 
 			const updatedChampionData: updateChampionDTO = ChampionMapper.mapChampionToUpdateDTO({
@@ -430,19 +430,19 @@ export class ChampionController implements ControllerInterface {
 			const { itemId, quantity, price } = req.body;
 
 			if (!championId) {
-				new ThrowsError("Invalid champion ID", 400);
+				throw new ThrowsError("Invalid champion ID", 400);
 			}
 
 			if (!itemId) {
-				new ThrowsError("Invalid item ID", 400);
+				throw new ThrowsError("Invalid item ID", 400);
 			}
 
 			if (price === undefined || price < 0) {
-				new ThrowsError("Invalid price", 400);
+				throw new ThrowsError("Invalid price", 400);
 			}
 
 			if (!quantity || isNaN(quantity) || quantity < 0) {
-				new ThrowsError("Invalid quantity", 400);
+				throw new ThrowsError("Invalid quantity", 400);
 			}
 
 			const inventory = await championService.updateInventoryItem(
